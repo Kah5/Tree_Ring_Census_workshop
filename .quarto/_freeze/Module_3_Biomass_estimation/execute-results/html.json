@@ -1,0 +1,15 @@
+{
+  "hash": "f6d7303670961dad1547bc9b047d4471",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Module 3: Estimating Biomass From Tree Ring Dat\"\nauthor: \"Andria Dawson and Kelly Heilman\"\nformat:\n  html:\n    code-fold: true\n---\n\n\n\n\n# Biomass estimation from tree ring data and forest census data\n\n## Estimating Forest biomass for trees at the time of census\n\n### using allodb package\n\n\n\n\n::: {.cell}\n::: {.cell-output .cell-output-stderr}\n\n```\nSkipping install of 'allodb' from a github remote, the SHA1 (1cfe846e) has not changed since last install.\n  Use `force = TRUE` to force installation\n```\n\n\n:::\n:::\n\n\n\n\n## Estimating Forest biomass from tree ring time-series\n\n### Step 1: Back-calculate tree size over time (no uncertainty)\n\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n### Step 2: Use AlloDB to estimate Biomass for each tree using the back-calculated tree size in each year\n\n### Step 3: visualizing biomass over time (with no uncertainty)\n\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n## Converting forest biomass to carbon using carbon fractions\n\nThe simplest way of estimating Carbon from tree-level biomass is to assume that the \"carbon fraction,\" that is the fraction of the tree's weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\n\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.\n\n# issues with estimating biomass this way:\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

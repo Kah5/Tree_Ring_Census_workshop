@@ -1,0 +1,387 @@
+[
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#load-packages-to-be-used",
+    "href": "Module_4_RingWidth_only_model.html#load-packages-to-be-used",
+    "title": "Module 4: Ring width only model",
+    "section": "Load packages to be used",
+    "text": "Load packages to be used\nWe estimate the parameters of this state-space model in a program called stan which interfaces to R via a package called rstan (cmdstan is another package that is used.)\n\n\nCode\nlibrary(rstan)\n\n\nLoading required package: StanHeaders\n\n\nLoading required package: ggplot2\n\n\nrstan (Version 2.21.7, GitRev: 2e1f913d3ca3)\n\n\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#running-the-model-example-for-a-short-run",
+    "href": "Module_4_RingWidth_only_model.html#running-the-model-example-for-a-short-run",
+    "title": "Module 4: Ring width only model",
+    "section": "Running the model: Example for a short run",
+    "text": "Running the model: Example for a short run\n\n\nCode\n# run a version with a small # of iterations here to show the output",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#the-model-outputs",
+    "href": "Module_4_RingWidth_only_model.html#the-model-outputs",
+    "title": "Module 4: Ring width only model",
+    "section": "The model outputs",
+    "text": "The model outputs\n\n\nCode\n# load the Full TR only model outputs\n# put some example exploration of the model outputs here",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#model-checking-in-stan",
+    "href": "Module_4_RingWidth_only_model.html#model-checking-in-stan",
+    "title": "Module 4: Ring width only model",
+    "section": "Model Checking in stan:",
+    "text": "Model Checking in stan:\n\n\nCode\n# traceplots\n# checking model diagnostics",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#model-validation",
+    "href": "Module_4_RingWidth_only_model.html#model-validation",
+    "title": "Module 4: Ring width only model",
+    "section": "Model Validation:",
+    "text": "Model Validation:\n\n\nCode\n# comparing estimates of diameter increment to observations",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#convert-tree-diameters-to-agb",
+    "href": "Module_4_RingWidth_only_model.html#convert-tree-diameters-to-agb",
+    "title": "Module 4: Ring width only model",
+    "section": "convert tree diameters to AGB",
+    "text": "convert tree diameters to AGB\n\n\nCode\n# code to estimate biomass",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_4_RingWidth_only_model.html#plot-of-agb-and-agbi-with-uncertainty",
+    "href": "Module_4_RingWidth_only_model.html#plot-of-agb-and-agbi-with-uncertainty",
+    "title": "Module 4: Ring width only model",
+    "section": "Plot of AGB and AGBI with uncertainty",
+    "text": "Plot of AGB and AGBI with uncertainty\n\n\nCode\n# plot total and by taxa",
+    "crumbs": [
+      "Home",
+      "Module 4: Ring width only model"
+    ]
+  },
+  {
+    "objectID": "Module_5_RingWidth_and_Census.html#load-packages-to-be-used",
+    "href": "Module_5_RingWidth_and_Census.html#load-packages-to-be-used",
+    "title": "Module 5: Ring Width and Census Data",
+    "section": "Load packages to be used",
+    "text": "Load packages to be used\nWe estimate the parameters of this state-space model in a program called stan which interfaces to R via a package called rstan (cmdstan is another package that is used.)\n\n\nCode\nlibrary(rstan)\n\n\nLoading required package: StanHeaders\n\n\nLoading required package: ggplot2\n\n\nrstan (Version 2.21.7, GitRev: 2e1f913d3ca3)\n\n\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)",
+    "crumbs": [
+      "Home",
+      "Module 5: Ring Width and Census Data"
+    ]
+  },
+  {
+    "objectID": "Module_5_RingWidth_and_Census.html#running-the-model-example-for-a-short-run",
+    "href": "Module_5_RingWidth_and_Census.html#running-the-model-example-for-a-short-run",
+    "title": "Module 5: Ring Width and Census Data",
+    "section": "Running the model: Example for a short run",
+    "text": "Running the model: Example for a short run\n\n\nCode\n# run a version with a small # of iterations here to show the output",
+    "crumbs": [
+      "Home",
+      "Module 5: Ring Width and Census Data"
+    ]
+  },
+  {
+    "objectID": "Module_5_RingWidth_and_Census.html#the-model-outputs",
+    "href": "Module_5_RingWidth_and_Census.html#the-model-outputs",
+    "title": "Module 5: Ring Width and Census Data",
+    "section": "The model outputs",
+    "text": "The model outputs\n\n\nCode\n# load the Full TR only model outputs\n# put some example exploration of the model outputs here",
+    "crumbs": [
+      "Home",
+      "Module 5: Ring Width and Census Data"
+    ]
+  },
+  {
+    "objectID": "Module_5_RingWidth_and_Census.html#convert-tree-diameters-to-agb",
+    "href": "Module_5_RingWidth_and_Census.html#convert-tree-diameters-to-agb",
+    "title": "Module 5: Ring Width and Census Data",
+    "section": "convert tree diameters to AGB",
+    "text": "convert tree diameters to AGB\n\n\nCode\n# code to estimate biomass",
+    "crumbs": [
+      "Home",
+      "Module 5: Ring Width and Census Data"
+    ]
+  },
+  {
+    "objectID": "Module_5_RingWidth_and_Census.html#plot-of-agb-and-agbi-with-uncertainty",
+    "href": "Module_5_RingWidth_and_Census.html#plot-of-agb-and-agbi-with-uncertainty",
+    "title": "Module 5: Ring Width and Census Data",
+    "section": "Plot of AGB and AGBI with uncertainty",
+    "text": "Plot of AGB and AGBI with uncertainty\n\n\nCode\n# plot total and by taxa",
+    "crumbs": [
+      "Home",
+      "Module 5: Ring Width and Census Data"
+    ]
+  },
+  {
+    "objectID": "Module_3_Biomass_estimation.html",
+    "href": "Module_3_Biomass_estimation.html",
+    "title": "Module 3: Estimating Biomass From Tree Ring Dat",
+    "section": "",
+    "text": "Skipping install of 'allodb' from a github remote, the SHA1 (1cfe846e) has not changed since last install.\n  Use `force = TRUE` to force installation\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe simplest way of estimating Carbon from tree-level biomass is to assume that the “carbon fraction,” that is the fraction of the tree’s weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.",
+    "crumbs": [
+      "Home",
+      "Module 3: Estimating Biomass From Tree Ring Dat"
+    ]
+  },
+  {
+    "objectID": "Module_3_Biomass_estimation.html#estimating-forest-biomass-for-trees-at-the-time-of-census",
+    "href": "Module_3_Biomass_estimation.html#estimating-forest-biomass-for-trees-at-the-time-of-census",
+    "title": "Module 3: Estimating Biomass From Tree Ring Dat",
+    "section": "",
+    "text": "Skipping install of 'allodb' from a github remote, the SHA1 (1cfe846e) has not changed since last install.\n  Use `force = TRUE` to force installation",
+    "crumbs": [
+      "Home",
+      "Module 3: Estimating Biomass From Tree Ring Dat"
+    ]
+  },
+  {
+    "objectID": "Module_3_Biomass_estimation.html#converting-forest-biomass-to-carbon-using-carbon-fractions",
+    "href": "Module_3_Biomass_estimation.html#converting-forest-biomass-to-carbon-using-carbon-fractions",
+    "title": "Module 3: Estimating Biomass From Tree Ring Dat",
+    "section": "",
+    "text": "The simplest way of estimating Carbon from tree-level biomass is to assume that the “carbon fraction,” that is the fraction of the tree’s weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.",
+    "crumbs": [
+      "Home",
+      "Module 3: Estimating Biomass From Tree Ring Dat"
+    ]
+  },
+  {
+    "objectID": "Module_6_Comparing_Biomass_Estimates.html",
+    "href": "Module_6_Comparing_Biomass_Estimates.html",
+    "title": "Module 6: Comparing RW only and RW + Census model",
+    "section": "",
+    "text": "Read in the outputs\nCompare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\nCompare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\nRelating AGBI estimates to climate drivers",
+    "crumbs": [
+      "Home",
+      "Module 6: Comparing RW only and RW + Census model"
+    ]
+  },
+  {
+    "objectID": "Module_6_Comparing_Biomass_Estimates.html#outline",
+    "href": "Module_6_Comparing_Biomass_Estimates.html#outline",
+    "title": "Module 6: Comparing RW only and RW + Census model",
+    "section": "",
+    "text": "Read in the outputs\nCompare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\nCompare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\nRelating AGBI estimates to climate drivers",
+    "crumbs": [
+      "Home",
+      "Module 6: Comparing RW only and RW + Census model"
+    ]
+  },
+  {
+    "objectID": "Module_7_TR_and_Census_model_w_climate.html#outline",
+    "href": "Module_7_TR_and_Census_model_w_climate.html#outline",
+    "title": "Module 7: Ring Width and Census model w/climate",
+    "section": "Outline",
+    "text": "Outline\n\nread in formatted climate data (or format here)\nRun STAN model with climate regression\nVisualize outputs\nPlot biomass estimates",
+    "crumbs": [
+      "Home",
+      "Module 7: Ring Width and Census model w/climate"
+    ]
+  },
+  {
+    "objectID": "Module_7_TR_and_Census_model_w_climate.html#load-packages-to-be-used",
+    "href": "Module_7_TR_and_Census_model_w_climate.html#load-packages-to-be-used",
+    "title": "Module 7: Ring Width and Census model w/climate",
+    "section": "Load packages to be used",
+    "text": "Load packages to be used\nWe estimate the parameters of this state-space model in a program called stan which interfaces to R via a package called rstan (cmdstan is another package that is used.)\n\n\nCode\nlibrary(rstan)\n\n\nLoading required package: StanHeaders\n\n\nLoading required package: ggplot2\n\n\nrstan (Version 2.21.7, GitRev: 2e1f913d3ca3)\n\n\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)",
+    "crumbs": [
+      "Home",
+      "Module 7: Ring Width and Census model w/climate"
+    ]
+  },
+  {
+    "objectID": "Module_7_TR_and_Census_model_w_climate.html#running-the-model-example-for-a-short-run",
+    "href": "Module_7_TR_and_Census_model_w_climate.html#running-the-model-example-for-a-short-run",
+    "title": "Module 7: Ring Width and Census model w/climate",
+    "section": "Running the model: Example for a short run",
+    "text": "Running the model: Example for a short run\n\n\nCode\n# run a version with a small # of iterations here to show the output",
+    "crumbs": [
+      "Home",
+      "Module 7: Ring Width and Census model w/climate"
+    ]
+  },
+  {
+    "objectID": "Module_7_TR_and_Census_model_w_climate.html#the-model-outputs",
+    "href": "Module_7_TR_and_Census_model_w_climate.html#the-model-outputs",
+    "title": "Module 7: Ring Width and Census model w/climate",
+    "section": "The model outputs",
+    "text": "The model outputs\n\n\nCode\n# load the Full TR only model outputs\n# put some example exploration of the model outputs here",
+    "crumbs": [
+      "Home",
+      "Module 7: Ring Width and Census model w/climate"
+    ]
+  },
+  {
+    "objectID": "Module_7_TR_and_Census_model_w_climate.html#convert-tree-diameters-to-agb",
+    "href": "Module_7_TR_and_Census_model_w_climate.html#convert-tree-diameters-to-agb",
+    "title": "Module 7: Ring Width and Census model w/climate",
+    "section": "convert tree diameters to AGB",
+    "text": "convert tree diameters to AGB\n\n\nCode\n# code to estimate biomass",
+    "crumbs": [
+      "Home",
+      "Module 7: Ring Width and Census model w/climate"
+    ]
+  },
+  {
+    "objectID": "Module_7_TR_and_Census_model_w_climate.html#plot-of-agb-and-agbi-with-uncertainty",
+    "href": "Module_7_TR_and_Census_model_w_climate.html#plot-of-agb-and-agbi-with-uncertainty",
+    "title": "Module 7: Ring Width and Census model w/climate",
+    "section": "Plot of AGB and AGBI with uncertainty",
+    "text": "Plot of AGB and AGBI with uncertainty\n\n\nCode\n# plot total and by taxa",
+    "crumbs": [
+      "Home",
+      "Module 7: Ring Width and Census model w/climate"
+    ]
+  },
+  {
+    "objectID": "Module_1_Introduction.html",
+    "href": "Module_1_Introduction.html",
+    "title": "Module 1: Introduction",
+    "section": "",
+    "text": "Tree Ring data have long bee\n\n\n\nIn this workshop we will introduce and work with a Bayesian statistical modelling framework to:\n\nuse tree-ring data to estimate annual tree diameter growth with uncertainty\nintegrate tree-ring data with forest census data to estimate annual growth for all trees on the plot (i.e. those with and without tree ring data)\nshow how this approach can directly link annual growth to climate and other drivers, and\nscale annual growth to carbon accumulation. \n\nWe will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.\n\n\n\n\n\nManaging forests to increase carbon uptake and storage is among the proposed carbon drawdown strategies. Tree-ring data makes it possible to quantify annual tree growth and carbon accumulation. While annually resolved, determining forest carbon accumulation from tree-rings requires complete sampling, or a set of assumptions that limit reliability. Tree-ring datasets are also subject to the fading record problem– they do not capture mortality processes.\nForest censuses, which re-measure individual trees over time, (e.g. Nationwide forest inventories (NFIs), ForestGEO plots, etc), provide snapshots of stand-level dynamics (forest growth, mortality, and recruitment processes) and thus forest carbon. This census data often lacks the annual temporal resolution needed to understand patterns and attribute forest carbon accumulation drivers. Participants of this workshop will learn how tree ring data alone, and tree ring data in combination with forest census data can be used to estimate forest carbon.\n\n\n\n\n\n\nEstimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time\n\n\n\n\n\nIntroduce the state-space approach that links tree ring data with forest census data\n\n\n\n\n\nIntroduce Bayesian statistical techniques using a linear regression",
+    "crumbs": [
+      "Home",
+      "Module 1: Introduction"
+    ]
+  },
+  {
+    "objectID": "Module_1_Introduction.html#motivation",
+    "href": "Module_1_Introduction.html#motivation",
+    "title": "Module 1: Introduction",
+    "section": "",
+    "text": "Tree Ring data have long bee",
+    "crumbs": [
+      "Home",
+      "Module 1: Introduction"
+    ]
+  },
+  {
+    "objectID": "Module_1_Introduction.html#objectives",
+    "href": "Module_1_Introduction.html#objectives",
+    "title": "Module 1: Introduction",
+    "section": "",
+    "text": "In this workshop we will introduce and work with a Bayesian statistical modelling framework to:\n\nuse tree-ring data to estimate annual tree diameter growth with uncertainty\nintegrate tree-ring data with forest census data to estimate annual growth for all trees on the plot (i.e. those with and without tree ring data)\nshow how this approach can directly link annual growth to climate and other drivers, and\nscale annual growth to carbon accumulation. \n\nWe will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.",
+    "crumbs": [
+      "Home",
+      "Module 1: Introduction"
+    ]
+  },
+  {
+    "objectID": "Module_1_Introduction.html#motivation-1",
+    "href": "Module_1_Introduction.html#motivation-1",
+    "title": "Module 1: Introduction",
+    "section": "",
+    "text": "Managing forests to increase carbon uptake and storage is among the proposed carbon drawdown strategies. Tree-ring data makes it possible to quantify annual tree growth and carbon accumulation. While annually resolved, determining forest carbon accumulation from tree-rings requires complete sampling, or a set of assumptions that limit reliability. Tree-ring datasets are also subject to the fading record problem– they do not capture mortality processes.\nForest censuses, which re-measure individual trees over time, (e.g. Nationwide forest inventories (NFIs), ForestGEO plots, etc), provide snapshots of stand-level dynamics (forest growth, mortality, and recruitment processes) and thus forest carbon. This census data often lacks the annual temporal resolution needed to understand patterns and attribute forest carbon accumulation drivers. Participants of this workshop will learn how tree ring data alone, and tree ring data in combination with forest census data can be used to estimate forest carbon.\n\n\n\n\n\n\nEstimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time",
+    "crumbs": [
+      "Home",
+      "Module 1: Introduction"
+    ]
+  },
+  {
+    "objectID": "Module_1_Introduction.html#introduction-to-the-tutorial-and-state-space-model",
+    "href": "Module_1_Introduction.html#introduction-to-the-tutorial-and-state-space-model",
+    "title": "Module 1: Introduction",
+    "section": "",
+    "text": "Introduce the state-space approach that links tree ring data with forest census data",
+    "crumbs": [
+      "Home",
+      "Module 1: Introduction"
+    ]
+  },
+  {
+    "objectID": "Module_1_Introduction.html#introduction-to-bayesian-statistics",
+    "href": "Module_1_Introduction.html#introduction-to-bayesian-statistics",
+    "title": "Module 1: Introduction",
+    "section": "",
+    "text": "Introduce Bayesian statistical techniques using a linear regression",
+    "crumbs": [
+      "Home",
+      "Module 1: Introduction"
+    ]
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "This workshop was developed by Kelly A. Heilman and Andria Dawson in preparation for a workshop associated with the World Dendro conference in Zambia in July-August of 2025",
+    "crumbs": [
+      "Home",
+      "About"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "State_space_workshop_2025",
+    "section": "",
+    "text": "Welcome to the Workshop: “Forest growth and carbon with uncertainty from tree-rings and census data”\nThis repository contains the material for the Workshop “Forest growth and carbon with uncertainty from tree-rings and census data” taught at World Dendro on Sunday, 27th July 2025.\nObjectives\nIn this workshop we will introduce and work with a Bayesian statistical modelling framework to:\n\nuse tree-ring data to estimate annual tree diameter growth with uncertainty\nintegrate tree-ring data with forest census data to estimate annual growth for all trees on the plot (i.e. those with and without tree ring data)\nshow how this approach can directly link annual growth to climate and other drivers, and\nscale annual growth to carbon accumulation. \n\nWe will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.\n\n\nSchedule\n\n\n\n\n\n\n\n\nTime\nTopic\nPresenter\n\n\n\n\n9:00 - 10:00\nModule 1: Introduction\n\n\n\n10:00 - 10:30\nModule 2: Tree Ring and Census Data\n\n\n\n10:30 - 11:00\nModule 3: Biomass Estimation\n\n\n\n11:00 - 11:30\nModule 4: Tree ring only model\n\n\n\n11:30 - 12:00\nModule 5: Tree ring and forest census model\n\n\n\n12:00 - 12:30\nModule 6: Comparing Biomass Estimates\n\n\n\n12:30 - 1:30\nLunch break\n\n\n\n1:30 - 2:00\nModule 7: Adding climate variables into the State-Space Model\n\n\n\n\n\n\nIn preparation for the workshop\nIf you would like to follow along and run each module in R, you should:\n\nmake a posit cloud account",
+    "crumbs": [
+      "Home",
+      "State_space_workshop_2025"
+    ]
+  },
+  {
+    "objectID": "Module_2_Data.html",
+    "href": "Module_2_Data.html",
+    "title": "Module 2: Data: Tree Ring and Census",
+    "section": "",
+    "text": "── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──\n✔ tibble  3.2.1     ✔ dplyr   1.1.4\n✔ tidyr   1.3.1     ✔ stringr 1.5.1\n✔ readr   2.1.3     ✔ forcats 0.5.2\n✔ purrr   1.0.2     \n\n\nWarning: package 'tidyr' was built under R version 4.2.3\n\n\nWarning: package 'dplyr' was built under R version 4.2.3\n\n\nWarning: package 'stringr' was built under R version 4.2.3\n\n\n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nLoading required package: StanHeaders\n\nrstan (Version 2.21.7, GitRev: 2e1f913d3ca3)\n\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)\n\n\nAttaching package: 'rstan'\n\n\nThe following object is masked from 'package:tidyr':\n\n    extract\n\n\n\n\n\n\n\n\nNotes on running this tutorial\n\n\n\n\n\nBoxes like this one above contain R code to run this analysis. Clicking the arrow character in the upper right corner of the box will expand or collapse the contents of the box.",
+    "crumbs": [
+      "Home",
+      "Module 2: Data: Tree Ring and Census"
+    ]
+  },
+  {
+    "objectID": "Module_2_Data.html#load-packages-to-be-used",
+    "href": "Module_2_Data.html#load-packages-to-be-used",
+    "title": "Module 2: Data: Tree Ring and Census",
+    "section": "",
+    "text": "── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──\n✔ tibble  3.2.1     ✔ dplyr   1.1.4\n✔ tidyr   1.3.1     ✔ stringr 1.5.1\n✔ readr   2.1.3     ✔ forcats 0.5.2\n✔ purrr   1.0.2     \n\n\nWarning: package 'tidyr' was built under R version 4.2.3\n\n\nWarning: package 'dplyr' was built under R version 4.2.3\n\n\nWarning: package 'stringr' was built under R version 4.2.3\n\n\n── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──\n✖ dplyr::filter() masks stats::filter()\n✖ dplyr::lag()    masks stats::lag()\nLoading required package: StanHeaders\n\nrstan (Version 2.21.7, GitRev: 2e1f913d3ca3)\n\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)\n\n\nAttaching package: 'rstan'\n\n\nThe following object is masked from 'package:tidyr':\n\n    extract\n\n\n\n\n\n\n\n\nNotes on running this tutorial\n\n\n\n\n\nBoxes like this one above contain R code to run this analysis. Clicking the arrow character in the upper right corner of the box will expand or collapse the contents of the box.",
+    "crumbs": [
+      "Home",
+      "Module 2: Data: Tree Ring and Census"
+    ]
+  },
+  {
+    "objectID": "Module_2_Data.html#tree-ring-data",
+    "href": "Module_2_Data.html#tree-ring-data",
+    "title": "Module 2: Data: Tree Ring and Census",
+    "section": "Tree Ring Data",
+    "text": "Tree Ring Data\n\nHarvard Forest tree ring data\nThere are two foundational datasets used in the processing of these biomass estimates. The first is a tree ring dataset collected by the Harvard Forest Research Area in 2012. Three 20m plots were measured following a double-nested design. The following species were included in the final ring width dataset:\n\nACRU = red maple (Acer rubrum)\nBEAL = yellow birch (Betula alleghaniensis)\nBELE = sweet birch (Betula lenta)\nFAGR = American beech (Fagus grandifolia)\nHAVI = Witch hazel (Hamamelis virginiana)\nPIST = Eastern white pine (Pinus strobus)\nQURU = Northern red oak (Quercus rubra)\nQUVE = Black oak (Quercus velutina)\nTSCA = Eastern hemlock (Tsuga canadensis)\n\nHarvard forest tree ring data samples were collected\nCitation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B. Poulter, and A. Hessl. Comparing tree-ring and permanent plot estimates of aboveground net primary production in three eastern us forests. Ecosphere, 7(9), 2016.\n\nWe downloaded the raw data for Harvard Forest Tree ring data for you\nVisualize the pre-formatted HF tree ring data below\n\n\n\nCode\n# code to plot the tree ring data, by species",
+    "crumbs": [
+      "Home",
+      "Module 2: Data: Tree Ring and Census"
+    ]
+  },
+  {
+    "objectID": "Module_2_Data.html#harvard-forest-census-data",
+    "href": "Module_2_Data.html#harvard-forest-census-data",
+    "title": "Module 2: Data: Tree Ring and Census",
+    "section": "Harvard Forest Census Data",
+    "text": "Harvard Forest Census Data\nThe second dataset for this site includes the census data measured for the Lyford Plots, which is available on the Harvard Forest data archive website. Censuses were conducted in 1962, 1969, 1975, 1987-1991, 2001, and 2011 and mapped all trees with DBH greater than 5 cm. in a mapped area covering 2.88 ha. The three ring-width plots include only a fraction of this area, and, therefore, we determined which census trees were located within the plot areas and considered only those trees for the model.\n\n\nCode\n# code to plot census data, by species",
+    "crumbs": [
+      "Home",
+      "Module 2: Data: Tree Ring and Census"
+    ]
+  }
+]

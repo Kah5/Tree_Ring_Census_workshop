@@ -1,0 +1,15 @@
+{
+  "hash": "debdddbfe8dd8b18657cd537325efb51",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Module 5: Ring Width and Census Data\"\nauthor: \"Andria Dawson and Kelly Heilman\"\nformat:\n  html:\n    code-fold: true\n---\n\n\n\n\n## State-space model for estimating biomass at HF with only tree ring time-series and the diameter at time of coring\n\n## Load packages to be used\nWe estimate the parameters of this state-space model in a program called `stan` which interfaces to `R` via a package called `rstan` (`cmdstan` is another package that is used.)\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(rstan)\n```\n\n::: {.cell-output .cell-output-stderr}\n\n```\nLoading required package: StanHeaders\n```\n\n\n:::\n\n::: {.cell-output .cell-output-stderr}\n\n```\nLoading required package: ggplot2\n```\n\n\n:::\n\n::: {.cell-output .cell-output-stderr}\n\n```\nrstan (Version 2.21.7, GitRev: 2e1f913d3ca3)\n```\n\n\n:::\n\n::: {.cell-output .cell-output-stderr}\n\n```\nFor execution on a local, multicore CPU with excess RAM we recommend calling\noptions(mc.cores = parallel::detectCores()).\nTo avoid recompilation of unchanged Stan programs, we recommend calling\nrstan_options(auto_write = TRUE)\n```\n\n\n:::\n:::\n\n\n\n\n\n# load the model data\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n# Stan Model\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# add R stan code here\n```\n:::\n\n\n\n\n# add the math notation of the model here:\n\n## Running the model: Example for a short run\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# run a version with a small # of iterations here to show the output\n```\n:::\n\n\n\n\n\n## The model outputs\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# load the Full TR only model outputs\n# put some example exploration of the model outputs here\n```\n:::\n\n\n\n\n## convert tree diameters to AGB\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# code to estimate biomass\n```\n:::\n\n\n\n\n\n## Plot of AGB and AGBI with uncertainty\n\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# plot total and by taxa\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

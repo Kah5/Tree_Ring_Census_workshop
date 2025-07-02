@@ -1,0 +1,29 @@
+{
+  "index.qmd": {
+    "index.html": "e9c9bc6a"
+  },
+  "about.qmd": {
+    "about.html": "e029c8d0"
+  },
+  "Module_1_Introduction.qmd": {
+    "Module_1_Introduction.html": "83da0f35"
+  },
+  "Module_2_Data.qmd": {
+    "Module_2_Data.html": "603f74aa"
+  },
+  "Module_3_Biomass_estimation.qmd": {
+    "Module_3_Biomass_estimation.html": "94db401b"
+  },
+  "Module_6_Comparing_Biomass_Estimates.qmd": {
+    "Module_6_Comparing_Biomass_Estimates.html": "04acae1a"
+  },
+  "Module_5_RingWidth_and_Census.qmd": {
+    "Module_5_RingWidth_and_Census.html": "e3a42633"
+  },
+  "Module_7_TR_and_Census_model_w_climate.qmd": {
+    "Module_7_TR_and_Census_model_w_climate.html": "e4022fdc"
+  },
+  "Module_4_RingWidth_only_model.qmd": {
+    "Module_4_RingWidth_only_model.html": "fc98724a"
+  }
+}

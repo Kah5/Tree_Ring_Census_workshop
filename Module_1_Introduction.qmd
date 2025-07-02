@@ -1,0 +1,52 @@
+---
+title: "Module 1: Introduction"
+author: "Andria Dawson and Kelly Heilman"
+format:
+  html:
+    code-fold: true
+subtitle: "Forest growth and carbon with uncertainty from tree-rings and census data"
+---
+
+# Forest growth and carbon with uncertainty from tree-rings and census data
+
+## Motivation
+
+Tree Ring data have long bee
+
+## Objectives
+
+In this workshop we will introduce and work with a Bayesian statistical modelling framework to:
+
+1.  use tree-ring data to estimate annual tree diameter growth with uncertainty
+
+2.  integrate tree-ring data with forest census data to estimate annual growth for all trees on the plot (i.e. those with and without tree ring data)
+
+3.  show how this approach can directly link annual growth to climate and other drivers, and
+
+4.  scale annual growth to carbon accumulation. 
+
+We will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.
+
+## Motivation
+
+### Forest Carbon Cycling
+
+Managing forests to increase carbon uptake and storage is among the proposed carbon drawdown strategies. Tree-ring data makes it possible to quantify annual tree growth and carbon accumulation. While annually resolved, determining forest carbon accumulation from tree-rings requires complete sampling, or a set of assumptions that limit reliability. Tree-ring datasets are also subject to the fading record problem-- they do not capture mortality processes.
+
+Forest censuses, which re-measure individual trees over time, (e.g. Nationwide forest inventories (NFIs), ForestGEO plots, etc), provide snapshots of stand-level dynamics (forest growth, mortality, and recruitment processes) and thus forest carbon. This census data often lacks the annual temporal resolution needed to understand patterns and attribute forest carbon accumulation drivers. Participants of this workshop will learn how tree ring data alone, and tree ring data in combination with forest census data can be used to estimate forest carbon.
+
+::: {style="text-align:center"}
+<img src="pics/Bioscience_fig.png" width="450"/>
+:::
+
+### Forest Dynamics and Demography
+
+Estimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time
+
+## Introduction to the tutorial and State-Space Model
+
+1.  Introduce the state-space approach that links tree ring data with forest census data
+
+## Introduction to Bayesian Statistics
+
+1.  Introduce Bayesian statistical techniques using a linear regression

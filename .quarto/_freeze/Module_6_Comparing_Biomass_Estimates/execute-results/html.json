@@ -1,0 +1,15 @@
+{
+  "hash": "85ff3253f518520cfdf8daf894b3e4de",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Module 6: Comparing RW only and RW + Census model\"\nauthor: \"Andria Dawson and Kelly Heilman\"\nformat:\n  html:\n    code-fold: true\n---\n\n\n\n\n## Outline\n  - Read in the outputs\n  - Compare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\n  - Compare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\n  - Relating AGBI estimates to climate drivers\n\n### Read in all of the outputs of each model\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n### Plot up total AGB and AGBI over time for each method\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n### Plot up species-level AGB and AGBI over time for each method\n\n\n\n::: {.cell}\n\n:::\n\n\n\n\n\n### Does variation in AGBI correspond to variation in climate?\n\n\n\n::: {.cell}\n\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
