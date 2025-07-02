@@ -1,5 +1,5 @@
 ---
-title: "Module 3: Estimating Biomass From Tree Ring Dat"
+title: "Module 3: Estimating Biomass From Tree Ring Data"
 author: "Andria Dawson and Kelly Heilman"
 format:
   html:
@@ -12,7 +12,8 @@ format:
 
 ### using allodb package
 
-```{R, echo = FALSE}
+```{R}
+#| warning: false
 devtools::install_github("ropensci/allodb",upgrade = "never")
 
 ```

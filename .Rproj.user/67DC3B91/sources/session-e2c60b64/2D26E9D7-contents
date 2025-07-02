@@ -1,12 +1,12 @@
 ---
-title: "State_space_workshop_2025"
+title: "Welcome and Schedule"
 ---
 
-# Welcome to the Workshop: "Forest growth and carbon with uncertainty from tree-rings and census data"
+## Welcome to the Workshop: "Forest growth and carbon with uncertainty from tree-rings and census data"
 
 This repository contains the material for the Workshop "Forest growth and carbon with uncertainty from tree-rings and census data" taught at World Dendro on Sunday, 27th July 2025.
 
-Objectives
+## Objectives
 
 In this workshop we will introduce and work with a Bayesian statistical modelling framework to:
 
@@ -17,10 +17,10 @@ In this workshop we will introduce and work with a Bayesian statistical modellin
 
 We will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.
 
-# Schedule
+## Schedule
 
 |     Time      |                             Topic                             | Presenter |
-|:-----------------:|:---------------------------------:|:-----------------:|
+|:-----------------:|:--------------------------------:|:-----------------:|
 | 9:00 - 10:00  |                    Module 1: Introduction                     |           |
 | 10:00 - 10:30 |              Module 2: Tree Ring and Census Data              |           |
 | 10:30 - 11:00 |                 Module 3: Biomass Estimation                  |           |

@@ -1,5 +1,5 @@
 ---
-title: "Module 2: Data: Tree Ring and Census"
+title: "Module 2: Data: Tree Ring and Census Data"
 author: "Andria Dawson and Kelly Heilman"
 format:
   html:
@@ -8,7 +8,8 @@ format:
 
 ## Load packages to be used
 
-```{R, echo = FALSE}
+```{R}
+#| warning: false
 library(ggplot2)
 library(tidyverse)
 library(rstan)
