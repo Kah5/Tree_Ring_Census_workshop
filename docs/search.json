@@ -132,36 +132,25 @@
     ]
   },
   {
-    "objectID": "Module_3_Biomass_estimation.html",
-    "href": "Module_3_Biomass_estimation.html",
-    "title": "Module 3: Estimating Biomass From Tree Ring Data",
+    "objectID": "Module_6_Comparing_Biomass_Estimates.html",
+    "href": "Module_6_Comparing_Biomass_Estimates.html",
+    "title": "Module 6: Comparing RW only and RW + Census model",
     "section": "",
-    "text": "Code\ndevtools::install_github(\"ropensci/allodb\",upgrade = \"never\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe simplest way of estimating Carbon from tree-level biomass is to assume that the “carbon fraction,” that is the fraction of the tree’s weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.",
+    "text": "Read in the outputs\nCompare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\nCompare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\nRelating AGBI estimates to climate drivers",
     "crumbs": [
       "Home",
-      "Module 3: Estimating Biomass From Tree Ring Data"
+      "Module 6: Comparing RW only and RW + Census model"
     ]
   },
   {
-    "objectID": "Module_3_Biomass_estimation.html#estimating-forest-biomass-for-trees-at-the-time-of-census",
-    "href": "Module_3_Biomass_estimation.html#estimating-forest-biomass-for-trees-at-the-time-of-census",
-    "title": "Module 3: Estimating Biomass From Tree Ring Data",
+    "objectID": "Module_6_Comparing_Biomass_Estimates.html#outline",
+    "href": "Module_6_Comparing_Biomass_Estimates.html#outline",
+    "title": "Module 6: Comparing RW only and RW + Census model",
     "section": "",
-    "text": "Code\ndevtools::install_github(\"ropensci/allodb\",upgrade = \"never\")",
+    "text": "Read in the outputs\nCompare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\nCompare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\nRelating AGBI estimates to climate drivers",
     "crumbs": [
       "Home",
-      "Module 3: Estimating Biomass From Tree Ring Data"
-    ]
-  },
-  {
-    "objectID": "Module_3_Biomass_estimation.html#converting-forest-biomass-to-carbon-using-carbon-fractions",
-    "href": "Module_3_Biomass_estimation.html#converting-forest-biomass-to-carbon-using-carbon-fractions",
-    "title": "Module 3: Estimating Biomass From Tree Ring Data",
-    "section": "",
-    "text": "The simplest way of estimating Carbon from tree-level biomass is to assume that the “carbon fraction,” that is the fraction of the tree’s weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.",
-    "crumbs": [
-      "Home",
-      "Module 3: Estimating Biomass From Tree Ring Data"
+      "Module 6: Comparing RW only and RW + Census model"
     ]
   },
   {
@@ -169,18 +158,7 @@
     "href": "Module_1_Introduction.html",
     "title": "Module 1: Introduction",
     "section": "",
-    "text": "Tree Ring data have long bee\n\n\n\nIn this workshop we will introduce and work with a Bayesian statistical modelling framework to:\n\nuse tree-ring data to estimate annual tree diameter growth with uncertainty\nintegrate tree-ring data with forest census data to estimate annual growth for all trees on the plot (i.e. those with and without tree ring data)\nshow how this approach can directly link annual growth to climate and other drivers, and\nscale annual growth to carbon accumulation. \n\nWe will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.\n\n\n\n\n\nManaging forests to increase carbon uptake and storage is among the proposed carbon drawdown strategies. Tree-ring data makes it possible to quantify annual tree growth and carbon accumulation. While annually resolved, determining forest carbon accumulation from tree-rings requires complete sampling, or a set of assumptions that limit reliability. Tree-ring datasets are also subject to the fading record problem– they do not capture mortality processes.\nForest censuses, which re-measure individual trees over time, (e.g. Nationwide forest inventories (NFIs), ForestGEO plots, etc), provide snapshots of stand-level dynamics (forest growth, mortality, and recruitment processes) and thus forest carbon. This census data often lacks the annual temporal resolution needed to understand patterns and attribute forest carbon accumulation drivers. Participants of this workshop will learn how tree ring data alone, and tree ring data in combination with forest census data can be used to estimate forest carbon.\n\n\n\n\n\n\nEstimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time\n\n\n\n\n\nIntroduce the state-space approach that links tree ring data with forest census data\n\n\n\n\n\nIntroduce Bayesian statistical techniques using a linear regression",
-    "crumbs": [
-      "Home",
-      "Module 1: Introduction"
-    ]
-  },
-  {
-    "objectID": "Module_1_Introduction.html#motivation",
-    "href": "Module_1_Introduction.html#motivation",
-    "title": "Module 1: Introduction",
-    "section": "",
-    "text": "Tree Ring data have long bee",
+    "text": "In this workshop we will introduce and work with a Bayesian statistical modelling framework to:\n\nuse tree-ring data to estimate annual tree diameter growth with uncertainty\nintegrate tree-ring data with forest census data to estimate annual growth for all trees on the plot (i.e. those with and without tree ring data)\nshow how this approach can directly link annual growth to climate and other drivers, and\nscale annual growth to carbon accumulation. \n\nWe will work through examples developed in R and RStudio. Experience with R is helpful but not required. All are welcome.\n\n\n\n\n\nManaging forests to increase carbon uptake and storage is among the proposed carbon drawdown strategies. Tree-ring data makes it possible to quantify annual tree growth and carbon accumulation. While annually resolved, determining forest carbon accumulation from tree-rings requires complete sampling, or a set of assumptions that limit reliability. Tree-ring datasets are also subject to the fading record problem– they do not capture mortality processes.\nForest censuses, which re-measure individual trees over time, (e.g. Nationwide forest inventories (NFIs), ForestGEO plots, etc), provide snapshots of stand-level dynamics (forest growth, mortality, and recruitment processes) and thus forest carbon. This census data often lacks the annual temporal resolution needed to understand patterns and attribute forest carbon accumulation drivers. Participants of this workshop will learn how tree ring data alone, and tree ring data in combination with forest census data can be used to estimate forest carbon.\n\n\n\n\n\n\nEstimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time\n\n\n\n\n\nIntroduce the state-space approach that links tree ring data with forest census data\n\n\n\n\n\nIntroduce Bayesian statistical techniques using a linear regression",
     "crumbs": [
       "Home",
       "Module 1: Introduction"
@@ -198,8 +176,8 @@
     ]
   },
   {
-    "objectID": "Module_1_Introduction.html#motivation-1",
-    "href": "Module_1_Introduction.html#motivation-1",
+    "objectID": "Module_1_Introduction.html#motivation",
+    "href": "Module_1_Introduction.html#motivation",
     "title": "Module 1: Introduction",
     "section": "",
     "text": "Managing forests to increase carbon uptake and storage is among the proposed carbon drawdown strategies. Tree-ring data makes it possible to quantify annual tree growth and carbon accumulation. While annually resolved, determining forest carbon accumulation from tree-rings requires complete sampling, or a set of assumptions that limit reliability. Tree-ring datasets are also subject to the fading record problem– they do not capture mortality processes.\nForest censuses, which re-measure individual trees over time, (e.g. Nationwide forest inventories (NFIs), ForestGEO plots, etc), provide snapshots of stand-level dynamics (forest growth, mortality, and recruitment processes) and thus forest carbon. This census data often lacks the annual temporal resolution needed to understand patterns and attribute forest carbon accumulation drivers. Participants of this workshop will learn how tree ring data alone, and tree ring data in combination with forest census data can be used to estimate forest carbon.\n\n\n\n\n\n\nEstimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time",
@@ -286,6 +264,39 @@
     ]
   },
   {
+    "objectID": "Module_3_Biomass_estimation.html",
+    "href": "Module_3_Biomass_estimation.html",
+    "title": "Module 3: Estimating Biomass From Tree Ring Data",
+    "section": "",
+    "text": "Code\ndevtools::install_github(\"ropensci/allodb\",upgrade = \"never\")\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe simplest way of estimating Carbon from tree-level biomass is to assume that the “carbon fraction,” that is the fraction of the tree’s weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.",
+    "crumbs": [
+      "Home",
+      "Module 3: Estimating Biomass From Tree Ring Data"
+    ]
+  },
+  {
+    "objectID": "Module_3_Biomass_estimation.html#estimating-forest-biomass-for-trees-at-the-time-of-census",
+    "href": "Module_3_Biomass_estimation.html#estimating-forest-biomass-for-trees-at-the-time-of-census",
+    "title": "Module 3: Estimating Biomass From Tree Ring Data",
+    "section": "",
+    "text": "Code\ndevtools::install_github(\"ropensci/allodb\",upgrade = \"never\")",
+    "crumbs": [
+      "Home",
+      "Module 3: Estimating Biomass From Tree Ring Data"
+    ]
+  },
+  {
+    "objectID": "Module_3_Biomass_estimation.html#converting-forest-biomass-to-carbon-using-carbon-fractions",
+    "href": "Module_3_Biomass_estimation.html#converting-forest-biomass-to-carbon-using-carbon-fractions",
+    "title": "Module 3: Estimating Biomass From Tree Ring Data",
+    "section": "",
+    "text": "The simplest way of estimating Carbon from tree-level biomass is to assume that the “carbon fraction,” that is the fraction of the tree’s weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.\nOther carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.",
+    "crumbs": [
+      "Home",
+      "Module 3: Estimating Biomass From Tree Ring Data"
+    ]
+  },
+  {
     "objectID": "Module_2_Data.html",
     "href": "Module_2_Data.html",
     "title": "Module 2: Data: Tree Ring and Census Data",
@@ -312,7 +323,7 @@
     "href": "Module_2_Data.html#tree-ring-data",
     "title": "Module 2: Data: Tree Ring and Census Data",
     "section": "Tree Ring Data",
-    "text": "Tree Ring Data\n\nHarvard Forest tree ring data\nThere are two foundational datasets used in the processing of these biomass estimates. The first is a tree ring dataset collected by the Harvard Forest Research Area in 2012. Three 20m plots were measured following a double-nested design. The following species were included in the final ring width dataset:\n\nACRU = red maple (Acer rubrum)\nBEAL = yellow birch (Betula alleghaniensis)\nBELE = sweet birch (Betula lenta)\nFAGR = American beech (Fagus grandifolia)\nHAVI = Witch hazel (Hamamelis virginiana)\nPIST = Eastern white pine (Pinus strobus)\nQURU = Northern red oak (Quercus rubra)\nQUVE = Black oak (Quercus velutina)\nTSCA = Eastern hemlock (Tsuga canadensis)\n\nHarvard forest tree ring data samples were collected\nCitation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B. Poulter, and A. Hessl. Comparing tree-ring and permanent plot estimates of aboveground net primary production in three eastern us forests. Ecosphere, 7(9), 2016.\n\nWe downloaded the raw data for Harvard Forest Tree ring data for you\nVisualize the pre-formatted HF tree ring data below\n\n\n\nCode\n# code to plot the tree ring data, by species",
+    "text": "Tree Ring Data\n\nHarvard Forest tree ring data\nThere are two foundational datasets used in the processing of these biomass estimates. The first is a tree ring dataset collected by the Harvard Forest Research Area in 2012. Three 20m plots were measured following a double-nested design. The following species were included in the final ring width dataset:\n\nACRU = red maple (Acer rubrum)\nBEAL = yellow birch (Betula alleghaniensis)\nBELE = sweet birch (Betula lenta)\nFAGR = American beech (Fagus grandifolia)\nHAVI = Witch hazel (Hamamelis virginiana)\nPIST = Eastern white pine (Pinus strobus)\nQURU = Northern red oak (Quercus rubra)\nQUVE = Black oak (Quercus velutina)\nTSCA = Eastern hemlock (Tsuga canadensis)\n\nHarvard forest tree ring data samples were collected\nCitation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B. Poulter, and A. Hessl. Comparing tree-ring and permanent plot estimates of aboveground net primary production in three eastern us forests. Ecosphere, 7(9), 2016.\n\nWe downloaded the raw data for Harvard Forest Tree ring data for you\nVisualize the pre-formatted HF tree ring data below\n\n\n\nCode\n# code to plot the tree ring data, by species\nHARV &lt;- readRDS(\"data/tree_data_HARVARD_STAN_v3.1_102020.RDS\")\n\n# Xobs contains the increment data for all the cored trees\nhead(HARV$Xobs)\n\n\n      id year incr plot stat_id taxon\n1 LF1001   63 0.69    1       1  TSCA\n2 LF1001   64 0.95    1       1  TSCA\n3 LF1001   65 0.83    1       1  TSCA\n4 LF1001   66 0.57    1       1  TSCA\n5 LF1001   67 0.58    1       1  TSCA\n6 LF1001   68 0.79    1       1  TSCA\n\n\nCode\n# Tr contains the diameter at the closest measured year for each cored tree\nhead(HARV$Tr)\n\n\n  stat_id plot     id year  dbh distance taxon\n1       1    1 LF1001  114 18.1      7.6  TSCA\n2       2    1 LF1002  114 66.0      7.2  QURU\n3       3    1 LF1003  113 22.3      7.5  ACRU\n4       4    1 LF1004  113 30.4     10.6  ACRU\n5       5    1 LF1005  113 15.6      9.7  ACRU\n6       6    1 LF1007  113 30.0     11.9  BEAL\n\n\nCode\n# combine the tree ring data with their diameters\nTree.ring &lt;- HARV$Xobs %&gt;% left_join(., HARV$Tr)\n\n# get the calendar years\nyear.df &lt;- data.frame(year = max(Tree.ring$year):1, \n                      cal.year = 2012:(2013 - max(Tree.ring$year)))\nTree.ring &lt;- Tree.ring %&gt;% left_join(., year.df)\n\n# make a timeseries plot of all the tree ring increments\nggplot(data = Tree.ring)+geom_line(aes(x = cal.year, y = incr, group = id, color = taxon), alpha = 0.5)+facet_wrap(~taxon)+ylab(\"Increment (mm)\")+xlab(\"Year\")+theme_bw()\n\n\n\n\n\n\n\n\n\nCode\n# plot the diameter measurements for the cored trees\nggplot(data = Tree.ring)+geom_point(aes(x = cal.year, y = dbh, group = id, color = taxon), alpha = 0.5)+facet_wrap(~taxon)+ylab(\"Increment (mm)\")+xlab(\"Year\")+theme_bw()",
     "crumbs": [
       "Home",
       "Module 2: Data: Tree Ring and Census Data"
@@ -323,32 +334,21 @@
     "href": "Module_2_Data.html#harvard-forest-census-data",
     "title": "Module 2: Data: Tree Ring and Census Data",
     "section": "Harvard Forest Census Data",
-    "text": "Harvard Forest Census Data\nThe second dataset for this site includes the census data measured for the Lyford Plots, which is available on the Harvard Forest data archive website. Censuses were conducted in 1962, 1969, 1975, 1987-1991, 2001, and 2011 and mapped all trees with DBH greater than 5 cm. in a mapped area covering 2.88 ha. The three ring-width plots include only a fraction of this area, and, therefore, we determined which census trees were located within the plot areas and considered only those trees for the model.\n\n\nCode\n# code to plot census data, by species",
+    "text": "Harvard Forest Census Data\nThe second dataset for this site includes the census data measured for the Lyford Plots, which is available on the Harvard Forest data archive website. Censuses were conducted in 1962, 1969, 1975, 1987-1991, 2001, and 2011 and mapped all trees with DBH greater than 5 cm. in a mapped area covering 2.88 ha. The three ring-width plots include only a fraction of this area, and, therefore, we determined which census trees were located within the plot areas and considered only those trees for the model.\n\n\nCode\n# code to plot census data, by species\nCensus &lt;- HARV$Dobs %&gt;% left_join(., year.df) %&gt;% \n  rename(\"taxon\" = \"species\")\n\nggplot(data = Census)+geom_point(aes(x = cal.year, y = dbh, group = ID, color = taxon, shape = finalCond), alpha = 0.5)+ geom_line(aes(x = cal.year, y = dbh, group = ID, color = taxon)) + facet_wrap(~taxon)+ylab(\"DBH (cm)\")+xlab(\"Year\")+theme_bw()",
     "crumbs": [
       "Home",
       "Module 2: Data: Tree Ring and Census Data"
     ]
   },
   {
-    "objectID": "Module_6_Comparing_Biomass_Estimates.html",
-    "href": "Module_6_Comparing_Biomass_Estimates.html",
-    "title": "Module 6: Comparing RW only and RW + Census model",
-    "section": "",
-    "text": "Read in the outputs\nCompare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\nCompare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\nRelating AGBI estimates to climate drivers",
+    "objectID": "Module_2_Data.html#in-the-next-module",
+    "href": "Module_2_Data.html#in-the-next-module",
+    "title": "Module 2: Data: Tree Ring and Census Data",
+    "section": "In the next module:",
+    "text": "In the next module:\nWe will learn how to back-calculate tree diameters from tree ring data and how to scale tree diameter measurements up to tree-level biomass and carbon",
     "crumbs": [
       "Home",
-      "Module 6: Comparing RW only and RW + Census model"
-    ]
-  },
-  {
-    "objectID": "Module_6_Comparing_Biomass_Estimates.html#outline",
-    "href": "Module_6_Comparing_Biomass_Estimates.html#outline",
-    "title": "Module 6: Comparing RW only and RW + Census model",
-    "section": "",
-    "text": "Read in the outputs\nCompare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)\nCompare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)\nRelating AGBI estimates to climate drivers",
-    "crumbs": [
-      "Home",
-      "Module 6: Comparing RW only and RW + Census model"
+      "Module 2: Data: Tree Ring and Census Data"
     ]
   },
   {

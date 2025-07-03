@@ -50,7 +50,29 @@ Citation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B
 -   Visualize the pre-formatted HF tree ring data below
 
 ```{R}
+#| warning: false
 # code to plot the tree ring data, by species
+HARV <- readRDS("data/tree_data_HARVARD_STAN_v3.1_102020.RDS")
+
+# Xobs contains the increment data for all the cored trees
+head(HARV$Xobs)
+
+# Tr contains the diameter at the closest measured year for each cored tree
+head(HARV$Tr)
+
+# combine the tree ring data with their diameters
+Tree.ring <- HARV$Xobs %>% left_join(., HARV$Tr)
+
+# get the calendar years
+year.df <- data.frame(year = max(Tree.ring$year):1, 
+                      cal.year = 2012:(2013 - max(Tree.ring$year)))
+Tree.ring <- Tree.ring %>% left_join(., year.df)
+
+# make a timeseries plot of all the tree ring increments
+ggplot(data = Tree.ring)+geom_line(aes(x = cal.year, y = incr, group = id, color = taxon), alpha = 0.5)+facet_wrap(~taxon)+ylab("Increment (mm)")+xlab("Year")+theme_bw()
+
+# plot the diameter measurements for the cored trees
+ggplot(data = Tree.ring)+geom_point(aes(x = cal.year, y = dbh, group = id, color = taxon), alpha = 0.5)+facet_wrap(~taxon)+ylab("Increment (mm)")+xlab("Year")+theme_bw()
 
 ```
 
@@ -59,6 +81,13 @@ Citation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B
 The second dataset for this site includes the census data measured for the Lyford Plots, which is available on the Harvard Forest data archive website. Censuses were conducted in 1962, 1969, 1975, 1987-1991, 2001, and 2011 and mapped all trees with DBH greater than 5 cm. in a mapped area covering 2.88 ha. The three ring-width plots include only a fraction of this area, and, therefore, we determined which census trees were located within the plot areas and considered only those trees for the model.
 
 ```{R}
+#| warning: false
 # code to plot census data, by species
+Census <- HARV$Dobs %>% left_join(., year.df) %>% 
+  rename("taxon" = "species")
+
+ggplot(data = Census)+geom_point(aes(x = cal.year, y = dbh, group = ID, color = taxon, shape = finalCond), alpha = 0.5)+ geom_line(aes(x = cal.year, y = dbh, group = ID, color = taxon)) + facet_wrap(~taxon)+ylab("DBH (cm)")+xlab("Year")+theme_bw()
 
 ```
+## In the next module:
+We will learn how to back-calculate tree diameters from tree ring data and how to scale tree diameter measurements up to tree-level biomass and carbon

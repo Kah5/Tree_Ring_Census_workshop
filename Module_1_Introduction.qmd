@@ -9,10 +9,6 @@ subtitle: "Forest growth and carbon with uncertainty from tree-rings and census 
 
 # Forest growth and carbon with uncertainty from tree-rings and census data
 
-## Motivation
-
-Tree Ring data have long bee
-
 ## Objectives
 
 In this workshop we will introduce and work with a Bayesian statistical modelling framework to:
