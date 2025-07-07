@@ -1,12 +1,12 @@
 ---
-title: "Module 4: Ring-width only model (RW-only)"
+title: "Module 3a: State-space model (RW-only)"
 author: "Andria Dawson and Kelly Heilman"
 format:
   html:
     code-fold: true
 ---
 
-## State-space model for estimating biomass at HF with only tree ring time-series and the diameter at time of coring
+## State-space model for estimating biomass 
 
 ## Load packages to be used
 
@@ -34,21 +34,10 @@ library(rstan)
 
 ```{r}
 # run a version with a small # of iterations here to show the output
-
-# settings
-
-#
-compiled_RW = stan_model(file = paste0('models/growth_model_RW.stan'))
-
-# fit and extract values
-fit_RW = sampling(compiled_RW, 
-                  data = dat, 
-                  iter = iter, 
-                  chains = nchains,
-                  verbose=TRUE)
 ```
 
 ## The model outputs
+
 
 ```{R}
 # load the Full TR only model outputs
