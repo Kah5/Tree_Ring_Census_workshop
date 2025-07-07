@@ -1,9 +1,9 @@
 {
     "id": "B9A81CFE",
-    "path": "~/Documents/Tree_Ring_Census_workshop/Module_4_RingWidth_only_model.qmd",
-    "project_path": "Module_4_RingWidth_only_model.qmd",
+    "path": "~/Documents/Tree_Ring_Census_workshop/Module_5_RingWidth_only_model.qmd",
+    "project_path": "Module_5_RingWidth_only_model.qmd",
     "type": "quarto_markdown",
-    "hash": "0",
+    "hash": "2770191958",
     "contents": "",
     "dirty": false,
     "created": 1751490455501.0,
@@ -21,11 +21,11 @@
         "rmdVisualCollapsedChunks": ""
     },
     "folds": "",
-    "lastKnownWriteTime": 1751490491,
+    "lastKnownWriteTime": 1751908613,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1751490491202,
+    "last_content_update": 1751908613,
     "read_only": false,
     "read_only_alternatives": []
 }

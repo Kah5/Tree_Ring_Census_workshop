@@ -1,12 +1,19 @@
 ---
-title: "Module 3a: State-space model (RW-only)"
+title: "Module 8: Regression with annual climate drivers within the RW + Census model"
 author: "Andria Dawson and Kelly Heilman"
 format:
   html:
     code-fold: true
 ---
 
-## State-space model for estimating biomass 
+## Example of incorporating predictor variables directly into the state-space model estimation
+
+## Outline
+
+-   read in formatted climate data (or format here)
+-   Run STAN model with climate regression
+-   Visualize outputs
+-   Plot biomass estimates
 
 ## Load packages to be used
 
@@ -38,24 +45,9 @@ library(rstan)
 
 ## The model outputs
 
-
 ```{R}
 # load the Full TR only model outputs
 # put some example exploration of the model outputs here
-```
-
-## Model Checking in stan:
-
-```{R}
-# traceplots
-# checking model diagnostics
-
-```
-
-## Model Validation:
-
-```{r}
-# comparing estimates of diameter increment to observations
 ```
 
 ## convert tree diameters to AGB

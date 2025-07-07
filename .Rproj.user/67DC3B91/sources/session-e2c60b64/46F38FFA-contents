@@ -1,5 +1,5 @@
 ---
-title: "Module 5: Ring Width and Census Data Model (RW + Census)"
+title: "Module 5: Ring-width only model (RW-only)"
 author: "Andria Dawson and Kelly Heilman"
 format:
   html:
@@ -34,6 +34,18 @@ library(rstan)
 
 ```{r}
 # run a version with a small # of iterations here to show the output
+
+# settings
+
+#
+compiled_RW = stan_model(file = paste0('models/growth_model_RW.stan'))
+
+# fit and extract values
+fit_RW = sampling(compiled_RW, 
+                  data = dat, 
+                  iter = iter, 
+                  chains = nchains,
+                  verbose=TRUE)
 ```
 
 ## The model outputs
@@ -41,6 +53,20 @@ library(rstan)
 ```{R}
 # load the Full TR only model outputs
 # put some example exploration of the model outputs here
+```
+
+## Model Checking in stan:
+
+```{R}
+# traceplots
+# checking model diagnostics
+
+```
+
+## Model Validation:
+
+```{r}
+# comparing estimates of diameter increment to observations
 ```
 
 ## convert tree diameters to AGB
