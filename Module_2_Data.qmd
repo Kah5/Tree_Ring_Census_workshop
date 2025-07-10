@@ -13,6 +13,8 @@ format:
 library(ggplot2)
 library(tidyverse)
 library(rstan)
+library(gt)
+library(FIESTA)
 
 ```
 
@@ -83,11 +85,62 @@ The second dataset for this site includes the census data measured for the Lyfor
 ```{R}
 #| warning: false
 # code to plot census data, by species
-Census <- HARV$Dobs %>% left_join(., year.df) %>% 
-  rename("taxon" = "species")
+# - ACRU = red maple (Acer rubrum) 
+# - BEAL = yellow birch (Betula alleghaniensis) 
+# - BELE = sweet birch (Betula lenta)
+# - FAGR = American beech (Fagus grandifolia) 
+# - HAVI = Witch hazel (Hamamelis virginiana) 
+# - PIST = Eastern white pine (Pinus strobus)
+# - QURU = Northern red oak (Quercus rubra) 
+# - QUVE = Black oak (Quercus velutina)
+# - TSCA = Eastern hemlock (Tsuga canadensis)
+taxon.conversion <- data.frame(taxon = HARV$taxa, # TAXA abbreviation
+                               SPCD = c(261, # Eastern Hemlock
+                                        833, # Northern Red Oak
+                                        316, # Red Maple
+                                        371, # Yellow Birch
+                                        531, # American beech
+                                        129, # White Pine
+                                        372, # Grey/Sweet Birch
+                                        837, # Black Oak
+                                        7331# Witch hazel (Hamamelis virginiana) 
+                                        ) # using FIA species codes:
+) %>% left_join(., FIESTA::ref_species %>% select(SPCD, COMMON_NAME, GENUS, SPECIES))%>%
+  mutate(`Scientific Name` = paste(GENUS, SPECIES))
 
-ggplot(data = Census)+geom_point(aes(x = cal.year, y = dbh, group = ID, color = taxon, shape = finalCond), alpha = 0.5)+ geom_line(aes(x = cal.year, y = dbh, group = ID, color = taxon)) + facet_wrap(~taxon)+ylab("DBH (cm)")+xlab("Year")+theme_bw()
+# set up the lat-long information:
+HARV.ll <- data.frame(site = c("LF1", "LF2", "LF3"), 
+                      lat = c(42.53065, 42.53128, 42.53008), 
+                      lon = c(-72.18346, -72.18271, -72.18246))
+
+Census <- HARV$Dobs %>% left_join(., year.df) %>% 
+  rename("taxon" = "species")%>%
+  left_join(., taxon.conversion) %>%# combine with taxon-infomation
+  left_join(., HARV.ll) # combine with lat-long information
+
+ggplot(data = Census)+geom_point(aes(x = cal.year, y = dbh, group = ID, color = `Scientific Name`, shape = finalCond), alpha = 0.5)+ geom_line(aes(x = cal.year, y = dbh, group = ID, color = `Scientific Name`)) + facet_wrap(~site, ncol = 3)+ylab("DBH (cm)")+xlab("Year")+theme_bw()
 
 ```
+# Note that for two of the plots at Harvard Forest, the census was split over mutiple years (1985-1990), creating an "inventory year" variable will allow us to compare tree estimates over each census
+```{R}
+ggplot(data = Census)+
+  geom_bar(aes(x = cal.year, fill = `Scientific Name`), stat = "count")+  facet_wrap(~site, ncol = 3)+xlab("Year")+theme_bw()
+
+#Census dates: 1962, 1969, 1975, 1985-1991, 2001, and 2011
+Census <- Census %>% 
+  mutate(INV.YEAR = ifelse(cal.year >= 1985 & cal.year <= 1991, 1990, cal.year))
+
+ggplot(data = Census)+
+  geom_bar(aes(x = INV.YEAR, fill = `Scientific Name`), stat = "count")+  facet_wrap(~site, ncol = 3)+xlab("Year")+theme_bw()
+```
+
 ## In the next module:
+
 We will learn how to back-calculate tree diameters from tree ring data and how to scale tree diameter measurements up to tree-level biomass and carbon
+
+## Additional information:
+
+Some tree census data sources of regional interest include:
+
+\- [ForestGEO forest census plots](http://ctfs.si.edu/datarequest/index.php/main/region/tree/africa) (Cameroon, Congo, Gabon, Kenya, Nigeria)
+\-
