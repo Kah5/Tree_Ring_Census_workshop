@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Andria Dawson and Kelly Heilman">
-<meta name="dcterms.date" content="2025-07-07">
+<meta name="dcterms.date" content="2025-07-09">
 
 <title>State Space Model Workshop 2025, Livingstone, Zambia – Module 3: Estimating Biomass From Tree Ring Data</title>
 <style>
@@ -226,16 +226,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#biomass-estimation-from-tree-ring-data-and-forest-census-data" id="toc-biomass-estimation-from-tree-ring-data-and-forest-census-data" class="nav-link active" data-scroll-target="#biomass-estimation-from-tree-ring-data-and-forest-census-data">Biomass estimation from tree ring data and forest census data</a>
+  <li><a href="#biomass-estimation-from-tree-ring-and-forest-census-data" id="toc-biomass-estimation-from-tree-ring-and-forest-census-data" class="nav-link active" data-scroll-target="#biomass-estimation-from-tree-ring-and-forest-census-data">Biomass estimation from tree ring and forest census data</a>
   <ul class="collapse">
-  <li><a href="#estimating-forest-biomass-for-trees-at-the-time-of-census" id="toc-estimating-forest-biomass-for-trees-at-the-time-of-census" class="nav-link" data-scroll-target="#estimating-forest-biomass-for-trees-at-the-time-of-census">Estimating Forest biomass for trees at the time of census</a>
+  <li><a href="#estimating-forest-biomass-for-trees-at-the-time-of-census" id="toc-estimating-forest-biomass-for-trees-at-the-time-of-census" class="nav-link" data-scroll-target="#estimating-forest-biomass-for-trees-at-the-time-of-census">1. Estimating Forest biomass for trees at the time of census</a>
   <ul class="collapse">
-  <li><a href="#using-allodb-package" id="toc-using-allodb-package" class="nav-link" data-scroll-target="#using-allodb-package">using allodb package</a></li>
+  <li><a href="#we-will-use-the-allometric-equations-in-the-allodb-r-package" id="toc-we-will-use-the-allometric-equations-in-the-allodb-r-package" class="nav-link" data-scroll-target="#we-will-use-the-allometric-equations-in-the-allodb-r-package">We will use the allometric equations in the <code>allodb</code> R package</a></li>
+  <li><a href="#lets-use-the-get_biomass-function-from-allodb-to-get-estimates-of-biomass" id="toc-lets-use-the-get_biomass-function-from-allodb-to-get-estimates-of-biomass" class="nav-link" data-scroll-target="#lets-use-the-get_biomass-function-from-allodb-to-get-estimates-of-biomass">Lets use the <code>get_biomass</code> function from allodb to get estimates of biomass</a></li>
+  <li><a href="#lets-get-the-total-species-trajectories-of-biomass-over-the-census-periods" id="toc-lets-get-the-total-species-trajectories-of-biomass-over-the-census-periods" class="nav-link" data-scroll-target="#lets-get-the-total-species-trajectories-of-biomass-over-the-census-periods">Lets get the total species trajectories of biomass over the census periods:</a></li>
+  <li><a href="#what-affects-the-trajectory-of-agb-over-time" id="toc-what-affects-the-trajectory-of-agb-over-time" class="nav-link" data-scroll-target="#what-affects-the-trajectory-of-agb-over-time">What affects the trajectory of AGB over time?</a></li>
   </ul></li>
-  <li><a href="#estimating-forest-biomass-from-tree-ring-time-series" id="toc-estimating-forest-biomass-from-tree-ring-time-series" class="nav-link" data-scroll-target="#estimating-forest-biomass-from-tree-ring-time-series">Estimating Forest biomass from tree ring time-series</a>
+  <li><a href="#step-2-use-tree-ring-data-to-back-calculate-tree-diameter-at-harvard-forest" id="toc-step-2-use-tree-ring-data-to-back-calculate-tree-diameter-at-harvard-forest" class="nav-link" data-scroll-target="#step-2-use-tree-ring-data-to-back-calculate-tree-diameter-at-harvard-forest">Step 2: Use tree ring data to back-calculate tree diameter at Harvard Forest:</a>
   <ul class="collapse">
-  <li><a href="#step-1-back-calculate-tree-size-over-time-no-uncertainty" id="toc-step-1-back-calculate-tree-size-over-time-no-uncertainty" class="nav-link" data-scroll-target="#step-1-back-calculate-tree-size-over-time-no-uncertainty">Step 1: Back-calculate tree size over time (no uncertainty)</a></li>
-  <li><a href="#step-2-use-allodb-to-estimate-biomass-for-each-tree-using-the-back-calculated-tree-size-in-each-year" id="toc-step-2-use-allodb-to-estimate-biomass-for-each-tree-using-the-back-calculated-tree-size-in-each-year" class="nav-link" data-scroll-target="#step-2-use-allodb-to-estimate-biomass-for-each-tree-using-the-back-calculated-tree-size-in-each-year">Step 2: Use AlloDB to estimate Biomass for each tree using the back-calculated tree size in each year</a></li>
+  <li><a href="#backcalculating-tree-diameter-using-dplr" id="toc-backcalculating-tree-diameter-using-dplr" class="nav-link" data-scroll-target="#backcalculating-tree-diameter-using-dplr">Backcalculating tree diameter using dplR</a></li>
   <li><a href="#step-3-visualizing-biomass-over-time-with-no-uncertainty" id="toc-step-3-visualizing-biomass-over-time-with-no-uncertainty" class="nav-link" data-scroll-target="#step-3-visualizing-biomass-over-time-with-no-uncertainty">Step 3: visualizing biomass over time (with no uncertainty)</a></li>
   </ul></li>
   <li><a href="#converting-forest-biomass-to-carbon-using-carbon-fractions" id="toc-converting-forest-biomass-to-carbon-using-carbon-fractions" class="nav-link" data-scroll-target="#converting-forest-biomass-to-carbon-using-carbon-fractions">Converting forest biomass to carbon using carbon fractions</a></li>
@@ -266,7 +268,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">2025-07-07</p>
+      <p class="date">2025-07-09</p>
     </div>
   </div>
   
@@ -278,27 +280,951 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="biomass-estimation-from-tree-ring-data-and-forest-census-data" class="level1">
-<h1>Biomass estimation from tree ring data and forest census data</h1>
+<section id="biomass-estimation-from-tree-ring-and-forest-census-data" class="level1">
+<h1>Biomass estimation from tree ring and forest census data</h1>
+<p>How do we get estimates of aboveground biomass and forest carbon from tree diameters and tree ring data?</p>
+<p>Allometric equations define the relationship between commonly measured aspects of a tree (usually tree species, diameter, and/or height) and the weight of the tree (aboveground biomass, AGB). These equations are developed through a small set of destructive samples– this involves sampling tree size, height, and species, measuring tree mass, and developing a quantitative relationship between the commonly measured metric and tree mass.</p>
+<p>In this module we will:</p>
+<ol type="1">
+<li><p>Apply species-specific allometric equations to the Harvard Forest Census dataset to estimate AGB at the time of census</p></li>
+<li><p>Back-calculate tree diameter from the tree ring data at Harvard Forest</p></li>
+<li><p>Apply allometric equations to the back-calculated tree diameters at Harvard Forest to estimate a timeseries of AGB.</p></li>
+</ol>
 <section id="estimating-forest-biomass-for-trees-at-the-time-of-census" class="level2">
-<h2 class="anchored" data-anchor-id="estimating-forest-biomass-for-trees-at-the-time-of-census">Estimating Forest biomass for trees at the time of census</h2>
-<section id="using-allodb-package" class="level3">
-<h3 class="anchored" data-anchor-id="using-allodb-package">using allodb package</h3>
+<h2 class="anchored" data-anchor-id="estimating-forest-biomass-for-trees-at-the-time-of-census">1. Estimating Forest biomass for trees at the time of census</h2>
+<section id="we-will-use-the-allometric-equations-in-the-allodb-r-package" class="level3">
+<h3 class="anchored" data-anchor-id="we-will-use-the-allometric-equations-in-the-allodb-r-package">We will use the allometric equations in the <code>allodb</code> R package</h3>
+<p>This package is available on github, and we highlight some additional resources here:</p>
+<ul>
+<li><p>Citation: Gonzalez-Akre,&nbsp;E.,&nbsp;&nbsp;Piponiot,&nbsp;C.,&nbsp;&nbsp;Lepore,&nbsp;M.,&nbsp;&nbsp;Herrmann,&nbsp;V.,&nbsp;&nbsp;Lutz,&nbsp;J. A.,&nbsp;&nbsp;Baltzer,&nbsp;J. L.,&nbsp;&nbsp;Dick,&nbsp;C. W.,&nbsp;&nbsp;Gilbert,&nbsp;G. S.,&nbsp;He,&nbsp;F.,&nbsp;&nbsp;Heym,&nbsp;M.,&nbsp;&nbsp;Huerta,&nbsp;A. I.,&nbsp;&nbsp;Jansen,&nbsp;P. A.,&nbsp;&nbsp;Johnson,&nbsp;D. J.,&nbsp;&nbsp;Knapp,&nbsp;N.,&nbsp;&nbsp;Král,&nbsp;K.,&nbsp;&nbsp;Lin,&nbsp;D.,&nbsp;&nbsp;Malhi,&nbsp;Y.,&nbsp;&nbsp;McMahon,&nbsp;S. M.,&nbsp;&nbsp;Myers,&nbsp;J. A., …&nbsp;&nbsp;Anderson-Teixeira,&nbsp;K. J.&nbsp;(2022).&nbsp;&nbsp;<a href="https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.13756"><em>allodb</em>: An R package for biomass estimation at globally distributed extratropical forest plots.</a>&nbsp;<em>Methods in Ecology and Evolution</em>,&nbsp;&nbsp;13,&nbsp;&nbsp;330–338.&nbsp;<a href="https://doi.org/10.1111/2041-210X.13756" class="uri">https://doi.org/10.1111/2041-210X.13756</a></p></li>
+<li><p>Github repository: <a href="https://github.com/ropensci/allodb/tree/master" class="uri">https://github.com/ropensci/allodb/tree/master</a></p></li>
+<li><p>Tutorial at Ropensci: <a href="https://docs.ropensci.org/allodb/" class="uri">https://docs.ropensci.org/allodb/</a></p></li>
+</ul>
+<p>Let’s explore allodb’s allometric objects and functions.</p>
+<p>Objects include:</p>
+<ul>
+<li><p><code>equations</code>: an object that has the original allometric reference/citation, location of the data, the type of equation, information on units, and alot of additional information</p></li>
+<li><p><code>references</code>: an object that has citations, authors, etc, for the original reference data</p></li>
+<li><p><code>sitespecies</code>: an object that lists the sites, species, genus, family, and species_code information for some of the example data available with the allodb package</p></li>
+</ul>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "ref_id"                       "equation_id"                 
+ [3] "equation_allometry"           "equation_form"               
+ [5] "dependent_variable"           "independent_variable"        
+ [7] "equation_taxa"                "allometry_specificity"       
+ [9] "equation_categ"               "geographic_area"             
+[11] "original_coord"               "lat"                         
+[13] "long"                         "elev_m"                      
+[15] "geography_notes"              "mat_C"                       
+[17] "min.temp_C"                   "max.temp_C"                  
+[19] "map_mm"                       "frost_free_period_days"      
+[21] "climate_notes"                "stand_age_range_yr"          
+[23] "stand_age_history"            "stand_basal_area_m2_ha"      
+[25] "stand_trees_ha"               "forest_description"          
+[27] "ecosystem_type"               "koppen"                      
+[29] "dbh_min_cm"                   "dbh_max_cm"                  
+[31] "sample_size"                  "collection_year"             
+[33] "dbh_units_original"           "dbh_unit_CF"                 
+[35] "output_units_original"        "output_units_CF"             
+[37] "allometry_development_method" "regression_model"            
+[39] "r_squared"                    "other_equations_tested"      
+[41] "log_biomass"                  "bias_corrected"              
+[43] "bias_correction_factor"       "notes_fitting_model"         
+[45] "original_equation_id"         "original_data_availability"  
+[47] "equation_notes"              </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "site"         "family"       "genus"        "species"      "variety"     
+ [6] "subspecies"   "latin_name"   "species_code" "life_form"    "notes"       </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "ref_id"                   "ref_doi"                 
+[3] "ref_author"               "ref_year"                
+[5] "ref_title"                "References full citation"</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Picea mariana" "Picea glauca"  "Betula"        "Fagus"        
+[5] "Fraxinus"      "Picea"        </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "exp(a+b*log(dbh))"                         
+[2] "exp(a+b*(log(dbh))"                        
+[3] "exp((a*(dbh-c))*(2*b+(dbh-c))/(b+(dbh-c)))"
+[4] "dbh((1/a)+(dbh/b))"                        
+[5] "10^(a+b*(log10(dbh)))"                     
+[6] "exp(a+b*log(dba))"                         </code></pre>
+</div>
+</div>
+<p>Here, we will focus on species from Harvard Forest, so lets see which species we have in our census data. This information is stored in the <code>taxon</code> column in the <code>Census</code> object:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"ropensci/allodb"</span>,<span class="at">upgrade =</span> <span class="st">"never"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lets visualize the number of trees sampled at Harvard Forest each census year:</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Census <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, COMMON_NAME, INV.YEAR) <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n.trees =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, COMMON_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(INV.YEAR, n.trees, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output-display">
+<div id="foaugveucw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#foaugveucw table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#foaugveucw thead, #foaugveucw tbody, #foaugveucw tfoot, #foaugveucw tr, #foaugveucw td, #foaugveucw th {
+  border-style: none;
+}
+
+#foaugveucw p {
+  margin: 0;
+  padding: 0;
+}
+
+#foaugveucw .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#foaugveucw .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#foaugveucw .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#foaugveucw .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#foaugveucw .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#foaugveucw .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#foaugveucw .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#foaugveucw .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#foaugveucw .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#foaugveucw .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#foaugveucw .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#foaugveucw .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#foaugveucw .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#foaugveucw .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#foaugveucw .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#foaugveucw .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#foaugveucw .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#foaugveucw .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#foaugveucw .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#foaugveucw .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#foaugveucw .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#foaugveucw .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#foaugveucw .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#foaugveucw .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#foaugveucw .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#foaugveucw .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#foaugveucw .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#foaugveucw .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#foaugveucw .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#foaugveucw .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#foaugveucw .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#foaugveucw .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#foaugveucw .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#foaugveucw .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#foaugveucw .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#foaugveucw .gt_left {
+  text-align: left;
+}
+
+#foaugveucw .gt_center {
+  text-align: center;
+}
+
+#foaugveucw .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#foaugveucw .gt_font_normal {
+  font-weight: normal;
+}
+
+#foaugveucw .gt_font_bold {
+  font-weight: bold;
+}
+
+#foaugveucw .gt_font_italic {
+  font-style: italic;
+}
+
+#foaugveucw .gt_super {
+  font-size: 65%;
+}
+
+#foaugveucw .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#foaugveucw .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#foaugveucw .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#foaugveucw .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#foaugveucw .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#foaugveucw .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#foaugveucw .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+
+<table class="gt_table caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead>
+<tr class="header gt_col_headings">
+<th id="taxon" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">taxon</th>
+<th id="Scientific Name" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">Scientific Name</th>
+<th id="COMMON_NAME" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col">COMMON_NAME</th>
+<th id="1960" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">1960</th>
+<th id="1967" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">1967</th>
+<th id="1973" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">1973</th>
+<th id="1990" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">1990</th>
+<th id="1999" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">1999</th>
+<th id="2009" class="gt_col_heading gt_columns_bottom_border gt_right" data-quarto-table-cell-role="th" scope="col">2009</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" headers="taxon">ACRU</td>
+<td class="gt_row gt_left" headers="Scientific Name">Acer rubrum</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">red maple</td>
+<td class="gt_row gt_right" headers="1960">41</td>
+<td class="gt_row gt_right" headers="1967">211</td>
+<td class="gt_row gt_right" headers="1973">188</td>
+<td class="gt_row gt_right" headers="1990">141</td>
+<td class="gt_row gt_right" headers="1999">111</td>
+<td class="gt_row gt_right" headers="2009">90</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="taxon">BEAL</td>
+<td class="gt_row gt_left" headers="Scientific Name">Betula alleghaniensis</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">yellow birch</td>
+<td class="gt_row gt_right" headers="1960">8</td>
+<td class="gt_row gt_right" headers="1967">17</td>
+<td class="gt_row gt_right" headers="1973">18</td>
+<td class="gt_row gt_right" headers="1990">16</td>
+<td class="gt_row gt_right" headers="1999">24</td>
+<td class="gt_row gt_right" headers="2009">29</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="taxon">BELE</td>
+<td class="gt_row gt_left" headers="Scientific Name">Betula lenta</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">sweet birch</td>
+<td class="gt_row gt_right" headers="1960">2</td>
+<td class="gt_row gt_right" headers="1967">5</td>
+<td class="gt_row gt_right" headers="1973">5</td>
+<td class="gt_row gt_right" headers="1990">7</td>
+<td class="gt_row gt_right" headers="1999">10</td>
+<td class="gt_row gt_right" headers="2009">16</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="taxon">FAGR</td>
+<td class="gt_row gt_left" headers="Scientific Name">Fagus grandifolia</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">American beech</td>
+<td class="gt_row gt_right" headers="1960">2</td>
+<td class="gt_row gt_right" headers="1967">4</td>
+<td class="gt_row gt_right" headers="1973">4</td>
+<td class="gt_row gt_right" headers="1990">12</td>
+<td class="gt_row gt_right" headers="1999">16</td>
+<td class="gt_row gt_right" headers="2009">26</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="taxon">HAVI</td>
+<td class="gt_row gt_left" headers="Scientific Name">Hamamelis virginiana</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">American witchhazel</td>
+<td class="gt_row gt_right" headers="1960">2</td>
+<td class="gt_row gt_right" headers="1967">5</td>
+<td class="gt_row gt_right" headers="1973">5</td>
+<td class="gt_row gt_right" headers="1990">9</td>
+<td class="gt_row gt_right" headers="1999">10</td>
+<td class="gt_row gt_right" headers="2009">25</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="taxon">PIST</td>
+<td class="gt_row gt_left" headers="Scientific Name">Pinus strobus</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">eastern white pine</td>
+<td class="gt_row gt_right" headers="1960">4</td>
+<td class="gt_row gt_right" headers="1967">29</td>
+<td class="gt_row gt_right" headers="1973">24</td>
+<td class="gt_row gt_right" headers="1990">6</td>
+<td class="gt_row gt_right" headers="1999">8</td>
+<td class="gt_row gt_right" headers="2009">8</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="taxon">QURU</td>
+<td class="gt_row gt_left" headers="Scientific Name">Quercus rubra</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">northern red oak</td>
+<td class="gt_row gt_right" headers="1960">27</td>
+<td class="gt_row gt_right" headers="1967">129</td>
+<td class="gt_row gt_right" headers="1973">114</td>
+<td class="gt_row gt_right" headers="1990">79</td>
+<td class="gt_row gt_right" headers="1999">73</td>
+<td class="gt_row gt_right" headers="2009">67</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" headers="taxon">QUVE</td>
+<td class="gt_row gt_left" headers="Scientific Name">Quercus velutina</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">black oak</td>
+<td class="gt_row gt_right" headers="1960">1</td>
+<td class="gt_row gt_right" headers="1967">7</td>
+<td class="gt_row gt_right" headers="1973">6</td>
+<td class="gt_row gt_right" headers="1990">4</td>
+<td class="gt_row gt_right" headers="1999">3</td>
+<td class="gt_row gt_right" headers="2009">3</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" headers="taxon">TSCA</td>
+<td class="gt_row gt_left" headers="Scientific Name">Tsuga canadensis</td>
+<td class="gt_row gt_left" headers="COMMON_NAME">eastern hemlock</td>
+<td class="gt_row gt_right" headers="1960">3</td>
+<td class="gt_row gt_right" headers="1967">4</td>
+<td class="gt_row gt_right" headers="1973">7</td>
+<td class="gt_row gt_right" headers="1990">8</td>
+<td class="gt_row gt_right" headers="1999">13</td>
+<td class="gt_row gt_right" headers="2009">25</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can also plot this up visually:</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census)<span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.character</span>(INV.YEAR), <span class="at">fill =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>), <span class="at">position =</span> <span class="st">"dodge"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ylab</span>(<span class="st">"Number of Trees Observed"</span>)<span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on this table and figure, which species do you think will have the largest aboveground biomass?</p>
+</section>
+<section id="lets-use-the-get_biomass-function-from-allodb-to-get-estimates-of-biomass" class="level3">
+<h3 class="anchored" data-anchor-id="lets-use-the-get_biomass-function-from-allodb-to-get-estimates-of-biomass">Lets use the <code>get_biomass</code> function from allodb to get estimates of biomass</h3>
+<p>This function requires the following arguments and provides and output of Aboveground biomass in kilograms (kg):</p>
+<ul>
+<li><p><code>dbh</code>: diameter at breast height (cm), numeric</p></li>
+<li><p><code>genus</code>: genus of the tree, character</p></li>
+<li><p><code>species</code>: the species name of the tree, character, can be NULL if only genus is known</p></li>
+<li><p><code>coords</code>: a vector (longitude, latitude) of the plot location, or a matrix with 2 columns if trees have individual locations</p></li>
+</ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(allodb)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># lets get the biomass for the first tree in the Census data (a 36.83 cm Northern Red Oak (Quercus rubra):</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span> <span class="ot">&lt;-</span> Census[<span class="dv">1</span>,] <span class="co"># first tree</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span><span class="sc">$</span>AGB<span class="fl">.1</span> <span class="ot">&lt;-</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census<span class="fl">.1</span><span class="sc">$</span>dbh ,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census<span class="fl">.1</span><span class="sc">$</span>GENUS,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census<span class="fl">.1</span><span class="sc">$</span>SPECIES,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(Census<span class="fl">.1</span><span class="sc">$</span>lon, Census<span class="fl">.1</span><span class="sc">$</span>lat)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span><span class="sc">$</span>AGB</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 979.5547</code></pre>
+</div>
+</div>
+<p>Now lets apply this function to the whole dataset</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ll <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(Census<span class="sc">$</span>lon, Census<span class="sc">$</span>lat), <span class="at">nrow =</span> <span class="fu">length</span>(Census<span class="sc">$</span>lon), <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">FALSE</span>, <span class="at">dimnames =</span> <span class="cn">NULL</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># here we split up the census by sites </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>Census.LF1 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>LF1.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>Census.LF2 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF2"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>LF2.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF2"</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>Census.LF3 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF3"</span>)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>LF3.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF3"</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="co"># get the biomass for each site:</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>Census.LF1<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF1<span class="sc">$</span>dbh ,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF1<span class="sc">$</span>GENUS,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF1<span class="sc">$</span>SPECIES,</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF1.ll<span class="sc">$</span>lon, LF1.ll<span class="sc">$</span>lat))</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>Census.LF2<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF2<span class="sc">$</span>dbh ,</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF2<span class="sc">$</span>GENUS,</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF2<span class="sc">$</span>SPECIES,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF2.ll<span class="sc">$</span>lon, LF2.ll<span class="sc">$</span>lat))</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>Census.LF3<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF3<span class="sc">$</span>dbh ,</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF3<span class="sc">$</span>GENUS,</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF3<span class="sc">$</span>SPECIES,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF3.ll<span class="sc">$</span>lon, LF3.ll<span class="sc">$</span>lat))</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>Census.AGB <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Census.LF1, Census.LF2, Census.LF3)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB)<span class="sc">+</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Aboveground Biomass (kg)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
 </div>
 </section>
+<section id="lets-get-the-total-species-trajectories-of-biomass-over-the-census-periods" class="level3">
+<h3 class="anchored" data-anchor-id="lets-get-the-total-species-trajectories-of-biomass-over-the-census-periods">Lets get the total species trajectories of biomass over the census periods:</h3>
+<p>Which species are increasing the most over time? Is this what you expected based on the number of trees tallied? Here, we have added lines to visualize the trajectory of taxon AGB over time, but we don’t have estimates of variability in annual AGB increment over time.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>Census.AGB.sums <span class="ot">&lt;-</span> Census.AGB <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, site, INV.YEAR) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(AGB_kg, <span class="at">na.rm =</span><span class="cn">TRUE</span>))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB.sums)<span class="sc">+</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> <span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span>, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> <span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span>, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Aboveground Biomass (kg)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
-<section id="estimating-forest-biomass-from-tree-ring-time-series" class="level2">
-<h2 class="anchored" data-anchor-id="estimating-forest-biomass-from-tree-ring-time-series">Estimating Forest biomass from tree ring time-series</h2>
-<section id="step-1-back-calculate-tree-size-over-time-no-uncertainty" class="level3">
-<h3 class="anchored" data-anchor-id="step-1-back-calculate-tree-size-over-time-no-uncertainty">Step 1: Back-calculate tree size over time (no uncertainty)</h3>
+<section id="what-affects-the-trajectory-of-agb-over-time" class="level3">
+<h3 class="anchored" data-anchor-id="what-affects-the-trajectory-of-agb-over-time">What affects the trajectory of AGB over time?</h3>
+<p>Forest demographic processes affecting AGB:</p>
+<ul>
+<li><strong><em>Recruitment</em></strong> of new small trees into the plot</li>
+<li><strong><em>Mortality</em></strong> of trees (or conversely, survival)</li>
+<li><strong><em>Growth</em></strong> of existing trees in the plot</li>
+</ul>
+<p>Census data provide an estimate of these processes over the remeasurement period.</p>
+<p>Recruitment makes up a small amount of AGB at these plots:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Recruitment</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>recruit.code.census <span class="ot">&lt;-</span> Census.AGB <span class="sc">%&gt;%</span> <span class="fu">select</span>(site, ID, taxon, AGB_kg, INV.YEAR) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, ID, taxon) <span class="sc">%&gt;%</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>( INV.YEAR, AGB_kg, <span class="at">fill =</span> <span class="cn">NA</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  reshape2<span class="sc">::</span><span class="fu">melt</span>(., <span class="at">id.vars =</span> <span class="fu">c</span>(<span class="st">"site"</span>, <span class="st">"ID"</span>, <span class="st">"taxon"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(ID, variable) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if there was no measurement in the previous year for the tree, give a recruit code of 1</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">recruit.code =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(<span class="fu">lag</span>(value)), <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if the current value is NA for the tree, set it to 0</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">recruit.code =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(value), <span class="dv">0</span>, recruit.code)) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># set all recruit.code in the initial census to 0</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">recruit.code =</span> <span class="fu">ifelse</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span> <span class="sc">&amp;</span> variable <span class="sc">==</span> <span class="dv">1960</span>, <span class="dv">0</span>, </span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                               <span class="fu">ifelse</span>(site <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"LF2"</span>, <span class="st">"LF3"</span>) <span class="sc">&amp;</span> variable <span class="sc">==</span> <span class="dv">1967</span>, <span class="dv">0</span>, recruit.code))) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Recruitment =</span> <span class="fu">ifelse</span>(recruit.code <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"New Recruit"</span>, <span class="st">"Existing Tree"</span>))</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>recruit.code.census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(ID <span class="sc">%in%</span> <span class="st">"LF1001"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  site     ID taxon variable    value recruit.code   Recruitment
+1  LF1 LF1001  TSCA     1960       NA            0 Existing Tree
+2  LF1 LF1001  TSCA     1967       NA            0 Existing Tree
+3  LF1 LF1001  TSCA     1973       NA            0 Existing Tree
+4  LF1 LF1001  TSCA     1990 19.36831            1   New Recruit
+5  LF1 LF1001  TSCA     1999 45.02890            0 Existing Tree
+6  LF1 LF1001  TSCA     2009 99.23069            0 Existing Tree</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> recruit.code.census) <span class="sc">+</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> variable, <span class="at">y =</span> value, <span class="at">fill =</span> Recruitment), <span class="at">stat =</span> <span class="st">"identity"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Aboveground Biomass (kg)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>There are some mortality events that remove AGB</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Mortality</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>mortality.code.census <span class="ot">&lt;-</span> Census.AGB <span class="sc">%&gt;%</span> <span class="co">#select(site, ID, taxon, AGB_kg, INV.YEAR) %&gt;% </span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, ID) <span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">max.INVYR =</span> <span class="fu">max</span>(INV.YEAR, <span class="at">na.rm =</span><span class="cn">TRUE</span>))<span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()<span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mort.code =</span> <span class="fu">ifelse</span>(INV.YEAR <span class="sc">==</span> max.INVYR <span class="sc">&amp;</span> finalCond <span class="sc">%in%</span> <span class="st">"dead"</span>, <span class="dv">1</span>, <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Mortality =</span> <span class="fu">ifelse</span>(mort.code <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Dead"</span>, <span class="st">"Live"</span>))</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> mortality.code.census) <span class="sc">+</span> </span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">fill =</span> Mortality), <span class="at">stat =</span> <span class="st">"identity"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Aboveground Biomass (kg)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Growth</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>Average.Growth.census <span class="ot">&lt;-</span> mortality.code.census <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(site, ID) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(cal.year) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">REMPER =</span> cal.year <span class="sc">-</span> <span class="fu">lag</span>(cal.year),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">prevDBH =</span> <span class="fu">lag</span>(dbh), </span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">prevAGB =</span> <span class="fu">lag</span>(AGB_kg)) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if the tree died in the remeasurement period, assume it died halfway through </span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">REMPER.mort.corrected =</span> <span class="fu">ifelse</span>(mort.code <span class="sc">==</span> <span class="dv">1</span>, REMPER<span class="sc">/</span><span class="dv">2</span>, REMPER)) <span class="sc">%&gt;%</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tree.AGBI =</span> (AGB_kg <span class="sc">-</span> prevAGB)<span class="sc">/</span>REMPER.mort.corrected, </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">tree.growth =</span> (dbh <span class="sc">-</span> prevDBH)<span class="sc">/</span>REMPER.mort.corrected) </span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Average.Growth.census) <span class="sc">+</span> </span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.AGBI, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.AGBI, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Average Aboveground Biomass Increment (kg/year)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Average.Growth.census) <span class="sc">+</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.growth, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.growth, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Average Growth Increment (cm/year)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>site.avgs <span class="ot">&lt;-</span> Average.Growth.census <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(site, taxon, INV.YEAR)<span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">taxon.AGBI.avg =</span> <span class="fu">mean</span>(tree.AGBI, <span class="at">na.rm =</span><span class="cn">TRUE</span>), </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">taxon.DI.avg =</span> <span class="fu">mean</span>(tree.AGBI, <span class="at">na.rm =</span><span class="cn">TRUE</span>))</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> site.avgs) <span class="sc">+</span> </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.DI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.DI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Average Growth Increment (cm/year)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-9-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> site.avgs) <span class="sc">+</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.AGBI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.AGBI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Average AGBI (kg/year)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-9-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>However, some remeasurement periods are quite long, and we miss inter-annual variation that could lead to differences in estimates of annual AGBI. Tree-ring data can help us fill in these gaps in our understanding of how AGB varies over time, since they are a direct measurement of annual growth.</p>
 </section>
-<section id="step-2-use-allodb-to-estimate-biomass-for-each-tree-using-the-back-calculated-tree-size-in-each-year" class="level3">
-<h3 class="anchored" data-anchor-id="step-2-use-allodb-to-estimate-biomass-for-each-tree-using-the-back-calculated-tree-size-in-each-year">Step 2: Use AlloDB to estimate Biomass for each tree using the back-calculated tree size in each year</h3>
+</section>
+<section id="step-2-use-tree-ring-data-to-back-calculate-tree-diameter-at-harvard-forest" class="level2">
+<h2 class="anchored" data-anchor-id="step-2-use-tree-ring-data-to-back-calculate-tree-diameter-at-harvard-forest">Step 2: Use tree ring data to back-calculate tree diameter at Harvard Forest:</h2>
+<p>In order to use tree ring data to estimate tree AGB, we first need to convert measurements of annual tree growth into estimates of tree diameter. To do this with a single core, we assume that each tree grows symmetrically and in a circle.</p>
+<section id="backcalculating-tree-diameter-using-dplr" class="level3">
+<h3 class="anchored" data-anchor-id="backcalculating-tree-diameter-using-dplr">Backcalculating tree diameter using dplR</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplR)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </section>
 <section id="step-3-visualizing-biomass-over-time-with-no-uncertainty" class="level3">
 <h3 class="anchored" data-anchor-id="step-3-visualizing-biomass-over-time-with-no-uncertainty">Step 3: visualizing biomass over time (with no uncertainty)</h3>

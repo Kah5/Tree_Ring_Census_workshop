@@ -6,7 +6,7 @@ format:
     code-fold: true
 ---
 
-# Biomass estimation from tree ring data and forest census data
+# Biomass estimation from tree ring and forest census data
 
 How do we get estimates of aboveground biomass and forest carbon from tree diameters and tree ring data?
 
@@ -33,8 +33,55 @@ This package is available on github, and we highlight some additional resources 
 -   Tutorial at Ropensci: <https://docs.ropensci.org/allodb/>
 
 ```{R}
+#| echo: FALSE
+#| label: Installing allodb & loading data
 #| warning: false
 devtools::install_github("ropensci/allodb",upgrade = "never")
+library(allodb)
+library(tidyverse)
+library(dplR)
+library(gt)
+library(FIESTA)
+library(reshape2)
+HARV <- readRDS("data/tree_data_HARVARD_STAN_v3.1_102020.RDS")
+
+taxon.conversion <- data.frame(taxon = HARV$taxa, # TAXA abbreviation
+                               SPCD = c(261, # Eastern Hemlock
+                                        833, # Northern Red Oak
+                                        316, # Red Maple
+                                        371, # Yellow Birch
+                                        531, # American beech
+                                        129, # White Pine
+                                        372, # Grey/Sweet Birch
+                                        837, # Black Oak
+                                        7331# Witch hazel (Hamamelis virginiana) 
+                                        ) # using FIA species codes:
+) %>% left_join(., FIESTA::ref_species %>% select(SPCD, COMMON_NAME, GENUS, SPECIES))%>%
+  mutate(`Scientific Name` = paste(GENUS, SPECIES))
+
+Tree.ring <- HARV$Xobs %>% left_join(., HARV$Tr)
+
+# get the calendar years
+year.df <- data.frame(year = max(Tree.ring$year):1, 
+                      cal.year = 2012:(2013 - max(Tree.ring$year)))
+
+Tree.ring <- Tree.ring %>% left_join(., year.df)
+
+year.df <- data.frame(year = max(Tree.ring$year):1, 
+                      cal.year = 2012:(2013 - max(Tree.ring$year)))
+# set up the lat-long information:
+HARV.ll <- data.frame(site = c("LF1", "LF2", "LF3"), 
+                      lat = c(42.53065, 42.53128, 42.53008), 
+                      lon = c(-72.18346, -72.18271, -72.18246))
+
+Census <- HARV$Dobs %>% left_join(., year.df) %>% 
+  rename("taxon" = "species")%>%
+  left_join(., taxon.conversion) %>%# combine with taxon-infomation
+  left_join(., HARV.ll) # combine with lat-long information
+
+Census <- Census %>% 
+  mutate(INV.YEAR = ifelse(cal.year >= 1985 & cal.year <= 1991, 1990, cal.year))
+
 
 ```
 
@@ -49,6 +96,7 @@ Objects include:
 -   `sitespecies`: an object that lists the sites, species, genus, family, and species_code information for some of the example data available with the allodb package
 
 ```{R}
+#| echo: FALSE
 ## Exploring allodb's obects
 colnames(equations)
 colnames(sitespecies)
@@ -65,6 +113,7 @@ head(unique(equations$equation_form))
 Here, we will focus on species from Harvard Forest, so lets see which species we have in our census data. This information is stored in the `taxon` column in the `Census` object:
 
 ```{R}
+#| warning: false
 # lets visualize the number of trees sampled at Harvard Forest each census year:
 Census %>% group_by(taxon, `Scientific Name`, COMMON_NAME, INV.YEAR) %>%
   summarise(n.trees = n()) %>% 
@@ -96,6 +145,7 @@ This function requires the following arguments and provides and output of Aboveg
 -   `coords`: a vector (longitude, latitude) of the plot location, or a matrix with 2 columns if trees have individual locations
 
 ```{R}
+#| warning: false
 
 require(allodb)
 
@@ -117,7 +167,7 @@ Census.1$AGB
 Now lets apply this function to the whole dataset
 
 ```{R}
-
+#| warning: false
 
 ll <- matrix(c(Census$lon, Census$lat), nrow = length(Census$lon), ncol = 2, byrow = FALSE, dimnames = NULL)
 
@@ -170,7 +220,7 @@ ggplot(data = Census.AGB)+
 Which species are increasing the most over time? Is this what you expected based on the number of trees tallied? Here, we have added lines to visualize the trajectory of taxon AGB over time, but we don't have estimates of variability in annual AGB increment over time.
 
 ```{R}
-
+#| warning: false
 Census.AGB.sums <- Census.AGB %>% group_by(taxon, `Scientific Name`, site, INV.YEAR) %>% 
   summarise(`Aboveground Biomass` = sum(AGB_kg, na.rm =TRUE))
 
@@ -193,6 +243,7 @@ Census data provide an estimate of these processes over the remeasurement period
 
 Recruitment makes up a small amount of AGB at these plots:
 ```{R} 
+#| warning: false
 # Recruitment
 recruit.code.census <- Census.AGB %>% select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
   group_by(site, ID, taxon) %>%
@@ -218,6 +269,7 @@ ggplot(data = recruit.code.census) +
 ```
 There are some mortality events that remove AGB 
 ```{R} 
+#| warning: false
 # Mortality
 mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
   group_by(site, ID) %>%
@@ -234,6 +286,7 @@ ggplot(data = mortality.code.census) +
 ```
 Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:
 ```{R} 
+#| warning: false
 # Growth
 Average.Growth.census <- mortality.code.census %>% 
   group_by(site, ID) %>%
@@ -281,46 +334,6 @@ library(dplR)
 ### Step 3: visualizing biomass over time (with no uncertainty)
 
 ```{R}
-show_cols <- c("equation_id", "equation_taxa", "equation_allometry")
-eq_tab_acer <- new_equations(subset_taxa = "Acer")
-head(eq_tab_acer[, show_cols])
-
-
-allom_weights <-
-  weight_allom(
-    genus = "Acer",
-    species = "rubrum",
-    coords = c(-78, 38)
-  )
-
-## visualize weights
-equ_tab_acer <- new_equations()
-equ_tab_acer$weights <- allom_weights
-keep_cols <-
-  c(
-    "equation_id",
-    "equation_taxa",
-    "sample_size",
-    "weights"
-  )
-order_weights <- order(equ_tab_acer$weights, decreasing = TRUE)
-equ_tab_acer <- equ_tab_acer[order_weights, keep_cols]
-head(equ_tab_acer)
-
-
-df_resample <-
-  resample_agb(
-    genus = "Acer",
-    species = "rubrum",
-    coords = c(-78, 38)
-  )
-
-plot(
-  df_resample$dbh,
-  df_resample$agb,
-  xlab = "DBH (cm)",
-  ylab = "Resampled AGB values (kg)"
-)
 
 ```
 

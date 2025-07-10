@@ -9,7 +9,7 @@
 <meta name="author" content="Andria Dawson and Kelly Heilman">
 <meta name="dcterms.date" content="2025-07-09">
 
-<title>State Space Model Workshop 2025, Livingstone, Zambia – Module 2: Data: Tree Ring and Census Data</title>
+<title>State Space Model Workshop 2025, Livingstone, Zambia – Module 7: Comparing RW only and RW + Census model</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,40 +22,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -66,8 +32,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./Module_3_Biomass_estimation.html" rel="next">
-<link href="./Module_1_Introduction.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -155,7 +119,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Module_2_Data.html">Module 2: Data: Tree Ring and Census Data</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Module 7: Comparing RW only and RW + Census model</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -195,7 +159,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./Module_2_Data.html" class="sidebar-item-text sidebar-link active">
+  <a href="./Module_2_Data.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Module 2: Data: Tree Ring and Census Data</span></a>
   </div>
 </li>
@@ -227,19 +191,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#load-packages-to-be-used" id="toc-load-packages-to-be-used" class="nav-link active" data-scroll-target="#load-packages-to-be-used">Load packages to be used</a></li>
-  <li><a href="#module-1-objectives" id="toc-module-1-objectives" class="nav-link" data-scroll-target="#module-1-objectives">Module 1 Objectives</a>
+  <li><a href="#outline" id="toc-outline" class="nav-link active" data-scroll-target="#outline">Outline</a>
   <ul class="collapse">
-  <li><a href="#tree-ring-data" id="toc-tree-ring-data" class="nav-link" data-scroll-target="#tree-ring-data">Tree Ring Data</a>
-  <ul class="collapse">
-  <li><a href="#harvard-forest-tree-ring-data" id="toc-harvard-forest-tree-ring-data" class="nav-link" data-scroll-target="#harvard-forest-tree-ring-data">Harvard Forest tree ring data</a></li>
-  </ul></li>
-  <li><a href="#harvard-forest-census-data" id="toc-harvard-forest-census-data" class="nav-link" data-scroll-target="#harvard-forest-census-data">Harvard Forest Census Data</a></li>
-  </ul></li>
-  <li><a href="#note-that-for-two-of-the-plots-at-harvard-forest-the-census-was-split-over-mutiple-years-1985-1990-creating-an-inventory-year-variable-will-allow-us-to-compare-tree-estimates-over-each-census" id="toc-note-that-for-two-of-the-plots-at-harvard-forest-the-census-was-split-over-mutiple-years-1985-1990-creating-an-inventory-year-variable-will-allow-us-to-compare-tree-estimates-over-each-census" class="nav-link" data-scroll-target="#note-that-for-two-of-the-plots-at-harvard-forest-the-census-was-split-over-mutiple-years-1985-1990-creating-an-inventory-year-variable-will-allow-us-to-compare-tree-estimates-over-each-census">Note that for two of the plots at Harvard Forest, the census was split over mutiple years (1985-1990), creating an “inventory year” variable will allow us to compare tree estimates over each census</a>
-  <ul class="collapse">
-  <li><a href="#in-the-next-module" id="toc-in-the-next-module" class="nav-link" data-scroll-target="#in-the-next-module">In the next module:</a></li>
-  <li><a href="#additional-information" id="toc-additional-information" class="nav-link" data-scroll-target="#additional-information">Additional information:</a></li>
+  <li><a href="#read-in-all-of-the-outputs-of-each-model" id="toc-read-in-all-of-the-outputs-of-each-model" class="nav-link" data-scroll-target="#read-in-all-of-the-outputs-of-each-model">Read in all of the outputs of each model</a></li>
+  <li><a href="#plot-up-total-agb-and-agbi-over-time-for-each-method" id="toc-plot-up-total-agb-and-agbi-over-time-for-each-method" class="nav-link" data-scroll-target="#plot-up-total-agb-and-agbi-over-time-for-each-method">Plot up total AGB and AGBI over time for each method</a></li>
+  <li><a href="#plot-up-species-level-agb-and-agbi-over-time-for-each-method" id="toc-plot-up-species-level-agb-and-agbi-over-time-for-each-method" class="nav-link" data-scroll-target="#plot-up-species-level-agb-and-agbi-over-time-for-each-method">Plot up species-level AGB and AGBI over time for each method</a></li>
+  <li><a href="#does-variation-in-agbi-correspond-to-variation-in-climate" id="toc-does-variation-in-agbi-correspond-to-variation-in-climate" class="nav-link" data-scroll-target="#does-variation-in-agbi-correspond-to-variation-in-climate">Does variation in AGBI correspond to variation in climate?</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -249,7 +206,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Module 2: Data: Tree Ring and Census Data</h1>
+<h1 class="title">Module 7: Comparing RW only and RW + Census model</h1>
 </div>
 
 
@@ -278,221 +235,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="load-packages-to-be-used" class="level2">
-<h2 class="anchored" data-anchor-id="load-packages-to-be-used">Load packages to be used</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(FIESTA)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="callout callout-style-simple callout-note callout-titled">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="true" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Notes on running this tutorial
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-1" class="callout-1-contents callout-collapse collapse show">
-<div class="callout-body-container callout-body">
-<p>Boxes like this one above contain R code to run this analysis. Clicking the arrow character in the upper right corner of the box will expand or collapse the contents of the box.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="module-1-objectives" class="level1">
-<h1>Module 1 Objectives</h1>
+<section id="outline" class="level2">
+<h2 class="anchored" data-anchor-id="outline">Outline</h2>
 <ul>
-<li>visualize Harvard Forest Tree Ring and Forest Census Data</li>
+<li>Read in the outputs</li>
+<li>Compare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)</li>
+<li>Compare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)</li>
+<li>Relating AGBI estimates to climate drivers</li>
 </ul>
-<section id="tree-ring-data" class="level2">
-<h2 class="anchored" data-anchor-id="tree-ring-data">Tree Ring Data</h2>
-<section id="harvard-forest-tree-ring-data" class="level3">
-<h3 class="anchored" data-anchor-id="harvard-forest-tree-ring-data">Harvard Forest tree ring data</h3>
-<p>There are two foundational datasets used in the processing of these biomass estimates. The first is a tree ring dataset collected by the Harvard Forest Research Area in 2012. Three 20m plots were measured following a double-nested design. The following species were included in the final ring width dataset:</p>
-<ul>
-<li>ACRU = red maple (Acer rubrum)</li>
-<li>BEAL = yellow birch (Betula alleghaniensis)</li>
-<li>BELE = sweet birch (Betula lenta)</li>
-<li>FAGR = American beech (Fagus grandifolia)</li>
-<li>HAVI = Witch hazel (Hamamelis virginiana)</li>
-<li>PIST = Eastern white pine (Pinus strobus)</li>
-<li>QURU = Northern red oak (Quercus rubra)</li>
-<li>QUVE = Black oak (Quercus velutina)</li>
-<li>TSCA = Eastern hemlock (Tsuga canadensis)</li>
-</ul>
-<p>Harvard forest tree ring data samples were collected</p>
-<p>Citation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B. Poulter, and A. Hessl. Comparing tree-ring and permanent plot estimates of aboveground net primary production in three eastern us forests. Ecosphere, 7(9), 2016.</p>
-<ul>
-<li>We downloaded the raw data for Harvard Forest Tree ring data for you</li>
-<li>Visualize the pre-formatted HF tree ring data below</li>
-</ul>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code to plot the tree ring data, by species</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>HARV <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/tree_data_HARVARD_STAN_v3.1_102020.RDS"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Xobs contains the increment data for all the cored trees</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(HARV<span class="sc">$</span>Xobs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>      id year incr plot stat_id taxon
-1 LF1001   63 0.69    1       1  TSCA
-2 LF1001   64 0.95    1       1  TSCA
-3 LF1001   65 0.83    1       1  TSCA
-4 LF1001   66 0.57    1       1  TSCA
-5 LF1001   67 0.58    1       1  TSCA
-6 LF1001   68 0.79    1       1  TSCA</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Tr contains the diameter at the closest measured year for each cored tree</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(HARV<span class="sc">$</span>Tr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>  stat_id plot     id year  dbh distance taxon
-1       1    1 LF1001  114 18.1      7.6  TSCA
-2       2    1 LF1002  114 66.0      7.2  QURU
-3       3    1 LF1003  113 22.3      7.5  ACRU
-4       4    1 LF1004  113 30.4     10.6  ACRU
-5       5    1 LF1005  113 15.6      9.7  ACRU
-6       6    1 LF1007  113 30.0     11.9  BEAL</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># combine the tree ring data with their diameters</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Tree.ring <span class="ot">&lt;-</span> HARV<span class="sc">$</span>Xobs <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., HARV<span class="sc">$</span>Tr)</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># get the calendar years</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>year.df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year =</span> <span class="fu">max</span>(Tree.ring<span class="sc">$</span>year)<span class="sc">:</span><span class="dv">1</span>, </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cal.year =</span> <span class="dv">2012</span><span class="sc">:</span>(<span class="dv">2013</span> <span class="sc">-</span> <span class="fu">max</span>(Tree.ring<span class="sc">$</span>year)))</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>Tree.ring <span class="ot">&lt;-</span> Tree.ring <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., year.df)</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co"># make a timeseries plot of all the tree ring increments</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Tree.ring)<span class="sc">+</span><span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">y =</span> incr, <span class="at">group =</span> id, <span class="at">color =</span> taxon), <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>taxon)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Increment (mm)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Module_2_Data_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the diameter measurements for the cored trees</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Tree.ring)<span class="sc">+</span><span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">y =</span> dbh, <span class="at">group =</span> id, <span class="at">color =</span> taxon), <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>taxon)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Increment (mm)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Module_2_Data_files/figure-html/unnamed-chunk-2-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="read-in-all-of-the-outputs-of-each-model" class="level3">
+<h3 class="anchored" data-anchor-id="read-in-all-of-the-outputs-of-each-model">Read in all of the outputs of each model</h3>
 </section>
+<section id="plot-up-total-agb-and-agbi-over-time-for-each-method" class="level3">
+<h3 class="anchored" data-anchor-id="plot-up-total-agb-and-agbi-over-time-for-each-method">Plot up total AGB and AGBI over time for each method</h3>
 </section>
-<section id="harvard-forest-census-data" class="level2">
-<h2 class="anchored" data-anchor-id="harvard-forest-census-data">Harvard Forest Census Data</h2>
-<p>The second dataset for this site includes the census data measured for the Lyford Plots, which is available on the Harvard Forest data archive website. Censuses were conducted in 1962, 1969, 1975, 1987-1991, 2001, and 2011 and mapped all trees with DBH greater than 5 cm. in a mapped area covering 2.88 ha. The three ring-width plots include only a fraction of this area, and, therefore, we determined which census trees were located within the plot areas and considered only those trees for the model.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code to plot census data, by species</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># - ACRU = red maple (Acer rubrum) </span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># - BEAL = yellow birch (Betula alleghaniensis) </span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># - BELE = sweet birch (Betula lenta)</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># - FAGR = American beech (Fagus grandifolia) </span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># - HAVI = Witch hazel (Hamamelis virginiana) </span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># - PIST = Eastern white pine (Pinus strobus)</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># - QURU = Northern red oak (Quercus rubra) </span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># - QUVE = Black oak (Quercus velutina)</span></span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co"># - TSCA = Eastern hemlock (Tsuga canadensis)</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>taxon.conversion <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">taxon =</span> HARV<span class="sc">$</span>taxa, <span class="co"># TAXA abbreviation</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>                               <span class="at">SPCD =</span> <span class="fu">c</span>(<span class="dv">261</span>, <span class="co"># Eastern Hemlock</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">833</span>, <span class="co"># Northern Red Oak</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">316</span>, <span class="co"># Red Maple</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">371</span>, <span class="co"># Yellow Birch</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">531</span>, <span class="co"># American beech</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">129</span>, <span class="co"># White Pine</span></span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">372</span>, <span class="co"># Grey/Sweet Birch</span></span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">837</span>, <span class="co"># Black Oak</span></span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>                                        <span class="dv">7331</span><span class="co"># Witch hazel (Hamamelis virginiana) </span></span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>                                        ) <span class="co"># using FIA species codes:</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., FIESTA<span class="sc">::</span>ref_species <span class="sc">%&gt;%</span> <span class="fu">select</span>(SPCD, COMMON_NAME, GENUS, SPECIES))<span class="sc">%&gt;%</span></span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">paste</span>(GENUS, SPECIES))</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co"># set up the lat-long information:</span></span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>HARV.ll <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">site =</span> <span class="fu">c</span>(<span class="st">"LF1"</span>, <span class="st">"LF2"</span>, <span class="st">"LF3"</span>), </span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lat =</span> <span class="fu">c</span>(<span class="fl">42.53065</span>, <span class="fl">42.53128</span>, <span class="fl">42.53008</span>), </span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lon =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">72.18346</span>, <span class="sc">-</span><span class="fl">72.18271</span>, <span class="sc">-</span><span class="fl">72.18246</span>))</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>Census <span class="ot">&lt;-</span> HARV<span class="sc">$</span>Dobs <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., year.df) <span class="sc">%&gt;%</span> </span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"taxon"</span> <span class="ot">=</span> <span class="st">"species"</span>)<span class="sc">%&gt;%</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., taxon.conversion) <span class="sc">%&gt;%</span><span class="co"># combine with taxon-infomation</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., HARV.ll) <span class="co"># combine with lat-long information</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census)<span class="sc">+</span><span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">y =</span> dbh, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, <span class="at">shape =</span> finalCond), <span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span> <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">y =</span> dbh, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>)) <span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"DBH (cm)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Module_2_Data_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="plot-up-species-level-agb-and-agbi-over-time-for-each-method" class="level3">
+<h3 class="anchored" data-anchor-id="plot-up-species-level-agb-and-agbi-over-time-for-each-method">Plot up species-level AGB and AGBI over time for each method</h3>
 </section>
-</section>
-<section id="note-that-for-two-of-the-plots-at-harvard-forest-the-census-was-split-over-mutiple-years-1985-1990-creating-an-inventory-year-variable-will-allow-us-to-compare-tree-estimates-over-each-census" class="level1">
-<h1>Note that for two of the plots at Harvard Forest, the census was split over mutiple years (1985-1990), creating an “inventory year” variable will allow us to compare tree estimates over each census</h1>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census)<span class="sc">+</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">fill =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>), <span class="at">stat =</span> <span class="st">"count"</span>)<span class="sc">+</span>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Module_2_Data_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Census dates: 1962, 1969, 1975, 1985-1991, 2001, and 2011</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>Census <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">INV.YEAR =</span> <span class="fu">ifelse</span>(cal.year <span class="sc">&gt;=</span> <span class="dv">1985</span> <span class="sc">&amp;</span> cal.year <span class="sc">&lt;=</span> <span class="dv">1991</span>, <span class="dv">1990</span>, cal.year))</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census)<span class="sc">+</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">fill =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>), <span class="at">stat =</span> <span class="st">"count"</span>)<span class="sc">+</span>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">3</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Module_2_Data_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<section id="in-the-next-module" class="level2">
-<h2 class="anchored" data-anchor-id="in-the-next-module">In the next module:</h2>
-<p>We will learn how to back-calculate tree diameters from tree ring data and how to scale tree diameter measurements up to tree-level biomass and carbon</p>
-</section>
-<section id="additional-information" class="level2">
-<h2 class="anchored" data-anchor-id="additional-information">Additional information:</h2>
-<p>Some tree census data sources of regional interest include:</p>
-<p>- <a href="http://ctfs.si.edu/datarequest/index.php/main/region/tree/africa">ForestGEO forest census plots</a> (Cameroon, Congo, Gabon, Kenya, Nigeria) -</p>
+<section id="does-variation-in-agbi-correspond-to-variation-in-climate" class="level3">
+<h3 class="anchored" data-anchor-id="does-variation-in-agbi-correspond-to-variation-in-climate">Does variation in AGBI correspond to variation in climate?</h3>
 
 
 </section>
@@ -1063,18 +824,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="./Module_1_Introduction.html" class="pagination-link" aria-label="Module 1: Introduction">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Module 1: Introduction</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="./Module_3_Biomass_estimation.html" class="pagination-link" aria-label="Module 3: Estimating Biomass From Tree Ring Data">
-        <span class="nav-page-text">Module 3: Estimating Biomass From Tree Ring Data</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
