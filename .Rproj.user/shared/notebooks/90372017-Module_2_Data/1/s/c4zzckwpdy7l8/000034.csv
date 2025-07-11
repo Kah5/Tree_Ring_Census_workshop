@@ -1,0 +1,6 @@
+"0","#| warning: false"
+"0","# code to plot the tree ring data, by species"
+"0","HARV <- readRDS(""data/tree_data_HARVARD_STAN_v3.1_102020.RDS"")"
+"0",""
+"0","# Xobs contains the increment data for all the cored trees"
+"0","head(HARV$Xobs)"

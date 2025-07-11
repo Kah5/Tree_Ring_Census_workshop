@@ -1,0 +1,82 @@
+---
+title: "Module 5: Ring-width only model (RW-only)"
+author: "Andria Dawson and Kelly Heilman"
+format:
+  html:
+    code-fold: true
+---
+
+## State-space model for estimating biomass at HF with only tree ring time-series and the diameter at time of coring
+
+## Load packages to be used
+
+We estimate the parameters of this state-space model in a program called `stan` which interfaces to `R` via a package called `rstan` (`cmdstan` is another package that is used.)
+
+```{R}
+library(rstan)
+```
+
+# load the model data
+
+```{r}
+
+```
+
+# Stan Model
+
+```{r}
+# add R stan code here
+```
+
+# add the math notation of the model here:
+
+## Running the model: Example for a short run
+
+```{r}
+# run a version with a small # of iterations here to show the output
+
+# settings
+
+#
+compiled_RW = stan_model(file = paste0('models/growth_model_RW.stan'))
+
+# fit and extract values
+fit_RW = sampling(compiled_RW, 
+                  data = dat, 
+                  iter = iter, 
+                  chains = nchains,
+                  verbose=TRUE)
+```
+
+## The model outputs
+
+```{R}
+# load the Full TR only model outputs
+# put some example exploration of the model outputs here
+```
+
+## Model Checking in stan:
+
+```{R}
+# traceplots
+# checking model diagnostics
+
+```
+
+## Model Validation:
+
+```{r}
+# comparing estimates of diameter increment to observations
+```
+
+## convert tree diameters to AGB
+
+```{R}
+# code to estimate biomass
+```
+
+## Plot of AGB and AGBI with uncertainty
+
+```{R}
+# plot total and by taxa
+```

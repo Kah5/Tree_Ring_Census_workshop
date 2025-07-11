@@ -1,0 +1,4 @@
+"0",""
+"0","# plot the diameter measurements for the cored trees"
+"0","ggplot(data = Tree.ring)+geom_point(aes(x = cal.year, y = dbh, group = id, color = taxon), alpha = 0.5)+facet_wrap(~taxon)+ylab(""Increment (mm)"")+xlab(""Year"")+theme_bw()"
+"0",""
