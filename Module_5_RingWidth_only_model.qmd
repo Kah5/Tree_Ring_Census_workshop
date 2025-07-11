@@ -33,6 +33,7 @@ library(rstan)
 ## Running the model: Example for a short run
 
 ```{r}
+#| eval: false
 # run a version with a small # of iterations here to show the output
 
 # settings

@@ -242,8 +242,12 @@ Forest demographic processes affecting AGB:
 Census data provide an estimate of these processes over the remeasurement period.
 
 Recruitment makes up a small amount of AGB at these plots:
+<<<<<<< HEAD
 
 ```{R}
+=======
+```{R} 
+>>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
 #| warning: false
 # Recruitment
 recruit.code.census <- Census.AGB %>% select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
@@ -268,10 +272,15 @@ recruit.code.census %>% filter(ID %in% "LF1001")
 ggplot(data = recruit.code.census) + 
   geom_col(aes(x = variable, y = value, fill = Recruitment), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (kg)")
 ```
+<<<<<<< HEAD
 
 There are some mortality events that remove AGB
 
 ```{R}
+=======
+There are some mortality events that remove AGB 
+```{R} 
+>>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
 #| warning: false
 # Mortality
 mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
@@ -287,10 +296,15 @@ mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEA
 ggplot(data = mortality.code.census) + 
   geom_col(aes(x = INV.YEAR, y = AGB_kg, fill = Mortality), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (kg)")
 ```
+<<<<<<< HEAD
 
 Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:
 
 ```{R}
+=======
+Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:
+```{R} 
+>>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
 #| warning: false
 # Growth
 Average.Growth.census <- mortality.code.census %>% 
@@ -326,6 +340,7 @@ ggplot(data = site.avgs) +
   geom_line(aes(x = INV.YEAR, y = taxon.AGBI.avg, color = taxon))+ facet_wrap(~site)+ylab("Taxon Average AGBI (kg/year)")+xlab("Inventory Year")
 
 ```
+<<<<<<< HEAD
 
 However, some remeasurement periods are quite long, and we miss inter-annual variation that could lead to differences in estimates of annual AGBI. Tree-ring data can help us fill in these gaps in our understanding of how AGB varies over time, since they are a direct measurement of annual growth.
 
@@ -335,6 +350,14 @@ In order to use tree ring data to estimate tree AGB, we first need to convert me
 
 ### Backcalculating tree diameter using dplR
 
+=======
+However, some remeasurement periods are quite long, and we miss inter-annual variation that could lead to differences in estimates of annual AGBI. Tree-ring data can help us fill in these gaps in our understanding of how AGB varies over time, since they are a direct measurement of annual growth. 
+
+## Step 2: Use tree ring data to back-calculate tree diameter at Harvard Forest:
+In order to use tree ring data to estimate tree AGB, we first need to convert measurements of annual tree growth into estimates of tree diameter. To do this with a single core, we assume that each tree grows symmetrically and in a circle. 
+
+### Backcalculating tree diameter using dplR
+>>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
 ```{r}
 library(dplR)
 ```

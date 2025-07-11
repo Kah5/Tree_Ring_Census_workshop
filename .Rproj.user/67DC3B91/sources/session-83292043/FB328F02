@@ -3,7 +3,7 @@
     "path": "~/Documents/Tree_Ring_Census_workshop/Module_2_Data.qmd",
     "project_path": "Module_2_Data.qmd",
     "type": "quarto_markdown",
-    "hash": "1862002080",
+    "hash": "0",
     "contents": "",
     "dirty": false,
     "created": 1751487265071.0,
@@ -21,11 +21,11 @@
         "rmdVisualModeLocation": "3937:3366.5"
     },
     "folds": "",
-    "lastKnownWriteTime": 1752268897,
+    "lastKnownWriteTime": 1752271091,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1752268899653,
+    "last_content_update": 1752271091,
     "read_only": false,
     "read_only_alternatives": []
 }
