@@ -85,30 +85,6 @@ Census <- Census %>%
 
 ```
 
-Let's explore allodb's allometric objects and functions.
-
-Objects include:
-
--   `equations`: an object that has the original allometric reference/citation, location of the data, the type of equation, information on units, and alot of additional information
-
--   `references`: an object that has citations, authors, etc, for the original reference data
-
--   `sitespecies`: an object that lists the sites, species, genus, family, and species_code information for some of the example data available with the allodb package
-
-```{R}
-#| echo: FALSE
-## Exploring allodb's obects
-colnames(equations)
-colnames(sitespecies)
-colnames(references)
-
-# there are 242 unique taxa in allodb
-head(unique(equations$equation_taxa))
-
-# Note that there are many different equation forms included in this database:
-head(unique(equations$equation_form))
-
-```
 
 Here, we will focus on species from Harvard Forest, so lets see which species we have in our census data. This information is stored in the `taxon` column in the `Census` object:
 
@@ -204,13 +180,23 @@ Census.LF3$AGB_kg <-
     species = Census.LF3$SPECIES,
     coords = c(LF3.ll$lon, LF3.ll$lat))
 
-Census.AGB <- rbind(Census.LF1, Census.LF2, Census.LF3)
+plot_radius = 20
+Census.AGB <- rbind(Census.LF1, Census.LF2, Census.LF3) %>% 
+  mutate(AGB_Mg_ha = AGB_kg*(1/(pi*plot_radius^2)) * (1/0.0001) * (1/1000)) # convert the tree level AGB to MG/ha)
+# convert the tree level AGB to MG/ha
+
 
 
 ggplot(data = Census.AGB)+
   geom_point(aes(x = INV.YEAR, y = AGB_kg, group = ID, color = `Scientific Name`))+
   geom_line(aes(x = INV.YEAR, y = AGB_kg, group = ID, color = `Scientific Name`))+
   facet_wrap(~site)+theme_bw()+ylab("Tree Aboveground Biomass (kg)")+xlab("Year")
+
+
+ggplot(data = Census.AGB)+
+  geom_point(aes(x = INV.YEAR, y =AGB_Mg_ha, group = ID, color = `Scientific Name`))+
+  geom_line(aes(x = INV.YEAR, y = AGB_Mg_ha, group = ID, color = `Scientific Name`))+
+  facet_wrap(~site)+theme_bw()+ylab("Tree Aboveground Biomass (Mg/ha)")+xlab("Year")
 
 
 ```
@@ -222,12 +208,12 @@ Which species are increasing the most over time? Is this what you expected based
 ```{R}
 #| warning: false
 Census.AGB.sums <- Census.AGB %>% group_by(taxon, `Scientific Name`, site, INV.YEAR) %>% 
-  summarise(`Aboveground Biomass` = sum(AGB_kg, na.rm =TRUE))
+  summarise(`Aboveground Biomass` = sum(AGB_Mg_ha, na.rm =TRUE))
 
 ggplot(data = Census.AGB.sums)+
   geom_point(aes(x = INV.YEAR, y = `Aboveground Biomass`, color = `Scientific Name`))+
   geom_line(aes(x = INV.YEAR, y = `Aboveground Biomass`, color = `Scientific Name`))+
-  facet_wrap(~site)+theme_bw()+ylab("Taxon Aboveground Biomass (kg)")+xlab("Year")
+  facet_wrap(~site)+theme_bw()+ylab("Taxon Aboveground Biomass (Mg/ha)")+xlab("Year")
 
 ```
 
@@ -241,15 +227,15 @@ Forest demographic processes affecting AGB:
 
 Census data provide an estimate of these processes over the remeasurement period.
 
-Recruitment makes up a small amount of AGB at these plots: \<\<\<\<\<\<\< HEAD
+Recruitment makes up a small amount of AGB at these plots:
 
 ```{R}
-
+#| echo: FALSE
 #| warning: false
 # Recruitment
-recruit.code.census <- Census.AGB %>% select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
+recruit.code.census <- Census.AGB %>% select(site, ID, taxon, AGB_Mg_ha, INV.YEAR) %>% 
   group_by(site, ID, taxon) %>%
-  spread( INV.YEAR, AGB_kg, fill = NA) %>%
+  spread( INV.YEAR, AGB_Mg_ha, fill = NA) %>%
   reshape2::melt(., id.vars = c("site", "ID", "taxon")) %>%
   arrange(ID, variable) %>% 
   
@@ -267,15 +253,14 @@ recruit.code.census <- Census.AGB %>% select(site, ID, taxon, AGB_kg, INV.YEAR) 
 recruit.code.census %>% filter(ID %in% "LF1001")
 
 ggplot(data = recruit.code.census) + 
-  geom_col(aes(x = variable, y = value, fill = Recruitment), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (kg)")
+  geom_col(aes(x = variable, y = value, fill = Recruitment), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (Mg/ha)")
 ```
 
 There are some mortality events that remove AGB
 
-There are some mortality events that remove AGB
 
 ```{R}
-
+#| echo: FALSE
 #| warning: false
 # Mortality
 mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
@@ -289,7 +274,7 @@ mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEA
 
 
 ggplot(data = mortality.code.census) + 
-  geom_col(aes(x = INV.YEAR, y = AGB_kg, fill = Mortality), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (kg)")
+  geom_col(aes(x = INV.YEAR, y = AGB_Mg_ha, fill = Mortality), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (Mg/ha)")
 ```
 
 Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:
@@ -302,17 +287,17 @@ Average.Growth.census <- mortality.code.census %>%
   arrange(cal.year) %>% 
   mutate(REMPER = cal.year - lag(cal.year),
          prevDBH = lag(dbh), 
-         prevAGB = lag(AGB_kg)) %>% 
+         prevAGB = lag(AGB_Mg_ha)) %>% 
   # if the tree died in the remeasurement period, assume it died halfway through 
   mutate(REMPER.mort.corrected = ifelse(mort.code == 1, REMPER/2, REMPER)) %>%
   ungroup() %>%
-  mutate(tree.AGBI = (AGB_kg - prevAGB)/REMPER.mort.corrected, 
+  mutate(tree.AGBI = (AGB_Mg_ha - prevAGB)/REMPER.mort.corrected, 
          tree.growth = (dbh - prevDBH)/REMPER.mort.corrected) 
 
 
 ggplot(data = Average.Growth.census) + 
   geom_point(aes(x = INV.YEAR, y = tree.AGBI, color = taxon, group = ID))+
-  geom_line(aes(x = INV.YEAR, y = tree.AGBI, color = taxon, group = ID))+ facet_wrap(~site)+ylab("Tree Average Aboveground Biomass Increment (kg/year)")
+  geom_line(aes(x = INV.YEAR, y = tree.AGBI, color = taxon, group = ID))+ facet_wrap(~site)+ylab("Tree Average Aboveground Biomass Increment (Mg/ha/year)")
 
 ggplot(data = Average.Growth.census) + 
   geom_point(aes(x = INV.YEAR, y = tree.growth, color = taxon, group = ID))+
@@ -327,7 +312,7 @@ ggplot(data = site.avgs) +
 
 ggplot(data = site.avgs) + 
   geom_point(aes(x = INV.YEAR, y = taxon.AGBI.avg, color = taxon))+
-  geom_line(aes(x = INV.YEAR, y = taxon.AGBI.avg, color = taxon))+ facet_wrap(~site)+ylab("Taxon Average AGBI (kg/year)")+xlab("Inventory Year")
+  geom_line(aes(x = INV.YEAR, y = taxon.AGBI.avg, color = taxon))+ facet_wrap(~site)+ylab("Taxon Average AGBI (Mg/ha/year)")+xlab("Inventory Year")
 
 ```
 
@@ -346,6 +331,7 @@ For simplicity here, we will we assume that each tree grows symmetrically and in
 Read in the rwl files for red maple at Harvard Forest (using read.tucson function in dplR) and link them up to the census dataset.
 
 ```{r}
+#| output: false
 library(dplR)
 # read in the rwl files using the helpful dplR functions:
 all.HF.rwl <- list.files("data/rwl/", pattern = ".rwl", full.names = T)
@@ -408,8 +394,9 @@ core.all <- inc.diam %>%
   # to convince yourself that this is working right, check that the estimated increments == the tree diameter increment:
   # core.all %>% mutate(check.dia.inc = dbh_cm_bc - lead(dbh_cm_bc)) %>% 
   #   filter(!round(dia.inc, 3) == round(check.dia.inc, 3) )
-  
+```
 
+```{r}
 east.core <- core.all %>% filter(core.id %in% "LF1005e")
  ggplot()+geom_line(data = east.core, aes(x = cal.year, y = dbh_cm_bc, color = core.id))+
    geom_point(data = east.core %>% filter(cal.year == cored.cal.year), aes(x = cal.year, y = dbh))+ylab("Tree diameter (cm)")+xlab("Year")
@@ -553,11 +540,35 @@ The simplest way of estimating Carbon from tree-level biomass is to assume that 
 Other carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.
 
 ```{r}
-TAXA.AGB <- TAXA.AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year) %>% 
-  summarise(Carbon_kg_taxa = sum(AGB_Mg_ha*0.5)) %>% filter(cal.year <= 2010)
+TAXA.C <- TR.AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>% 
+  summarise(Carbon_Mg_ha_taxa = sum(AGB_Mg_ha*0.5)) #%>% 
+  # ungroup()%>%
+  # # average across sites
+  # summarise(Carbon_Mg_ha_taxa_avg = mean(Carbon_Mg_ha_taxa))%>% filter(cal.year <= 2010)
 
 ggplot()+
-  geom_line(data = TAXA.AGB, aes(x = cal.year, y = Carbon_kg_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Carbon (kg)")+xlab("Year")
+  geom_line(data = TAXA.C, aes(x = cal.year, y = Carbon_Mg_ha_taxa, color = COMMON_NAME), line_width = 2)+ylab("Taxa Aboveground Carbon (Mg C/ha)")+xlab("Year")+facet_wrap(~plot)
+```
+
+### Comparing Census and tree-ring derived Aboveground biomass and Carbon
+```{r}
+Census.totals <- Census.AGB.sums %>% left_join(.,taxon.conversion) %>% 
+  group_by(COMMON_NAME, INV.YEAR) %>% 
+  summarise(AGB_Mg_ha_Site = mean(`Aboveground Biomass`))
+
+TR.totals <- TAXA.AGB %>% 
+  group_by(COMMON_NAME, cal.year) %>% 
+  summarise(AGB_Mg_ha_Site = mean(AGB_Mg_ha_taxa))
+
+ggplot()+
+  geom_line(data = TR.totals , aes(x = cal.year, y = AGB_Mg_ha_Site, color = "Tree Ring"), size = 2)+
+  geom_point(data = Census.totals, aes(x = INV.YEAR, y = AGB_Mg_ha_Site, color = "Census"), size= 2) + ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~COMMON_NAME, scales = "free_y")+
+  scale_color_manual(values = c("Tree Ring" = "brown", 
+                                "Census" = "forestgreen"), 
+                     name = "Data Source")
+  
+  
+
 ```
 
 # **Issues and strengths of estimating biomass from tree ring data alone:**
