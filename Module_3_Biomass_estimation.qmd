@@ -241,13 +241,10 @@ Forest demographic processes affecting AGB:
 
 Census data provide an estimate of these processes over the remeasurement period.
 
-Recruitment makes up a small amount of AGB at these plots:
-<<<<<<< HEAD
+Recruitment makes up a small amount of AGB at these plots: \<\<\<\<\<\<\< HEAD
 
 ```{R}
-=======
-```{R} 
->>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
+
 #| warning: false
 # Recruitment
 recruit.code.census <- Census.AGB %>% select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
@@ -272,15 +269,13 @@ recruit.code.census %>% filter(ID %in% "LF1001")
 ggplot(data = recruit.code.census) + 
   geom_col(aes(x = variable, y = value, fill = Recruitment), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (kg)")
 ```
-<<<<<<< HEAD
+
+There are some mortality events that remove AGB
 
 There are some mortality events that remove AGB
 
 ```{R}
-=======
-There are some mortality events that remove AGB 
-```{R} 
->>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
+
 #| warning: false
 # Mortality
 mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEAR) %>% 
@@ -296,15 +291,10 @@ mortality.code.census <- Census.AGB %>% #select(site, ID, taxon, AGB_kg, INV.YEA
 ggplot(data = mortality.code.census) + 
   geom_col(aes(x = INV.YEAR, y = AGB_kg, fill = Mortality), stat = "identity")+facet_wrap(~site)+ylab("Aboveground Biomass (kg)")
 ```
-<<<<<<< HEAD
 
 Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:
 
 ```{R}
-=======
-Tree and taxon average annual growth and average annual aboveground biomass increment (AGBI) appear to vary across remeasurement periods:
-```{R} 
->>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
 #| warning: false
 # Growth
 Average.Growth.census <- mortality.code.census %>% 
@@ -340,38 +330,252 @@ ggplot(data = site.avgs) +
   geom_line(aes(x = INV.YEAR, y = taxon.AGBI.avg, color = taxon))+ facet_wrap(~site)+ylab("Taxon Average AGBI (kg/year)")+xlab("Inventory Year")
 
 ```
-<<<<<<< HEAD
 
 However, some remeasurement periods are quite long, and we miss inter-annual variation that could lead to differences in estimates of annual AGBI. Tree-ring data can help us fill in these gaps in our understanding of how AGB varies over time, since they are a direct measurement of annual growth.
 
-## Step 2: Use tree ring data to back-calculate tree diameter at Harvard Forest:
+## **Step 2: Use tree ring data to back-calculate tree diameter at Harvard Forest:**
 
-In order to use tree ring data to estimate tree AGB, we first need to convert measurements of annual tree growth into estimates of tree diameter. To do this with a single core, we assume that each tree grows symmetrically and in a circle.
+In order to use tree ring data to estimate tree AGB, we first need to convert measurements of annual tree growth into estimates of tree diameter.
 
-### Backcalculating tree diameter using dplR
+There are many different ways to convert tree ring radial increments to an estimate of circumference (i.e. diameter) and to an estimate of area (i.e. basal area). The [`dplR` package](https://cran.r-project.org/web/packages/dplR/index.html) from [opendendro](https://opendendro.org) has some functions to calculate basal area increment--check out `bai.in`, `bai.out`, and `bakker.`
 
-=======
-However, some remeasurement periods are quite long, and we miss inter-annual variation that could lead to differences in estimates of annual AGBI. Tree-ring data can help us fill in these gaps in our understanding of how AGB varies over time, since they are a direct measurement of annual growth. 
+For simplicity here, we will we assume that each tree grows symmetrically and in a circle. So we convert tree ring growth data for each core from radial increment to a diameter increment by multiplying by 2. Because we have a diameter measurement from a recent census, we can back-calculate the diameter by subtracting the following year's increment. To calculate the Diameter for core () in the year just before the census diameter was taken year (), we subtract the diameter increment growth () from the Census measured Diameter 
 
-## Step 2: Use tree ring data to back-calculate tree diameter at Harvard Forest:
-In order to use tree ring data to estimate tree AGB, we first need to convert measurements of annual tree growth into estimates of tree diameter. To do this with a single core, we assume that each tree grows symmetrically and in a circle. 
+### **Back-calculating tree diameter for a single tree Red Maple tree at Harvard Forest:**
 
-### Backcalculating tree diameter using dplR
->>>>>>> ae5f9a4b5f60fbf768ebb4eafab536706a2471ca
+Read in the rwl files for red maple at Harvard Forest (using read.tucson function in dplR) and link them up to the census dataset.
+
 ```{r}
 library(dplR)
+# read in the rwl files using the helpful dplR functions:
+all.HF.rwl <- list.files("data/rwl/", pattern = ".rwl", full.names = T)
+
+
+read.rwl.reformat <- function(SPCD.rwl){
+        inc.rwl <- read.tucson(SPCD.rwl)
+        # here, I reformat the data as a dataframe, get a tree id (id), and keep a core.id.
+        # the core.id is a separate core that denotes what direction on the tree the sample was taken from
+        inc.rwl.df <- data.frame(inc.rwl) %>% mutate(cal.year = row.names(inc.rwl)) %>%
+          reshape2::melt(., id.vars = "cal.year") %>% 
+          rename("core.id" = "variable", 
+                 "incr" = "value") %>%
+          mutate(id = substr(core.id, 1, 6)) %>% 
+          filter(!is.na(incr))%>%
+          mutate(cal.year = as.numeric(cal.year))
+        
+        return(inc.rwl.df)
+
+}
+
+all.HF.increment <- do.call(rbind, lapply(all.HF.rwl, read.rwl.reformat))
+# get the diameter measurements for the cored trees:
+Cored.Diam <- HARV$Tr %>% left_join(., year.df) %>%
+  left_join(., all.HF.increment ) %>% filter(!is.na(core.id)) %>% select(-incr)%>%
+  rename("cored.year"="year", 
+         "cored.cal.year"= "cal.year")
+
+inc.diam <- all.HF.increment  %>% left_join(., Cored.Diam)
+
+# example of back-calculating diameters for all the red maple cores
+core.all <- inc.diam %>% 
+  
+  # filter so we only have increments from the last census diameter measurement or earlier (for now)
+  filter(cal.year <= cored.cal.year) %>% 
+  
+  # get the cumulative diameter increment, or how much the tree has grown from the outside in since a given year:
+  # The increments are in mm, so convert to cm by dividing by 10
+  # assume the tree is a perfect circle so multiply by 2 to get the diameter increment
+
+  #filter(id %in% "LF1035") %>% 
+  group_by(core.id) %>% 
+  arrange(desc(cal.year)) %>% 
+  
+  # calculate the cumulative sum of diameter increments, from the cored diameter to the earliest:
+  mutate(cum.diainc = cumsum((incr/10)*2), 
+         dia.inc = (incr/10)*2) %>% 
+  # simplify this dataset for use:
+  select(cal.year, cored.cal.year, core.id, incr, id, dbh, cum.diainc, dia.inc, plot) %>%
+  ungroup()%>%
+  
+  # grouping by the core id after arranging by calendar year is important!!
+  group_by(core.id) %>%
+  # if the year is the year the cored tree diameter was measured, use that as the dbh
+  mutate(dbh_cm_bc = ifelse(cal.year == cored.cal.year, dbh, 
+  # if the year is before the tree was cored, use lag to subtract the cumulative increment
+  # lag gives use the previous value (gives the cumulative diameter increment from year == 2012 for cal.year == 2011)
+                            ifelse(cal.year < cored.cal.year, dbh - lag(cum.diainc), NA)))
+  
+  # to convince yourself that this is working right, check that the estimated increments == the tree diameter increment:
+  # core.all %>% mutate(check.dia.inc = dbh_cm_bc - lead(dbh_cm_bc)) %>% 
+  #   filter(!round(dia.inc, 3) == round(check.dia.inc, 3) )
+  
+
+east.core <- core.all %>% filter(core.id %in% "LF1005e")
+ ggplot()+geom_line(data = east.core, aes(x = cal.year, y = dbh_cm_bc, color = core.id))+
+   geom_point(data = east.core %>% filter(cal.year == cored.cal.year), aes(x = cal.year, y = dbh))+ylab("Tree diameter (cm)")+xlab("Year")
+
 ```
+
+### **Multiple cores: Within-tree variation in increment and diameter observations**
+
+Using our simple method get a back-calculated tree diameter estimate based on each core. When using tree-ring data to estimate trends in tree size (or Basal Area, Aboveground Biomass, etc), the variation in tree ring widths from different cores in the same tree and year represents `observation uncertainty`. Here, a single red maple tree (LF1005) has three cores, with variability in tree ring increment and the back-calculated tree size.
+
+```{R}
+LF2012 <- core.all %>% filter(id %in% "LF1005")
+
+ DBH.bc.p <- ggplot()+geom_line(data = LF2012, aes(x = cal.year, y = dbh_cm_bc, color = core.id))+
+   geom_point(data = LF2012 %>% filter(cal.year == cored.cal.year), aes(x = cal.year, y = dbh))+ylab("Tree diameter (cm)")+xlab("Year")
+ 
+ inc.p <-  ggplot()+geom_line(data = LF2012, aes(x = cal.year, y = dia.inc, color = core.id))+
+   ylab("Tree Diameter Increment (cm)")+xlab("Year")
+ 
+ cowplot::plot_grid(inc.p, DBH.bc.p, ncol = 1)
+
+```
+
+We note that the approach in this module has some issues, including the possibility of estimating negative tree diameters near the beginning of the time series, ignoring bark thickness, and assuming perfectly circular tree trunks.
+
+Later in our tutorial, we will demonstrate how developing a "data model" can allow us to estimate uncertainty due to information from different cores and to include this uncertainty in our estimates of tree diameter and aboveground biomass. For this module, we will average the diameter increments for each core before back-calculating the diameters to demonstrate how to estimate biomass over time.
 
 ### Step 3: visualizing biomass over time (with no uncertainty)
 
-```{R}
+```{r}
+tree.averages <- inc.diam %>% 
+  group_by(id, cal.year, dbh, cored.cal.year, taxon, plot) %>%
+  summarise(incr.avg = mean(incr, na.rm = TRUE)) %>% 
+  
+  # filter so we only have increments from the last census diameter measurement or earlier (for now)
+  filter(cal.year <= cored.cal.year) %>% 
+  
+  # get the cumulative diameter increment, or how much the tree has grown from the outside in since a given year:
+  # The increments are in mm, so convert to cm by dividing by 10
+  # assume the tree is a perfect circle so multiply by 2 to get the diameter increment
+  group_by(id) %>% 
+  arrange(desc(cal.year)) %>% 
+  
+  # calculate the cumulative sum of diameter increments, from the cored diameter to the earliest:
+  mutate(cum.diainc = cumsum((incr.avg/10)*2), 
+         dia.inc = (incr.avg/10)*2) %>% 
+  # simplify this dataset for use:
+  select(cal.year, cored.cal.year, incr.avg, id, dbh, cum.diainc, dia.inc, plot, taxon) %>%
+  ungroup()%>%
+  
+  # grouping by the core id after arranging by calendar year is important!!
+  group_by(id) %>%
+  # if the year is the year the cored tree diameter was measured, use that as the dbh
+  mutate(dbh_cm_bc = ifelse(cal.year == cored.cal.year, dbh, 
+  # if the year is before the tree was cored, use lag to subtract the cumulative increment
+  # lag gives use the previous value (gives the cumulative diameter increment from year == 2012 for cal.year == 2011)
+                            ifelse(cal.year < cored.cal.year, dbh - lag(cum.diainc), NA)))
 
+ ggplot()+geom_line(data = tree.averages, aes(x = cal.year, y = dbh_cm_bc, group = id, color = taxon))+
+   geom_point(data = tree.averages %>% filter(cal.year == cored.cal.year), aes(x = cal.year, y = dbh))+ylab("Tree diameter (cm)")+xlab("Year")
 ```
 
 ## Converting forest biomass to carbon using carbon fractions
+
+We convert back-calculated tree diameters to aboveground biomass, again using the allometric equations in the `allodb` package.
+
+```{r}
+tree.averages <- tree.averages %>% left_join(.,taxon.conversion) %>% filter(dbh_cm_bc > 0)
+TR.LF1 <- tree.averages %>% filter(plot %in% "1")
+LF1.ll <- HARV.ll %>% filter(site %in% "LF1")
+
+TR.LF2 <- tree.averages %>% filter(plot %in% "2")
+LF2.ll <- HARV.ll %>% filter(site %in% "LF2")
+
+TR.LF3 <- tree.averages %>% filter(plot %in% "3")
+LF3.ll <- HARV.ll %>% filter(site %in% "LF3")
+
+# get the biomass for each site:
+TR.LF1$AGB_kg <-
+  get_biomass(
+    dbh = TR.LF1$dbh_cm_bc ,
+    genus = TR.LF1$GENUS,
+    species = TR.LF1$SPECIES,
+    coords = c(LF1.ll$lon, LF1.ll$lat))
+
+
+TR.LF2$AGB_kg <-
+  get_biomass(
+    dbh = TR.LF2$dbh_cm_bc,
+    genus = TR.LF2$GENUS,
+    species = TR.LF2$SPECIES,
+    coords = c(LF2.ll$lon, LF2.ll$lat))
+
+TR.LF3$AGB_kg <-
+  get_biomass(
+    dbh = TR.LF3$dbh_cm_bc,
+    genus = TR.LF3$GENUS,
+    species = TR.LF3$SPECIES,
+    coords = c(LF3.ll$lon, LF3.ll$lat))
+
+TR.AGB <- rbind(TR.LF1, TR.LF2, TR.LF3)
+
+
+ggplot()+
+  geom_line(data = TR.AGB, aes(x = cal.year, y = AGB_kg, group = id, color = COMMON_NAME))+ylab("Tree Aboveground Biomass (kg)")+xlab("Year")
+```
+
+### Scaling Tree Ring-based tree-level biomass using the sample design:
+
+For the tree ring sample, a double-nested plot sampling design was deployed at harvard forest, where the smaller diameter trees (\<20cm) were sampled in the inner plot and large trees were sampled in the inner plot (\>=20cm). This means that each cored tree represents a different sub-sample of the population. We use unit conversions to convert tree biomass units from kg/plot to Mg/ha
+
+```{r}
+ # we need to adjust the biomass units from kg/plot to Mg/ha
+    inner_factor = (1 / (pi*13^2)) * (1/0.0001) * (1/1000)
+    outer_factor = (1 / (pi*20^2)) * (1/0.0001) * (1/1000)
+    
+    
+   TR.AGB <-  TR.AGB %>% mutate(TPA_factor = ifelse(dbh >= 20, outer_factor, inner_factor)) %>% mutate(AGB_Mg_ha= AGB_kg*TPA_factor)
+```
+
+Let's calculate the total taxon AGB over time & Aboveground biomass increment
+
+```{r}
+TAXA.AGB <- TR.AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>% 
+  summarise(AGB_Mg_ha_taxa = sum(AGB_Mg_ha)) %>% 
+  filter(cal.year <= 2010) %>% 
+  ungroup() %>% 
+  group_by(COMMON_NAME, GENUS, SPECIES, plot) %>%
+  arrange(cal.year) %>% 
+  mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa)) 
+
+ggplot()+
+  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot)
+
+ggplot()+
+  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI.taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot)
+```
 
 The simplest way of estimating Carbon from tree-level biomass is to assume that the "carbon fraction," that is the fraction of the tree's weight that is made up of Carbon, is 50%, so multiplying your biomass value by 0.5 will give you a mass of Carbon per unit area.
 
 Other carbon fractions are available, for example for live trees vs. dead trees, and for different forest types/species, but for simplicity we will use 0.5 here.
 
-# issues with estimating biomass this way:
+```{r}
+TAXA.AGB <- TAXA.AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year) %>% 
+  summarise(Carbon_kg_taxa = sum(AGB_Mg_ha*0.5)) %>% filter(cal.year <= 2010)
+
+ggplot()+
+  geom_line(data = TAXA.AGB, aes(x = cal.year, y = Carbon_kg_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Carbon (kg)")+xlab("Year")
+```
+
+# **Issues and strengths of estimating biomass from tree ring data alone:**
+
+**Strengths:**
+
+-   Annual estimates of tree growth allow us to estimate interannual variabliity in AGB and AGBI (which we may be interested in correlating to climate, disturbances, etc)
+
+-   tree ring time-series may cover time periods prior to traditional census or forest inventory data
+
+**Issues:**
+
+-   Approach in this module ignore uncertainty in our estimates due to information from different cores
+
+-   We assume that the census diameter closest to the time of coring is \"truth,\" but diameter measurements also have measurement uncertainty
+
+-   Lack of demographic data prior to coring leads contributes to an underestimation of AGB in the past; i.e. the \"Fading-record\" problem, where we miss AGB from trees that have died and prior to coring (and were not sampled).
+
+-   Often, we may not have a dendroecological sample with a core from all the trees.
+
+**In the next module,** we will introduce a modelling approach that leverages the strengths of both forest census and tree ring data to address some of the issues.
