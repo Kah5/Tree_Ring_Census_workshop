@@ -89,8 +89,6 @@ post_RW = readRDS('output/model_post_RW_HARVARD.RDS')
 ```
 
 ```{r}
-#| eval: FALSE
-
 # run a version with a small # of iterations here to show the output
 
 # settings

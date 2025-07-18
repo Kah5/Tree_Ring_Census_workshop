@@ -1,0 +1,8 @@
+"0","# lets visualize the number of trees sampled at Harvard Forest each census year:
+Census %>% group_by(taxon, `Scientific Name`, COMMON_NAME, INV.YEAR) %>%
+  summarise(n.trees = n()) %>% 
+  group_by(taxon, `Scientific Name`, COMMON_NAME) %>% 
+  spread(INV.YEAR, n.trees, fill = 0) %>%
+  ungroup() %>% gt()
+"
+"2","`summarise()` has grouped output by 'taxon', 'Scientific Name', 'COMMON_NAME'. You can override using the `.groups` argument."
