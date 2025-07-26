@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Andria Dawson and Kelly Heilman">
-<meta name="dcterms.date" content="2025-07-11">
+<meta name="dcterms.date" content="2025-07-26">
 
 <title>State Space Model Workshop 2025, Livingstone, Zambia – Module 3: Estimating Biomass From Tree Ring Data</title>
 <style>
@@ -66,6 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./Module_4_Growth_model_Introduction.html" rel="next">
 <link href="./Module_2_Data.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -205,17 +206,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
         <li class="sidebar-item">
- <span class="menu-text">Module_4_RingWidth_only_model.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_4_Growth_model_Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 4: Model Introduction</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_5_RingWidth_and_Census.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_5_RingWidth_only_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 5: Ring-width only model (RW-only)</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_6_Comparing_Biomass_Estimates.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_6_RingWidth_and_Census.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 6: Ring Width and Census Data Model (RW + Census)</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_7_TR_and_Census_model_w_climate.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_7_Comparing_Biomass_Estimates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 7: Comparing RW only and RW + Census model</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Module_8_TR_and_Census_model_w_climate.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 8: Regression with annual climate drivers within the RW + Census model</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -273,7 +292,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">2025-07-11</p>
+      <p class="date">2025-07-26</p>
     </div>
   </div>
   
@@ -305,35 +324,74 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><p>Github repository: <a href="https://github.com/ropensci/allodb/tree/master" class="uri">https://github.com/ropensci/allodb/tree/master</a></p></li>
 <li><p>Tutorial at Ropensci: <a href="https://docs.ropensci.org/allodb/" class="uri">https://docs.ropensci.org/allodb/</a></p></li>
 </ul>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"ropensci/allodb"</span>,<span class="at">upgrade =</span> <span class="st">"never"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(allodb)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplR)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>HARV <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/tree_data_HARVARD_STAN_v3.1_102020.RDS"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>taxon.conversion <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">"data/taxon_conversion.RDS"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Tree.ring <span class="ot">&lt;-</span> HARV<span class="sc">$</span>Xobs <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., HARV<span class="sc">$</span>Tr)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># get the calendar years</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>year.df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year =</span> <span class="fu">max</span>(Tree.ring<span class="sc">$</span>year)<span class="sc">:</span><span class="dv">1</span>, </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cal.year =</span> <span class="dv">2012</span><span class="sc">:</span>(<span class="dv">2013</span> <span class="sc">-</span> <span class="fu">max</span>(Tree.ring<span class="sc">$</span>year)))</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Tree.ring <span class="ot">&lt;-</span> Tree.ring <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., year.df)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>year.df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">year =</span> <span class="fu">max</span>(Tree.ring<span class="sc">$</span>year)<span class="sc">:</span><span class="dv">1</span>, </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                      <span class="at">cal.year =</span> <span class="dv">2012</span><span class="sc">:</span>(<span class="dv">2013</span> <span class="sc">-</span> <span class="fu">max</span>(Tree.ring<span class="sc">$</span>year)))</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># set up the lat-long information:</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>HARV.ll <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">site =</span> <span class="fu">c</span>(<span class="st">"LF1"</span>, <span class="st">"LF2"</span>, <span class="st">"LF3"</span>), </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lat =</span> <span class="fu">c</span>(<span class="fl">42.53065</span>, <span class="fl">42.53128</span>, <span class="fl">42.53008</span>), </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>                      <span class="at">lon =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">72.18346</span>, <span class="sc">-</span><span class="fl">72.18271</span>, <span class="sc">-</span><span class="fl">72.18246</span>))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>Census <span class="ot">&lt;-</span> HARV<span class="sc">$</span>Dobs <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(., year.df) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="st">"taxon"</span> <span class="ot">=</span> <span class="st">"species"</span>)<span class="sc">%&gt;%</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., taxon.conversion) <span class="sc">%&gt;%</span><span class="co"># combine with taxon-infomation</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(., HARV.ll) <span class="co"># combine with lat-long information</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>Census <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> </span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">INV.YEAR =</span> <span class="fu">ifelse</span>(cal.year <span class="sc">&gt;=</span> <span class="dv">1985</span> <span class="sc">&amp;</span> cal.year <span class="sc">&lt;=</span> <span class="dv">1991</span>, <span class="dv">1990</span>, cal.year))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <p>Here, we will focus on species from Harvard Forest, so lets see which species we have in our census data. This information is stored in the <code>taxon</code> column in the <code>Census</code> object:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lets visualize the number of trees sampled at Harvard Forest each census year:</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>Census <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, COMMON_NAME, INV.YEAR) <span class="sc">%&gt;%</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n.trees =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, COMMON_NAME) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(INV.YEAR, n.trees, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># lets visualize the number of trees sampled at Harvard Forest each census year:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Census <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, COMMON_NAME, INV.YEAR) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n.trees =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, COMMON_NAME) <span class="sc">%&gt;%</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(INV.YEAR, n.trees, <span class="at">fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="dezukpedkr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#dezukpedkr table {
+<div id="xskduusehw" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#xskduusehw table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#dezukpedkr thead, #dezukpedkr tbody, #dezukpedkr tfoot, #dezukpedkr tr, #dezukpedkr td, #dezukpedkr th {
+#xskduusehw thead, #xskduusehw tbody, #xskduusehw tfoot, #xskduusehw tr, #xskduusehw td, #xskduusehw th {
   border-style: none;
 }
 
-#dezukpedkr p {
+#xskduusehw p {
   margin: 0;
   padding: 0;
 }
 
-#dezukpedkr .gt_table {
+#xskduusehw .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -359,12 +417,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_caption {
+#xskduusehw .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#dezukpedkr .gt_title {
+#xskduusehw .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -376,7 +434,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#dezukpedkr .gt_subtitle {
+#xskduusehw .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -388,7 +446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#dezukpedkr .gt_heading {
+#xskduusehw .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -400,13 +458,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_bottom_border {
+#xskduusehw .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_col_headings {
+#xskduusehw .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -421,7 +479,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_col_heading {
+#xskduusehw .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -441,7 +499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#dezukpedkr .gt_column_spanner_outer {
+#xskduusehw .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -453,15 +511,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#dezukpedkr .gt_column_spanner_outer:first-child {
+#xskduusehw .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dezukpedkr .gt_column_spanner_outer:last-child {
+#xskduusehw .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dezukpedkr .gt_column_spanner {
+#xskduusehw .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -473,11 +531,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#dezukpedkr .gt_spanner_row {
+#xskduusehw .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#dezukpedkr .gt_group_heading {
+#xskduusehw .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -503,7 +561,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#dezukpedkr .gt_empty_group_heading {
+#xskduusehw .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -518,15 +576,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#dezukpedkr .gt_from_md > :first-child {
+#xskduusehw .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dezukpedkr .gt_from_md > :last-child {
+#xskduusehw .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dezukpedkr .gt_row {
+#xskduusehw .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -545,7 +603,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#dezukpedkr .gt_stub {
+#xskduusehw .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -558,7 +616,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#dezukpedkr .gt_stub_row_group {
+#xskduusehw .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -572,15 +630,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#dezukpedkr .gt_row_group_first td {
+#xskduusehw .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#dezukpedkr .gt_row_group_first th {
+#xskduusehw .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#dezukpedkr .gt_summary_row {
+#xskduusehw .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -590,16 +648,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#dezukpedkr .gt_first_summary_row {
+#xskduusehw .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_first_summary_row.thick {
+#xskduusehw .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#dezukpedkr .gt_last_summary_row {
+#xskduusehw .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -609,7 +667,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_grand_summary_row {
+#xskduusehw .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -619,7 +677,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#dezukpedkr .gt_first_grand_summary_row {
+#xskduusehw .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -629,7 +687,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_last_grand_summary_row_top {
+#xskduusehw .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -639,11 +697,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_striped {
+#xskduusehw .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dezukpedkr .gt_table_body {
+#xskduusehw .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -652,7 +710,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_footnotes {
+#xskduusehw .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -666,7 +724,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_footnote {
+#xskduusehw .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -675,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#dezukpedkr .gt_sourcenotes {
+#xskduusehw .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -689,7 +747,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#dezukpedkr .gt_sourcenote {
+#xskduusehw .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -697,63 +755,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#dezukpedkr .gt_left {
+#xskduusehw .gt_left {
   text-align: left;
 }
 
-#dezukpedkr .gt_center {
+#xskduusehw .gt_center {
   text-align: center;
 }
 
-#dezukpedkr .gt_right {
+#xskduusehw .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dezukpedkr .gt_font_normal {
+#xskduusehw .gt_font_normal {
   font-weight: normal;
 }
 
-#dezukpedkr .gt_font_bold {
+#xskduusehw .gt_font_bold {
   font-weight: bold;
 }
 
-#dezukpedkr .gt_font_italic {
+#xskduusehw .gt_font_italic {
   font-style: italic;
 }
 
-#dezukpedkr .gt_super {
+#xskduusehw .gt_super {
   font-size: 65%;
 }
 
-#dezukpedkr .gt_footnote_marks {
+#xskduusehw .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#dezukpedkr .gt_asterisk {
+#xskduusehw .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#dezukpedkr .gt_indent_1 {
+#xskduusehw .gt_indent_1 {
   text-indent: 5px;
 }
 
-#dezukpedkr .gt_indent_2 {
+#xskduusehw .gt_indent_2 {
   text-indent: 10px;
 }
 
-#dezukpedkr .gt_indent_3 {
+#xskduusehw .gt_indent_3 {
   text-indent: 15px;
 }
 
-#dezukpedkr .gt_indent_4 {
+#xskduusehw .gt_indent_4 {
   text-indent: 20px;
 }
 
-#dezukpedkr .gt_indent_5 {
+#xskduusehw .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -879,12 +937,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can also plot this up visually:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census)<span class="sc">+</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.character</span>(INV.YEAR), <span class="at">fill =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>), <span class="at">position =</span> <span class="st">"dodge"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ylab</span>(<span class="st">"Number of Trees Observed"</span>)<span class="sc">+</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># we can also plot this up visually:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census)<span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_bar</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.character</span>(INV.YEAR), <span class="at">fill =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>), <span class="at">position =</span> <span class="st">"dodge"</span>)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ylab</span>(<span class="st">"Number of Trees Observed"</span>)<span class="sc">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>site, <span class="at">ncol =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -908,21 +966,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(allodb)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># lets get the biomass for the first tree in the Census data (a 36.83 cm Northern Red Oak (Quercus rubra):</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span> <span class="ot">&lt;-</span> Census[<span class="dv">1</span>,] <span class="co"># first tree</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span><span class="sc">$</span>AGB<span class="fl">.1</span> <span class="ot">&lt;-</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census<span class="fl">.1</span><span class="sc">$</span>dbh ,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census<span class="fl">.1</span><span class="sc">$</span>GENUS,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census<span class="fl">.1</span><span class="sc">$</span>SPECIES,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(Census<span class="fl">.1</span><span class="sc">$</span>lon, Census<span class="fl">.1</span><span class="sc">$</span>lat)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span><span class="sc">$</span>AGB</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">require</span>(allodb)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># lets get the biomass for the first tree in the Census data (a 36.83 cm Northern Red Oak (Quercus rubra):</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span> <span class="ot">&lt;-</span> Census[<span class="dv">1</span>,] <span class="co"># first tree</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span><span class="sc">$</span>AGB<span class="fl">.1</span> <span class="ot">&lt;-</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census<span class="fl">.1</span><span class="sc">$</span>dbh ,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census<span class="fl">.1</span><span class="sc">$</span>GENUS,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census<span class="fl">.1</span><span class="sc">$</span>SPECIES,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(Census<span class="fl">.1</span><span class="sc">$</span>lon, Census<span class="fl">.1</span><span class="sc">$</span>lat)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>Census<span class="fl">.1</span><span class="sc">$</span>AGB</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 979.5547</code></pre>
@@ -932,71 +990,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ll <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(Census<span class="sc">$</span>lon, Census<span class="sc">$</span>lat), <span class="at">nrow =</span> <span class="fu">length</span>(Census<span class="sc">$</span>lon), <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">FALSE</span>, <span class="at">dimnames =</span> <span class="cn">NULL</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># here we split up the census by sites </span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>Census.LF1 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>LF1.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>Census.LF2 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF2"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>LF2.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF2"</span>)</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>Census.LF3 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF3"</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>LF3.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF3"</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co"># get the biomass for each site:</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>Census.LF1<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF1<span class="sc">$</span>dbh ,</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF1<span class="sc">$</span>GENUS,</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF1<span class="sc">$</span>SPECIES,</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF1.ll<span class="sc">$</span>lon, LF1.ll<span class="sc">$</span>lat))</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>Census.LF2<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF2<span class="sc">$</span>dbh ,</span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF2<span class="sc">$</span>GENUS,</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF2<span class="sc">$</span>SPECIES,</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF2.ll<span class="sc">$</span>lon, LF2.ll<span class="sc">$</span>lat))</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>Census.LF3<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF3<span class="sc">$</span>dbh ,</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF3<span class="sc">$</span>GENUS,</span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF3<span class="sc">$</span>SPECIES,</span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF3.ll<span class="sc">$</span>lon, LF3.ll<span class="sc">$</span>lat))</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>plot_radius <span class="ot">=</span> <span class="dv">20</span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>Census.AGB <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Census.LF1, Census.LF2, Census.LF3) <span class="sc">%&gt;%</span> </span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">AGB_Mg_ha =</span> AGB_kg<span class="sc">*</span>(<span class="dv">1</span><span class="sc">/</span>(pi<span class="sc">*</span>plot_radius<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span><span class="fl">0.0001</span>) <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span><span class="dv">1000</span>)) <span class="co"># convert the tree level AGB to MG/ha)</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co"># convert the tree level AGB to MG/ha</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB)<span class="sc">+</span></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Aboveground Biomass (kg)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>ll <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(Census<span class="sc">$</span>lon, Census<span class="sc">$</span>lat), <span class="at">nrow =</span> <span class="fu">length</span>(Census<span class="sc">$</span>lon), <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">FALSE</span>, <span class="at">dimnames =</span> <span class="cn">NULL</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># here we split up the census by sites </span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>Census.LF1 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>LF1.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF1"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>Census.LF2 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF2"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>LF2.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF2"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>Census.LF3 <span class="ot">&lt;-</span> Census <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF3"</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>LF3.ll <span class="ot">&lt;-</span> HARV.ll <span class="sc">%&gt;%</span> <span class="fu">filter</span>(site <span class="sc">%in%</span> <span class="st">"LF3"</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># get the biomass for each site:</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>Census.LF1<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF1<span class="sc">$</span>dbh ,</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF1<span class="sc">$</span>GENUS,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF1<span class="sc">$</span>SPECIES,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF1.ll<span class="sc">$</span>lon, LF1.ll<span class="sc">$</span>lat))</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>Census.LF2<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF2<span class="sc">$</span>dbh ,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF2<span class="sc">$</span>GENUS,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF2<span class="sc">$</span>SPECIES,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF2.ll<span class="sc">$</span>lon, LF2.ll<span class="sc">$</span>lat))</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>Census.LF3<span class="sc">$</span>AGB_kg <span class="ot">&lt;-</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">get_biomass</span>(</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbh =</span> Census.LF3<span class="sc">$</span>dbh ,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">genus =</span> Census.LF3<span class="sc">$</span>GENUS,</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">species =</span> Census.LF3<span class="sc">$</span>SPECIES,</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">coords =</span> <span class="fu">c</span>(LF3.ll<span class="sc">$</span>lon, LF3.ll<span class="sc">$</span>lat))</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>plot_radius <span class="ot">=</span> <span class="dv">20</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>Census.AGB <span class="ot">&lt;-</span> <span class="fu">rbind</span>(Census.LF1, Census.LF2, Census.LF3) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tph_corr =</span> (<span class="dv">1</span><span class="sc">/</span>(pi<span class="sc">*</span>plot_radius<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span><span class="fl">0.0001</span>) <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span><span class="dv">1000</span>)) <span class="co">#%&gt;%  # get tree per hectare correction factor to scale tree biomass up</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>  <span class="co">#mutate(AGB_Mg_ha = AGB_kg*) # convert the tree level AGB to MG/ha)</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB)<span class="sc">+</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_kg, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Aboveground Biomass (kg)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB)<span class="sc">+</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span>AGB_Mg_ha, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_Mg_ha, <span class="at">group =</span> ID, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Aboveground Biomass (Mg/ha)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Module_3_Biomass_estimation_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -1008,13 +1054,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Census.AGB.sums <span class="ot">&lt;-</span> Census.AGB <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, site, INV.YEAR) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(AGB_Mg_ha, <span class="at">na.rm =</span><span class="cn">TRUE</span>))</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB.sums)<span class="sc">+</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> <span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span>, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> <span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span>, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Aboveground Biomass (Mg/ha)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(data = Census.AGB)+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_point(aes(x = INV.YEAR, y =AGB_Mg_ha, group = ID, color = `Scientific Name`))+</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   geom_line(aes(x = INV.YEAR, y = AGB_Mg_ha, group = ID, color = `Scientific Name`))+</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   facet_wrap(~site)+theme_bw()+ylab("Tree Aboveground Biomass (Mg/ha)")+xlab("Year")</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>Census.AGB.sums <span class="ot">&lt;-</span> Census.AGB <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(taxon, <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>, site, INV.YEAR) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">AGB_Mg_ha_taxon =</span> <span class="fu">sum</span>(AGB_kg<span class="sc">*</span>tph_corr, <span class="at">na.rm =</span><span class="cn">TRUE</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Census.AGB.sums)<span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_Mg_ha_taxon, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> AGB_Mg_ha_taxon, <span class="at">color =</span> <span class="st">`</span><span class="at">Scientific Name</span><span class="st">`</span>))<span class="sc">+</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">theme_bw</span>()<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Aboveground Biomass (Mg/ha)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1037,13 +1088,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Recruitment makes up a small amount of AGB at these plots:</p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code>  site     ID taxon variable     value recruit.code   Recruitment
-1  LF1 LF1001  TSCA     1960        NA            0 Existing Tree
-2  LF1 LF1001  TSCA     1967        NA            0 Existing Tree
-3  LF1 LF1001  TSCA     1973        NA            0 Existing Tree
-4  LF1 LF1001  TSCA     1990 0.1541281            1   New Recruit
-5  LF1 LF1001  TSCA     1999 0.3583286            0 Existing Tree
-6  LF1 LF1001  TSCA     2009 0.7896527            0 Existing Tree</code></pre>
+<pre><code>  site     ID taxon variable    value recruit.code   Recruitment
+1  LF1 LF1001  TSCA     1960       NA            0 Existing Tree
+2  LF1 LF1001  TSCA     1967       NA            0 Existing Tree
+3  LF1 LF1001  TSCA     1973       NA            0 Existing Tree
+4  LF1 LF1001  TSCA     1990 19.36831            1   New Recruit
+5  LF1 LF1001  TSCA     1999 45.02890            0 Existing Tree
+6  LF1 LF1001  TSCA     2009 99.23069            0 Existing Tree</code></pre>
 </div>
 <div class="cell-output-display">
 <div>
@@ -1073,17 +1124,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(cal.year) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">REMPER =</span> cal.year <span class="sc">-</span> <span class="fu">lag</span>(cal.year),</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">prevDBH =</span> <span class="fu">lag</span>(dbh), </span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">prevAGB =</span> <span class="fu">lag</span>(AGB_Mg_ha)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">prevAGB =</span> <span class="fu">lag</span>(AGB_kg)) <span class="sc">%&gt;%</span> </span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if the tree died in the remeasurement period, assume it died halfway through </span></span>
 <span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">REMPER.mort.corrected =</span> <span class="fu">ifelse</span>(mort.code <span class="sc">==</span> <span class="dv">1</span>, REMPER<span class="sc">/</span><span class="dv">2</span>, REMPER)) <span class="sc">%&gt;%</span></span>
 <span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tree.AGBI =</span> (AGB_Mg_ha <span class="sc">-</span> prevAGB)<span class="sc">/</span>REMPER.mort.corrected, </span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">tree.AGBI =</span> (AGB_kg <span class="sc">-</span> prevAGB)<span class="sc">/</span>REMPER.mort.corrected, </span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">tree.growth =</span> (dbh <span class="sc">-</span> prevDBH)<span class="sc">/</span>REMPER.mort.corrected) </span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> Average.Growth.census) <span class="sc">+</span> </span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.AGBI, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.AGBI, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Average Aboveground Biomass Increment (Mg/ha/year)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> tree.AGBI, <span class="at">color =</span> taxon, <span class="at">group =</span> ID))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Tree Average Aboveground Biomass Increment (kg/year)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1125,7 +1176,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> site.avgs) <span class="sc">+</span> </span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.AGBI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.AGBI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Average AGBI (Mg/ha/year)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> INV.YEAR, <span class="at">y =</span> taxon.AGBI.avg, <span class="at">color =</span> taxon))<span class="sc">+</span> <span class="fu">facet_wrap</span>(<span class="sc">~</span>site)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxon Average AGBI (kgyear)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Inventory Year"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -1378,7 +1429,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    outer_factor <span class="ot">=</span> (<span class="dv">1</span> <span class="sc">/</span> (pi<span class="sc">*</span><span class="dv">20</span><span class="sc">^</span><span class="dv">2</span>)) <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span><span class="fl">0.0001</span>) <span class="sc">*</span> (<span class="dv">1</span><span class="sc">/</span><span class="dv">1000</span>)</span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>   TR.AGB <span class="ot">&lt;-</span>  TR.AGB <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">TPA_factor =</span> <span class="fu">ifelse</span>(dbh <span class="sc">&gt;=</span> <span class="dv">20</span>, outer_factor, inner_factor)) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">AGB_Mg_ha=</span> AGB_kg<span class="sc">*</span>TPA_factor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>   TR.AGB <span class="ot">&lt;-</span>  TR.AGB <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">tph_corr =</span> <span class="fu">ifelse</span>(dbh <span class="sc">&gt;=</span> <span class="dv">20</span>, outer_factor, inner_factor)) <span class="co">#%&gt;% mutate(AGB_Mg_ha= AGB_kg*TPA_factor)</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>   </span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>   <span class="fu">saveRDS</span>(TR.AGB, <span class="st">"data/TR_AGB_ests_allodb.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Let’s calculate the total taxon AGB over time &amp; Aboveground biomass increment</p>
@@ -1386,7 +1439,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>TAXA.AGB <span class="ot">&lt;-</span> TR.AGB <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(COMMON_NAME, GENUS, SPECIES, cal.year, plot) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">AGB_Mg_ha_taxa =</span> <span class="fu">sum</span>(AGB_Mg_ha)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">AGB_Mg_ha_taxa =</span> <span class="fu">sum</span>(AGB_kg<span class="sc">*</span>tph_corr)) <span class="sc">%&gt;%</span> </span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(cal.year <span class="sc">&lt;=</span> <span class="dv">2010</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(COMMON_NAME, GENUS, SPECIES, plot) <span class="sc">%&gt;%</span></span>
@@ -1416,7 +1469,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>()<span class="sc">+</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> TAXA.AGB, <span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">y =</span> AGBI.taxa, <span class="at">color =</span> COMMON_NAME), <span class="at">size =</span> <span class="dv">2</span>)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxa Aboveground Biomass (Mg/ha)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">data =</span> TAXA.AGB, <span class="fu">aes</span>(<span class="at">x =</span> cal.year, <span class="at">y =</span> AGBI.taxa, <span class="at">color =</span> COMMON_NAME), <span class="at">size =</span> <span class="dv">2</span>)<span class="sc">+</span><span class="fu">ylab</span>(<span class="st">"Taxa Aboveground Biomass Increment (Mg/ha)"</span>)<span class="sc">+</span><span class="fu">xlab</span>(<span class="st">"Year"</span>)<span class="sc">+</span><span class="fu">facet_wrap</span>(<span class="sc">~</span>plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 9 rows containing missing values or values outside the scale range
@@ -1436,7 +1489,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>TAXA.C <span class="ot">&lt;-</span> TR.AGB <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(COMMON_NAME, GENUS, SPECIES, cal.year, plot) <span class="sc">%&gt;%</span> </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Carbon_Mg_ha_taxa =</span> <span class="fu">sum</span>(AGB_Mg_ha<span class="sc">*</span><span class="fl">0.5</span>)) <span class="co">#%&gt;% </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Carbon_Mg_ha_taxa =</span> <span class="fu">sum</span>(AGB_kg<span class="sc">*</span>tph_corr<span class="sc">*</span><span class="fl">0.5</span>)) <span class="co">#%&gt;% </span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>`summarise()` has grouped output by 'COMMON_NAME', 'GENUS', 'SPECIES',
@@ -1471,7 +1524,7 @@ Ignoring unknown parameters: `line_width`</code></pre>
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>Census.totals <span class="ot">&lt;-</span> Census.AGB.sums <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(.,taxon.conversion) <span class="sc">%&gt;%</span> </span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(COMMON_NAME, INV.YEAR) <span class="sc">%&gt;%</span> </span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">AGB_Mg_ha_Site =</span> <span class="fu">mean</span>(<span class="st">`</span><span class="at">Aboveground Biomass</span><span class="st">`</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">AGB_Mg_ha_Site =</span> <span class="fu">mean</span>(AGB_Mg_ha_taxon))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stderr">
 <pre><code>Joining with `by = join_by(taxon, `Scientific Name`)`
@@ -1518,8 +1571,8 @@ Ignoring unknown parameters: `line_width`</code></pre>
 <p><strong>Issues:</strong></p>
 <ul>
 <li><p>Approach in this module ignore uncertainty in our estimates due to information from different cores</p></li>
-<li><p>We assume that the census diameter closest to the time of coring is "truth," but diameter measurements also have measurement uncertainty</p></li>
-<li><p>Lack of demographic data prior to coring leads contributes to an underestimation of AGB in the past; i.e.&nbsp;the "Fading-record" problem, where we miss AGB from trees that have died and prior to coring (and were not sampled).</p></li>
+<li><p>We assume that the census diameter closest to the time of coring is “truth,” but diameter measurements also have measurement uncertainty</p></li>
+<li><p>Lack of demographic data prior to coring leads contributes to an underestimation of AGB in the past; i.e.&nbsp;the “Fading-record” problem, where we miss AGB from trees that have died and prior to coring (and were not sampled).</p></li>
 <li><p>Often, we may not have a dendroecological sample with a core from all the trees.</p></li>
 </ul>
 <p><strong>In the next module,</strong>&nbsp;we will introduce a modelling approach that leverages the strengths of both forest census and tree ring data to address some of the issues.</p>
@@ -2099,6 +2152,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./Module_4_Growth_model_Introduction.html" class="pagination-link" aria-label="Module 4: Model Introduction">
+        <span class="nav-page-text">Module 4: Model Introduction</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

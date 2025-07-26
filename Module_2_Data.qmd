@@ -10,11 +10,12 @@ format:
 
 ```{R}
 #| warning: false
+packages <- c("ggplot2", "tidyverse", "rstan", "dplR", "reshape2")
+install.packages(setdiff(packages, rownames(installed.packages())))  
+
 library(ggplot2)
 library(tidyverse)
 library(rstan)
-library(gt)
-library(FIESTA)
 
 ```
 
@@ -54,7 +55,8 @@ Citation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B
 ```{R}
 #| warning: false
 # code to plot the tree ring data, by species
-HARV <- readRDS("data/tree_data_HARVARD_STAN_v3.1_102020.RDS")
+HARV <- readRDS("data/tree_data_HARVARD.RDS")
+taxon.conversion <- readRDS("data/taxon_conversion.RDS")
 
 # Xobs contains the increment data for all the cored trees
 head(HARV$Xobs)
@@ -94,19 +96,7 @@ The second dataset for this site includes the census data measured for the Lyfor
 # - QURU = Northern red oak (Quercus rubra) 
 # - QUVE = Black oak (Quercus velutina)
 # - TSCA = Eastern hemlock (Tsuga canadensis)
-taxon.conversion <- data.frame(taxon = HARV$taxa, # TAXA abbreviation
-                               SPCD = c(261, # Eastern Hemlock
-                                        833, # Northern Red Oak
-                                        316, # Red Maple
-                                        371, # Yellow Birch
-                                        531, # American beech
-                                        129, # White Pine
-                                        372, # Grey/Sweet Birch
-                                        837, # Black Oak
-                                        7331# Witch hazel (Hamamelis virginiana) 
-                                        ) # using FIA species codes:
-) %>% left_join(., FIESTA::ref_species %>% select(SPCD, COMMON_NAME, GENUS, SPECIES))%>%
-  mutate(`Scientific Name` = paste(GENUS, SPECIES))
+
 
 # set up the lat-long information:
 HARV.ll <- data.frame(site = c("LF1", "LF2", "LF3"), 

@@ -12,11 +12,16 @@ This module introduces the workflow for the case where the only data informing t
 
 This workflow involves:
 
-1.  Inferring tree growth using the state-space model;
-2.  Using inferred growth to determine biomass; and
-3.  Calculating biomass increment from biomass.
 
-## 1. Inferring Growth
+1.  Inferring growth using the state-space model;
+2.  Sampling models in STAN: A (very brief) overview
+3.  Visualizing process and data uncertainty
+4.  Visualizing chronology-like effects: year random effects
+5.  Using inferred growth to determine tree-level biomass
+6.  Comparing tree-level RW-only model to data-based biomass estimates
+6.  Scaling to stand & Calculating biomass increment from biomass.
+
+## 1. Inferring growth using the state-space model;
 
 First we will infer tree growth using the state space model introduced in Module 4. We will use `Stan` to implement the model and estimate the model parameters. `Stan` which interfaces to `R` via a package called `rstan`.
 
@@ -25,6 +30,7 @@ We will also make use of several other packages to organize, summarize, and visu
 ### load the packages
 
 ```{R}
+#| warning: FALSE
 library(rstan)
 library(dplyr)
 library(reshape2)
@@ -48,26 +54,28 @@ class(dat)
 
 names(dat)
 
-taxa = dat$taxa
-years = dat$years
+taxa = dat$taxa # the taxa abbreviations
+years = dat$years # the years where we will estimate increments
 
-N_years = dat$N_years
-N_Tr = dat$N_Tr
-N_taxa = dat$N_taxa
-X2Tr = dat$X2Tr
-X2year = dat$X2year
-Tr = dat$Tr %>% arrange(stat_id)
-taxon = Tr$taxon
-plot = Tr$plot
-years = dat$years
-year_lo = min(years)
-year_hi = max(years)
-pdbh = exp(dat$logTr)
+# STAN requires you to tell it the dimensions of the inputs and outputs, so we need to define these: 
+N_years = dat$N_years # number of years
+N_Tr = dat$N_Tr # number of trees
+N_taxa = dat$N_taxa # number of taxa
+X2Tr = dat$X2Tr # vector of tree ids
+X2year = dat$X2year # vector of years for each tree
+Tr = dat$Tr %>% arrange(stat_id) # arrange the Tree data by ids, and save as Tr
+taxon = Tr$taxon # vector of taxon ids
+plot = Tr$plot # vector of plot ids
+years = dat$years # vector of calendar years
+year_lo = min(years) # minimum year
+year_hi = max(years) # maximum year
+pdbh = exp(dat$logTr) #vector of diameters
 
-list2env(dat, envir = globalenv())
 
-N_C = dat$N_C
-X2C = dat$X2C
+list2env(dat, envir = globalenv())# load all the data objects into the environment
+
+N_C = dat$N_C # vector of Census ids
+X2C = dat$X2C # links the Census tree to the increment measurements
 X2year_C = dat$X2year_C
 
 allTrees = dat$allTrees %>% arrange(stat_id)
@@ -76,7 +84,7 @@ plot_C = allTrees$plot
 distance = allTrees$distance
 ```
 
-We will also load a previous estimate of the DBH data uncertainty `sig_d_obs`, and add this to our dataset.
+We will also load a previous estimate of the DBH data uncertainty `sig_d_obs`, and add this to our dataset. This estimate is used as data in the RW-only of the model. We will estimate the DBH data uncertainty in the models that include census measurements.
 
 ```{R}
 sig_d_obs = readRDS('data/sig_d_obs_RWC.RDS')
@@ -85,8 +93,20 @@ dat$sig_d_obs = sig_d_obs
 
 ### Stan Model
 
-The `Stan` model code is stored in `growth_model_RW.stan`. (FIXME)
+The `stan` model code is stored in the `models/` folder. The RW only model is the `growth_model_RW.stan`. If you are working through this tutorial on R, you can view this file in your environment. We won't dive too deep into how to write your own stan model, but note that this model includes several blocks:
 
+1.  `data{}`: inputs read in and used as "data" in the model
+2.  `parameters`{}: defines the parameters that will be estimated in the model (we will draw samples from these in the model block)
+3.  `transformed parameters`{}: defines the parameters that are calculated from other parameters (we will draw samples from parameters and transform them into quantities we care about in this block)
+4.  `model`{}: This is where the increment data model, diameter data model and liklihood function are defined
+
+```{R}
+#| class-output: stan
+writeLines(readLines("models/growth_model_RW.stan"))
+```
+
+
+## 2.  Sampling models in STAN: A (very brief) overview
 ### Running the model: Example for a short run
 
 To estimate growth using the growth model via `Stan`, we need to compile the model `Stan` code, and then sample from the parameter posterior distributions. The sampling function requires that we tell it the model we are using, the dataset we are using, the number of iterations, and the number of chains. The compute time for the sampling function can be quite long, depending on the model, data, and sampling algorithm settings (number of iterations and chains).
@@ -112,7 +132,6 @@ fit_RW = sampling(compiled_RW,
 We will load the output from the fitted model (fitted model object and parameter posterior distributions).
 
 ```{R, echo=FALSE}
-
 iter = 500
 nchains = 1
 
@@ -122,50 +141,61 @@ post_RW = readRDS('output/model_post_RW_HARVARD.RDS')
 
 ```
 
-## show summary table of model fit
+## 3. Summarizing model fit--Visualizing process and data uncertainty
 
 The model output is a `stanfit` object. We can use this object to assess model fit, and to extract posterior distribution samples for the model parameters.
 
 The default view for the object is a summary that shows summary statistics for the posterior samples for the model parameters. To access the summary table, you can use `summary(fit_RW)` There are arguments we can pass to the summary function to look at particular parameters, and specific the quantiles we want (among other things).
 
-Below we look at a summary for the `sig_x` parameter, which characterizes the process uncertainty for each species.
+Below we look at a summary for the `sig_x` parameter, which characterizes the process uncertainty for each species, and the `sig_x_obs` parameter, which characterizes the increment data uncertainty for all of the data.
 
 ```{r}
 #| eval: TRUE
 
-fit_RW
+#fit_RW
+length(names(fit_RW)) # there are alot of parameters estimated in this model--each year for every tree has an estimated diameter (D[]), and an estimated increment ("X"), as well as an initial diameter estimate (D0[]).
 
-summary(fit_RW)$summary
+#summary(fit_RW)$summary # this will make a summary of the whole model fit, but is not loaded because there are so many parameters. Lets visualize a the taxa-level observation error and population-level observation errors for the increment uncertainty:
 
-summary(fit_RW, pars = c('sig_x'), probs = c(0.1, 0.9))$summary
+summary(fit_RW, pars = c('sig_x', 'sig_x_obs'), probs = c(0.1, 0.9))$summary
+
 ```
 
+## Evaluating model convergence--how do we know we have enough iterations sampled? 
+While not a complete list, we will look at 3 ways of evaluating the stan model fit itself:
+1. Effective sample size
+2. Rhat
+3. Visualizing traceplots
+
+### Effective Sample Size
 The summary table also includes columns for effective sample size (`n_eff`) and `Rhat`. The effective sample size is a statistic used to estimate the number of posterior samples after accounting for autocorrelation. We want this number to be large. There is no definitive rule about the minimum `n_eff` needed to conclude that you have enough samples to make inference about model parameters, but the generally accepted minimum is 100 or 200 ESS for each parameter. In some cases the effective sample size can be larger than the total number of iterations.
 
 We can use `stan_ess` to plot a histogram of the ratio of the effective sample size to the total number of iterations. The larger this value the better. Note than it can be larger than 1 because the ESS can be larger than the total number of iterations.
 
+```{r}
+#| eval: TRUE
+stan_ess(fit_RW)
+```
+### Rhat
 `Rhat` is a statistic that estimates model convergence. It is one way to try to answer the question: has the sampler converged sufficiently so that we are getting samples from the posterior distribution? At convergence, `Rhat` is equal to 1. Perfect convergence is hard to achieve in practice, so generally we want `Rhat` smaller than 1.01 (but this is not always possible for all parameters for some complex models).
 
 ```{r}
 #| eval: TRUE
 stan_rhat(fit_RW)
-
-stan_ess(fit_RW)
 ```
-
+### Traceplots
+Traceplots are useful to visualize if all the different chains are converging on a similar estimate for each value. Here we only show one chain, so it may not be as useful, but we can see that this estimate is varying around a mean value (and not slowly trending up/down over the number of samples).
+```{r}
+#| eval: TRUE
+traceplot(fit_RW, pars = c('sig_x_obs'))
+```
+## 3. Visualizing process and data uncertainty
 We will want to work with posterior samples for the model parameters, and we can get these by extracting them from the model output object into an easier to work with object. This object is a three dimensional array, which dimensions equal to the number of iterations BY the number of chains BY the number of parameters.
 
 ```{r}
 #| eval: TRUE
-
-# show extract code?
-
-post_RW
-
 class(post_RW)
-
 dim(post_RW)
-
 ```
 
 #### histograms of data and process uncertainty
@@ -177,6 +207,7 @@ Here we will consider the species specific process uncertainty parameter, `sig_x
 First we summarize the posterior samples for `sig_x` by species.
 
 ```{R}
+# this code is pulling out the model samples for each iteration and aligning the estimated process uncertainties for each taxa:
 variables = names(post_RW[1,1,])
 allSX = grep('sig_x\\[',variables)
 
@@ -196,6 +227,7 @@ sig_x_mean = sig_x_mean[order(sig_x_mean$sig_x_mean),]
 
 post_sx_melt$species_code = factor(post_sx_melt$species_code, levels=sig_x_mean$species_code)
 
+# plot up the species level increment uncertainties
 p = ggplot(data=post_sx_melt) +
   # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
   geom_violin(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
@@ -207,14 +239,13 @@ print(p)
 p = ggplot(data=post_sx_melt) +
   geom_histogram(aes(x=sigma_x, , y=after_stat(density), colour=model, fill=model), alpha=0.5) +
   theme_bw(14) +
-  xlab('Species') +
-  ylab('sigma_x') +
+  xlab('sigma_x (increment data uncertainty)') +
   facet_wrap(~species_code)
 print(p)
 
 ```
 
-Then we look at the trace plots for the `sig_x` parameter for each species.
+Then we look at the trace plots for the `sig_x` parameter for each species. Have all of these converged after 500 iterations?
 
 ```{R}
 
@@ -249,16 +280,14 @@ p = ggplot(data=post_sxobs) +
   # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
   geom_violin(aes(x=model, y=sigma_x_obs, colour=model, fill=model), alpha=0.5) +
   theme_bw(14) +
-  xlab('Species') +
+  #xlab('Species') +
   ylab('sigma_x')
 print(p)
 
 
 p = ggplot(data=post_sxobs) +
   geom_histogram(aes(x=sigma_x_obs, y=after_stat(density), colour=model, fill=model)) +
-  theme_bw(14) +
-  xlab('Species') +
-  ylab('sigma_x')
+  theme_bw(14) 
 print(p)
 
 p = ggplot(data=post_sxobs) +
@@ -270,7 +299,7 @@ p = ggplot(data=post_sxobs) +
 print(p)
 ```
 
-#### chronology-like
+## 4. Visualizing chronology-like effects: year random effects
 
 Here we will also look at some summary figures for the `beta_t` parameter. For each species, there is a `beta_t` parameter for each year. This parameter is conceptually the same as a forest chronology; it is a time series that describes the common forest growth signal for a given species.
 
@@ -278,7 +307,7 @@ We could look at summary plots for the posterior samples for a given year for a 
 
 We do want to visualize the `beta_t` chronology-like parameters as species-specific time series.
 
-```{R}
+```{R, fig.width=8, fig.height=12}
 
 allBTs = grep('beta_t\\[',variables)
 post_bt = post_RW[,,allBTs]
@@ -312,12 +341,12 @@ p = ggplot(data=beta_t_quant) +
 print(p)
 
 ```
-
-#### Growth plots for some trees
+## 5.  Using inferred growth to determine tree-level biomass
+#### RW-only model estimated Tree Daimaeter and Growth plots (for some trees)
 
 For the purpose of this workflow, we are most interested in the model inferred tree growth. For each tree, we have parameter estimates that describe increment and diameter growth through for each year.
 
-Here we visualize inferred and observed diameter data for one tree (Tree 1).
+Here we visualize inferred and observed diameter data for one tree (Tree 1). Filled circles indicate the diameter measurement included in this model and hollow circles are census diameter measurements not included in the model. 
 
 ```{R}
 
@@ -514,7 +543,7 @@ p1 = ggplot() +
   theme_bw(16)  +
   annotation_custom(grob)
 
-print(p1)
+#print(p1)
 
 if (in.RW){
   inds = which(X2Tr == tree)
@@ -588,7 +617,7 @@ p = ggplot(data=dbh_validate) +
 print(p)
 ```
 
-Now we visualize the model versus data diameter using a scatter plot.
+Now we visualize the model versus data diameter using a scatter plot. The Blue line is the best-fit line through the median predictions vs. observations. Do you think this model is under or over estimating increment data?
 
 ```{r}
 rw_validate = readRDS('output/RW_VALIDATE_HARVARD.RDS')
@@ -605,9 +634,10 @@ q = ggplot(data=rw_validate) +
 print(q)
 ```
 
+
 # 2. Growth to Biomass
 
-We will use the model inferred tree growth to determine tree biomass. This is done using allometric equations, which are used to determine tree biomass based on tree size. In this workflow, we will use the allometric equations from Chojnacky et al. (XXXX). For each species, tree biomass is determined by tree diameter using the equation AGB = exp(beta0 + beta1 * log(DBH)), where beta0 and beta1 are published parameter values (estimated using destructive sampling that involves cutting down and weighing trees).
+We will use the model inferred tree growth to determine tree biomass. This is done using allometric equations, which are used to determine tree biomass based on tree size. In this workflow, we will use the allometric equations from Chojnacky et al. (XXXX). For each species, tree biomass is determined by tree diameter using the equation AGB = exp(beta0 + beta1 \* log(DBH)), where beta0 and beta1 are published parameter values (estimated using destructive sampling that involves cutting down and weighing trees).
 
 ```{R}
 # code to estimate biomass
@@ -620,11 +650,14 @@ choj = choj %>% filter(acronym %in% unique(taxon_C))
 head(choj)
 
 ```
-For each tree, for each year, and for each posterior diameter sample we determine tree biomass. We also regorganize the model inferred diameter so that both the diameter and biomass objects have the same structure. 
+
+For each tree, for each year, and for each posterior diameter sample we determine tree biomass. We also regorganize the model inferred diameter so that both the diameter and biomass objects have the same structure.
 
 We also reorganize the data to facilitate visualization.
 
 ```{R}
+#| echo: FALSE
+#| warning: false
 # first for RW only model (no census)
 dbh_array_RW = array(NA, dim = c(N_Tr, N_years, iter))
 agb_array_RW = array(NA, dim = c(N_Tr, N_years, iter))
@@ -674,6 +707,7 @@ agb_melt$model = rep("RW", nrow(agb_melt))
 agb_melt$type = rep('ab',nrow(agb_melt))
 
 ```
+
 Now we visualize biomass for a single tree through time.
 
 ```{R}
@@ -744,8 +778,6 @@ p2 = ggplot() +
 grid.arrange(p1, p2, nrow = 2)
 ```
 
-
-
 In this workflow we only consider trees that are above 5 cm diameter. To satisfy this constraint we need to filter out all model inferred tree diameters that are less than 5 cm. For a given tree, for a given year, if the mean diameter (across all iterations) is less than 5 cm, the samples are replaced with NA. This step ensures they won't contribute to the species and site total biomass we will calculate.
 
 ```{R}
@@ -764,7 +796,6 @@ for (tree in 1:N_Tr){
 }
 ```
 
-
 The sampling protocol used at Harvard Forest is described in Module 2, and is referred to as the double-nested circular design. As in Module 2, we need to perform a sampling correction to account for the fact that small trees (those with dbh less than 20 cm at time of sampling) were only sampled in the inner circle, while larger trees were sampled in both the inner circle and outer ring.
 
 ```{R}
@@ -778,7 +809,6 @@ agb_array_RW[idx_small,,] = agb_array_RW[idx_small,,] * inner_factor
 agb_array_RW[idx_large,,] = agb_array_RW[idx_large,,] * outer_factor
 
 ```
-
 
 ```{R}
 
@@ -806,20 +836,24 @@ abi_melt$type = rep('abi',nrow(abi_melt))
 
 ```
 
-## taxon
 
-## site
+## Taxon-level Aboveground Biomass (AGB) and Aboveground Biomass Increment (AGBI)
 
-# XXX
-# taxon summary data across plots
+
 ```{R}
 agb_taxon_by_iter = agb_melt %>%
-  group_by(year, iter, taxon, model) %>% 
-  dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
-                   .groups='keep')
+  group_by(year, iter, taxon, plot, model) %>% 
+  # # sum up the taxon-level information by plot, iteration, year
+  summarise( AGB.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
+  # 
+  # get the mean value across plots for each iteration:
+  group_by(year, iter, taxon, model) %>%
+   # dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
+   #                  .groups='keep')
+   dplyr::summarize(AGB.iter.mean = mean(AGB.taxon.plot, na.rm = TRUE),
+                     .groups='keep')
 
-#taxon summary data without plot 
-agb_taxon_summary = agb_taxon_by_iter %>%
+agb_taxon_summary = agb_taxon_by_iter %>%ungroup() %>% 
   group_by(year, taxon, model) %>% 
   dplyr::summarize(AGB.mean = mean(AGB.iter.mean, na.rm = TRUE),
                    AGB.sd = sd(AGB.iter.mean, na.rm=TRUE),
@@ -828,12 +862,14 @@ agb_taxon_summary = agb_taxon_by_iter %>%
                    .groups='keep')
 
 abi_taxon_by_iter = abi_melt %>%
+  group_by(year, iter, taxon, plot, model) %>% 
+  summarise( AGBI.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
   group_by(year, iter, taxon, model) %>% 
-  dplyr::summarize(ABI.iter.mean = mean(value, na.rm = TRUE),
+  dplyr::summarize(ABI.iter.mean = mean(AGBI.taxon.plot, na.rm = TRUE),
                    .groups='keep')
 
 #taxon summary data without plot 
-abi_taxon_summary = abi_taxon_by_iter %>%
+abi_taxon_summary = abi_taxon_by_iter %>% ungroup() %>%
   group_by(year, taxon, model) %>% 
   dplyr::summarize(ABI.mean = mean(ABI.iter.mean, na.rm = TRUE),
                    ABI.sd = sd(ABI.iter.mean, na.rm=TRUE),
@@ -841,44 +877,6 @@ abi_taxon_summary = abi_taxon_by_iter %>%
                    ABI.hi = quantile(ABI.iter.mean, c(0.975), na.rm=TRUE), 
                    .groups='keep')
 
-```
-
-```{R}
-# sum annual biomass across taxa for each year, iteration, and plot 
-# also remove incomplete final years if applicable
-agb_taxa = agb_melt %>%
-  # filter(year <= finalyr) %>%
-  dplyr::group_by(taxon, year, plot, iter, model) %>% 
-  dplyr::summarize(ab = sum(value), .groups='keep')
-
-# sum annual biomass across taxa for each year, iteration, and plot 
-# also remove incomplete final years if applicable
-abi_taxa = abi_melt %>%
-  # filter(year <= finalyr) %>%
-  dplyr::group_by(taxon, year, plot, iter, model) %>% 
-  dplyr::summarize(abi = sum(value), .groups='keep')
-
-
-# determine quantiles for graphing 
-agb_plot = agb_taxa %>%
-  dplyr::group_by(model, plot, taxon, year) %>%
-  dplyr::summarize(ab025 = quantile(ab, 0.025),
-                   ab50 = quantile(ab, 0.5),
-                   ab975 = quantile(ab, 0.975), 
-                   .groups = 'keep') %>% 
-  ungroup()
-
-agb_plot$plot =  as.numeric(agb_plot$plot)
-
-sum_plot = agb_taxa %>%
-  dplyr::group_by(model, plot, year, iter) %>%
-  dplyr::summarize(ab = sum(ab), .groups = 'keep') %>%
-  ungroup() %>% 
-  group_by(model, plot, year) %>%
-  dplyr::summarize(ab025 = quantile(ab, 0.025),
-                   ab50 = quantile(ab, 0.5),
-                   ab975 = quantile(ab, 0.975), 
-                   .groups = 'keep')
 ```
 
 
@@ -898,16 +896,16 @@ ggplot(data = abi_taxon_summary)+
   geom_line(aes(x = year, y = ABI.mean, color = taxon))+
   facet_grid(model~., scales='free_y') +
   theme_light(18) +
-  ylab('biomass (mg/ha)')
+  ylab('biomass increment (mg/ha)')
 
 ```
-
-## site level
+## Stand-level Biomass and Biomass increment
 
 ```{R}
 
 agb_all_plot_by_iter <- agb_melt |>
   group_by(year, iter, plot, model) |>
+  # sums all of the trees by plot
   dplyr::summarize(AGB.sum = sum(value),
             .groups = 'keep') 
 
@@ -968,75 +966,115 @@ ggplot(data = abi_site_summary)+
 
 ```
 
-<!-- # 4. Compare with data only -->
+## 6. Comparing RW-only model to our data-based estimates
 
-<!-- ```{R} -->
-<!-- #  -->
+```{R}
+# 
 
-<!-- TR_AGB = readRDS('data/TR_AGB_ests_allodb.rds') -->
+TR_AGB = readRDS('data/TR_AGB_ests_allodb.rds')
+TR_AGB$tree = allTrees$stat_id[match(TR_AGB$id, allTrees$ID)]
 
-<!-- TR_AGB = TR_AGB %>% group_by(tree) %>%  -->
+TR_AGB = TR_AGB %>% group_by(tree) %>% 
+  
+  arrange(cal.year) %>% 
+  
+  mutate(AGBI_kg = AGB_kg - lag(AGB_kg))
 
-<!--   arrange(cal.year) %>%  -->
-
-<!--   mutate(AGBI_kg = AGB_kg - lag(AGB_kg)) -->
-
-<!-- head(TR_AGB) -->
-
-<!-- TR_AGB$tree = allTrees$stat_id[match(TR_AGB$id, allTrees$ID)] -->
-<!-- TR_AGB_sub = subset(TR_AGB, tree==1) -->
+head(TR_AGB)
 
 
-<!-- p1 = ggplot() + -->
-<!--   geom_ribbon(data = agb_tree_quants, aes(x = year, ymin = agb_lo, ymax = agb_hi, fill = model), alpha=0.5) + -->
-<!--   geom_line(data=agb_tree_quants, aes(x=year, y=agb_median, colour = model)) + -->
-<!--   geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGB_kg)) +  -->
-<!--   xlab('year') + -->
-<!--   ylab('agb (kg)') + -->
-<!--   xlim(c(year_lo, year_hi)) + -->
-<!--   theme_bw(16)  + -->
-<!--   # ggtitle(paste0('Tree ', i)) + -->
-<!--   annotation_custom(grob) -->
-<!-- print(p1) -->
+TR_AGB_sub = subset(TR_AGB, tree==1)
 
 
-<!-- p2 = ggplot() + -->
-<!--   geom_ribbon(data = abi_tree_quants, aes(x = year, ymin = abi_lo, ymax = abi_hi, fill = model), alpha=0.5) + -->
-<!--   geom_line(data=abi_tree_quants, aes(x=year, y=abi_median, colour = model)) + -->
-<!--   geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGBI_kg)) +  -->
-<!--   xlab('year') + -->
-<!--   ylab('abi (kg / year)') + -->
-<!--   xlim(c(year_lo, year_hi)) + -->
-<!--   theme_bw(16)  -->
-<!-- print(p2) -->
-
-<!-- ``` -->
-
-<!-- ```{R} -->
-<!-- TAXA.AGB <- TR_AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>%  -->
-
-<!--   summarise(AGB_Mg_ha_taxa = sum(AGB_Mg_ha)) %>%  -->
-
-<!--   filter(cal.year <= 2010) %>%  -->
-
-<!--   ungroup() %>%  -->
-
-<!--   group_by(COMMON_NAME, GENUS, SPECIES, plot) %>% -->
-
-<!--   arrange(cal.year) %>%  -->
-
-<!--   mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa))  -->
+p1 = ggplot() +
+  geom_ribbon(data = agb_tree_quants, aes(x = year, ymin = agb_lo, ymax = agb_hi, fill = model), alpha=0.5) +
+  geom_line(data=agb_tree_quants, aes(x=year, y=agb_median, colour = model)) +
+  geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGB_kg)) + 
+  xlab('year') +
+  ylab('Tree Level Biomass (kg)') +
+  xlim(c(year_lo, year_hi)) +
+  theme_bw(16)  +
+  # ggtitle(paste0('Tree ', i)) +
+  annotation_custom(grob)
+print(p1)
 
 
+p2 = ggplot() +
+  geom_ribbon(data = abi_tree_quants, aes(x = year, ymin = abi_lo, ymax = abi_hi, fill = model), alpha=0.5) +
+  geom_line(data=abi_tree_quants, aes(x=year, y=abi_median, colour = model)) +
+  geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGBI_kg)) + 
+  xlab('year') +
+  ylab('Tree-level Biomass Increment (kg / year)') +
+  xlim(c(year_lo, year_hi)) +
+  theme_bw(16) 
+print(p2)
 
-<!-- ggplot()+ -->
+```
 
-<!--   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot) -->
+```{R}
+TAXA.AGB <- TR_AGB %>% group_by(taxon, COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>% 
+  
+  summarise(AGB_Mg_ha_taxa_plot = sum(AGB_kg*tph_corr), 
+            AGBI_Mg_ha_taxa_plot = sum(AGBI_kg*tph_corr)) %>% 
+  
+  filter(cal.year <= 2010) %>% 
+  
+  ungroup() %>% 
+  
+  group_by(taxon, COMMON_NAME, GENUS, SPECIES, cal.year) %>%
+  
+  summarise(AGB_Mg_ha_taxa = mean(AGB_Mg_ha_taxa_plot, na.rm = TRUE), 
+            AGBI_Mg_ha_taxa = mean(AGBI_Mg_ha_taxa_plot, na.rm =TRUE)) #%>%
 
 
+site.AGB <- TR_AGB %>% group_by(cal.year, plot) %>% 
+  
+  summarise(AGB_Mg_ha_plot = sum(AGB_kg*tph_corr), 
+            AGBI_Mg_ha_plot = sum(AGBI_kg*tph_corr)) %>% 
+  
+  filter(cal.year <= 2010) %>% 
+  
+  ungroup() %>% 
+  
+  group_by( cal.year) %>%
+  
+  summarise(AGB_Mg_ha = mean(AGB_Mg_ha_plot, na.rm = TRUE), 
+            AGBI_Mg_ha = mean(AGBI_Mg_ha_plot, na.rm =TRUE)) 
 
-<!-- ggplot()+ -->
+ggplot(data = agb_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=AGB.lo, ymax=AGB.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = AGB.mean, color = taxon))+
+   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa), size = 1)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('Taxa Biomass (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
 
-<!--   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI.taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot) -->
 
-<!-- ``` -->
+ggplot(data = abi_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=ABI.lo, ymax=ABI.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = ABI.mean, color = taxon))+
+  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI_Mg_ha_taxa), size = 1)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('Taxa Biomass Increment (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
+
+
+# site -level AGB:
+ggplot(data = agb_site_summary)+
+  geom_ribbon(aes(x=year, ymin=ab025, ymax=ab975), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abmean))+
+  geom_line(data = site.AGB, aes(x = cal.year, y = AGB_Mg_ha), linetype = 3)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('Site-level Biomass (mg/ha)')
+
+
+ggplot(data = abi_site_summary)+
+  geom_ribbon(aes(x=year, ymin=abi025, ymax=abi975), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abimean))+
+  geom_line(data = site.AGB, aes(x = cal.year, y = AGBI_Mg_ha), linetype = 3)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('Site-level Biomass Increment (mg/ha)')
+
+```

@@ -1,0 +1,38 @@
+---
+title: "Module 7: Comparing RW only and RW + Census model"
+author: "Andria Dawson and Kelly Heilman"
+format:
+  html:
+    code-fold: true
+---
+
+## Outline
+
+-   Read in the outputs
+-   Compare Total Aboveground Biomass over time for each method (data-only estimates, TR only model, TR + census model)
+-   Compare Aboveground Biomass Increment over time for each method (data-only estimates, TR only model, TR + census model)
+-   Relating AGBI estimates to climate drivers
+
+### Read in all of the outputs of each model
+
+```{R}
+
+```
+
+### Plot up total AGB and AGBI over time for each method
+
+```{R}
+
+```
+
+### Plot up species-level AGB and AGBI over time for each method
+
+```{R}
+
+```
+
+### Does variation in AGBI correspond to variation in climate?
+
+```{R}
+
+```
