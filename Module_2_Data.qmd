@@ -55,7 +55,7 @@ Citation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B
 ```{R}
 #| warning: false
 # code to plot the tree ring data, by species
-HARV <- readRDS("data/tree_data_HARVARD_STAN.RDS")
+HARV <- readRDS("data/tree_data_HARVARD.RDS")
 taxon.conversion <- readRDS("data/taxon_conversion.RDS")
 
 # Xobs contains the increment data for all the cored trees
