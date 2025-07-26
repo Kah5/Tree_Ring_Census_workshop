@@ -617,7 +617,7 @@ p = ggplot(data=dbh_validate) +
 print(p)
 ```
 
-Now we visualize the model versus data diameter using a scatter plot.
+Now we visualize the model versus data diameter using a scatter plot. The Blue line is the best-fit line through the median predictions vs. observations. Do you think this model is under or over estimating increment data?
 
 ```{r}
 rw_validate = readRDS('output/RW_VALIDATE_HARVARD.RDS')
