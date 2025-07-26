@@ -87,10 +87,10 @@ nchains = 1
 compiled_CENSUS = stan_model(file = paste0('models/growth_model_CENSUS.stan'))
 
 fit_CENSUS = sampling(compiled_CENSUS, 
-                  data = dat, 
-                  iter = iter, 
-                  chains = nchains,
-                  verbose=TRUE)
+                      data = dat, 
+                      iter = iter, 
+                      chains = nchains,
+                      verbose=TRUE)
 
 ```
 
@@ -137,43 +137,6 @@ p = ggplot(data=post_sx_melt) +
   ylab('sigma_x')
 print(p)
 
-```
-```{R}
-variables = names(post_CENSUS[1,1,])
-allSXOBS = grep('sig_x_obs',variables)
-
-post_sxobs = post_CENSUS[,,allSXOBS]
-
-# head(post_sx)
-# dim(post_sx)
-
-post_sxobs = data.frame(post_sxobs)
-post_sxobs$iteration = seq(1, nrow(post_sxobs))
-colnames(post_sxobs) = c('sigma_x_obs', 'iteration')
-post_sxobs$model = 'CENSUS-only'
-saveRDS(post_sxobs, "data/post_sxobs_CENSUS.rds")
-
-p = ggplot(data=post_sxobs) +
-  # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
-  geom_violin(aes(x=model, y=sigma_x_obs, colour=model, fill=model), alpha=0.5) +
-  theme_bw(14) +
-  #xlab('Species') +
-  ylab('sigma_x')
-print(p)
-
-
-p = ggplot(data=post_sxobs) +
-  geom_histogram(aes(x=sigma_x_obs, y=after_stat(density), colour=model, fill=model)) +
-  theme_bw(14) 
-print(p)
-
-p = ggplot(data=post_sxobs) +
-  geom_line(aes(x=iteration, y=sigma_x_obs)) +
-  geom_point(aes(x=iteration, y=sigma_x_obs)) +
-  theme_bw(14) +
-  xlab('Iteration') +
-  ylab('sigma_x_obs') 
-print(p)
 ```
 
 ## 4. Visualizing chronology-like effects: year random effects
@@ -228,122 +191,51 @@ post_d = post_CENSUS[,,allDs]
 tree = 1
 
 
- print(tree)
-  in.RW = tree %in% X2Tr
-  
-  # if (in.RW){
-  #   inds = which(X2Tr == tree)
-  #   yrinds = X2year[inds]
-  #   
-  #   dbh_iter = t(post_d[[1]][,inds])
-  #   dbh_iter = data.frame(dbh_iter)
-  #   dbh_iter = data.frame(year=years[yrinds], dbh_iter)
-  #   
-  #   dbh_mean = apply(dbh_iter[,2:ncol(dbh_iter)], 1, mean, na.rm=TRUE)
-  #   dbh_quant = t(apply(dbh_iter[,2:ncol(dbh_iter)], 1, 
-  #                       function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
-  #   
-  #   dbh_tree = data.frame(d_mean = dbh_mean, 
-  #                         d_median = dbh_quant[,2], 
-  #                         d_lo = dbh_quant[,1], 
-  #                         d_hi = dbh_quant[,3], 
-  #                         year = years[yrinds],
-  #                         model = 'RW')
-  #   
-  # }
-  
-  # determine which estimates correspond to this tree
-  inds_C = which(X2Tr_C == tree)
-  yrinds_C = X2year_C[inds_C]
+print(tree)
+in.RW = tree %in% X2Tr
 
-  # C
-  dbh_iter_C = t(post_d[,inds_C])
-  dbh_iter_C = data.frame(dbh_iter_C)
-  dbh_iter_C = data.frame(year=years[yrinds_C], dbh_iter_C)
-  
-  dbh_mean_C = apply(dbh_iter_C[,2:ncol(dbh_iter_C)], 1, mean, na.rm=TRUE)
-  dbh_quant_C = t(apply(dbh_iter_C[,2:ncol(dbh_iter_C)], 1, 
-                        function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
-  
-  dbh_tree_C = data.frame(d_mean = dbh_mean_C, 
-                          d_median = dbh_quant_C[,2], 
-                          d_lo = dbh_quant_C[,1], 
-                          d_hi = dbh_quant_C[,3], 
-                          year = years[yrinds_C],
-                          model = 'Census')
+# determine which estimates correspond to this tree
+inds_C = which(X2Tr_C == tree)
+yrinds_C = X2year_C[inds_C]
 
-  
+# C
+dbh_iter_C = t(post_d[,inds_C])
+dbh_iter_C = data.frame(dbh_iter_C)
+dbh_iter_C = data.frame(year=years[yrinds_C], dbh_iter_C)
 
-  dbh_tree = dbh_tree_C
-  
-  idx_d_obs_C = which(Dobs$stat_id == tree)
-  
-  dbh_obs_C = data.frame(d_obs = Dobs$dbh[idx_d_obs_C],
-                         year = years[Dobs$year[idx_d_obs_C]])
-  
-  stem_id = Dobs$ID[idx_d_obs_C][1]
-  
-  if (in.RW){
-    idx_d_obs = which(Tr$stat_id == tree)
-    
-    dbh_obs = data.frame(d_obs = Tr$dbh[idx_d_obs],
-                         year = years[Tr$year[idx_d_obs]])
-    
-  } else {
-    dbh_obs = data.frame(d_obs = numeric(0),
-                         year = numeric(0))
-  }
+dbh_mean_C = apply(dbh_iter_C[,2:ncol(dbh_iter_C)], 1, mean, na.rm=TRUE)
+dbh_quant_C = t(apply(dbh_iter_C[,2:ncol(dbh_iter_C)], 1, 
+                      function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
 
-###
-
-# in.CENSUS = tree %in% X2Tr
-# 
-# if (in.CENSUS){
-#   inds = which(X2Tr == tree)
-#   yrinds = X2year[inds]
-#   
-#   dbh_iter = t(post_d[,inds])
-#   dbh_iter = data.frame(dbh_iter)
-#   dbh_iter = data.frame(year=years[yrinds], dbh_iter)
-#   
-#   dbh_mean = apply(dbh_iter[,2:ncol(dbh_iter)], 1, mean, na.rm=TRUE)
-#   dbh_quant = t(apply(dbh_iter[,2:ncol(dbh_iter)], 1,
-#                       function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
-#   
-#   dbh_tree = data.frame(d_mean = dbh_mean,
-#                         d_median = dbh_quant[,2],
-#                         d_lo = dbh_quant[,1],
-#                         d_hi = dbh_quant[,3],
-#                         year = years[yrinds],
-#                         model = 'CENSUS-only')
-#   
-# }
-# 
-# # determine which estimates correspond to this tree
-# inds_C = which(X2Tr_C == tree)
-# yrinds_C = X2year_C[inds_C]
-# 
-# 
-# idx_d_obs_C = which(Dobs$stat_id == tree)
-# 
-# dbh_obs_C = data.frame(d_obs = Dobs$dbh[idx_d_obs_C],
-#                        year = years[Dobs$year[idx_d_obs_C]])
-# 
-# stem_id = Dobs$ID[idx_d_obs_C][1]
-# 
-# if (in.CENSUS){
-#   idx_d_obs = which(Tr$stat_id == tree)
-#   
-#   dbh_obs = data.frame(d_obs = Tr$dbh[idx_d_obs],
-#                        year = years[Tr$year[idx_d_obs]])
-#   
-# } else {
-#   dbh_obs = data.frame(d_obs = numeric(0),
-#                        year = numeric(0))
-# }
+dbh_tree_C = data.frame(d_mean = dbh_mean_C, 
+                        d_median = dbh_quant_C[,2], 
+                        d_lo = dbh_quant_C[,1], 
+                        d_hi = dbh_quant_C[,3], 
+                        year = years[yrinds_C],
+                        model = 'Census')
 
 
+
+dbh_tree = dbh_tree_C
+
+idx_d_obs_C = which(Dobs$stat_id == tree)
+
+dbh_obs_C = data.frame(d_obs = Dobs$dbh[idx_d_obs_C],
+                       year = years[Dobs$year[idx_d_obs_C]])
+
+stem_id = Dobs$ID[idx_d_obs_C][1]
+
+if (in.RW){
+  idx_d_obs = which(Tr$stat_id == tree)
   
+  dbh_obs = data.frame(d_obs = Tr$dbh[idx_d_obs],
+                       year = years[Tr$year[idx_d_obs]])
+  
+} else {
+  dbh_obs = data.frame(d_obs = numeric(0),
+                       year = numeric(0))
+}
+
 # Create a text
 grob = grobTree(textGrob(paste0('Tree ', tree, '; ID ', stem_id, '; Species ', taxon_C[tree] ), x=0.05,  y=0.9, hjust=0,
                          gp=gpar(col="black", fontsize=18)))
@@ -359,145 +251,49 @@ p1 = ggplot() +
   theme_bw(16)  +
   annotation_custom(grob)
 
-  
-  # Create a text
-  # grob = grobTree(textGrob(paste0('Tree ', tree, '; Stem ID ', stem_id, '; Species ', taxon[tree] ), x=0.05,  y=0.9, hjust=0,
-  #                          gp=gpar(col="black", fontsize=22)))
-  # 
-  # p1 = ggplot() +
-  #   geom_ribbon(data=dbh_tree, aes(x=year, ymin=d_lo, ymax=d_hi, fill=model), alpha=0.5) +
-  #   geom_line(data=dbh_tree, aes(x=year, y=d_median, colour=model)) +
-  #   geom_point(data=dbh_obs, aes(x=year, y=d_obs), size=2) +
-  #   geom_point(data=dbh_obs_C, aes(x=year, y=d_obs), size=2, shape=1) +
-  #   xlab('year') +
-  #   ylab('dbh (cm)') +
-  #   xlim(c(year_lo, year_hi)) +
-  #   theme_bw(16)  +
-  #   annotation_custom(grob)
-  # 
-  # print(p1)
-
 print(p1)
 ```
 
 
 ```{R}
 
-allCENSUSs = grep('X\\[',variables)
-post_CENSUS = post_CENSUS[,,allCENSUSs]
-
-# 
-#   if (in.RW){
-#     inds = which(X2Tr == tree)
-#     yrinds = X2year[inds]
-#     
-#     rw_iter = t(post_rw[[1]][,inds])
-#     rw_iter = data.frame(rw_iter)
-#     rw_iter = data.frame(year=years[yrinds], rw_iter)
-#     
-#     rw_mean = apply(rw_iter[,2:ncol(rw_iter)], 1, mean, na.rm=TRUE)
-#     rw_quant = t(apply(rw_iter[,2:ncol(rw_iter)], 1, 
-#                        function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
-#     
-#     rw_tree = data.frame(x_mean = rw_mean, 
-#                          x_median = rw_quant[,2], 
-#                          x_lo = rw_quant[,1], 
-#                          x_hi = rw_quant[,3], 
-#                          year = years[yrinds],
-#                          model = 'RW')
-#   }
-  
-  
-  inds_C = which(X2Tr_C == tree)
-  yrinds_C = X2year_C[inds_C]
-  
-  rw_iter_C = t(post_rw[,inds_C])
-  rw_iter_C = data.frame(rw_iter_C)
-  rw_iter_C = data.frame(year=years[yrinds_C], rw_iter_C)
-  
-  rw_mean_C = apply(rw_iter_C[,2:ncol(rw_iter_C)], 1, mean, na.rm=TRUE)
-  rw_quant_C = t(apply(rw_iter_C[,2:ncol(rw_iter_C)], 1, 
-                       function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
-  
-  rw_tree_C = data.frame(x_mean = rw_mean_C, 
-                         x_median = rw_quant_C[,2], 
-                         x_lo = rw_quant_C[,1], 
-                         x_hi = rw_quant_C[,3], 
-                         year = years[yrinds_C],
-                         model = 'Census')
-
-  rw_tree = rw_tree_C
-  
-
-    rw_obs = data.frame(x_obs = numeric(0),
-                        year = numeric(0))
-
-
-  
-  ###
-if (in.CENSUS){
-  inds = which(X2Tr == tree)
-  yrinds = X2year[inds]
-  
-  CENSUS_iter = t(post_CENSUS[,inds])
-  CENSUS_iter = data.frame(CENSUS_iter)
-  CENSUS_iter = data.frame(year=years[yrinds], CENSUS_iter)
-  
-  CENSUS_mean = apply(CENSUS_iter[,2:ncol(CENSUS_iter)], 1, mean, na.rm=TRUE)
-  CENSUS_quant = t(apply(CENSUS_iter[,2:ncol(CENSUS_iter)], 1,
-                     function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
-  
-  CENSUS_tree = data.frame(x_mean = CENSUS_mean,
-                       x_median = CENSUS_quant[,2],
-                       x_lo = CENSUS_quant[,1],
-                       x_hi = CENSUS_quant[,3],
-                       year = years[yrinds],
-                       model = 'CENSUS-only')
-}
-
+allRWs = grep('X\\[',variables)
+post_rw = post_CENSUS[,,allRWs]
 
 inds_C = which(X2Tr_C == tree)
 yrinds_C = X2year_C[inds_C]
 
-if (in.CENSUS){
-  idx_CENSUS_obs = which(Xobs$stat_id == tree)
-  
-  CENSUS_obs = data.frame(x_obs = Xobs$incr[idx_CENSUS_obs],
-                      year = years[Xobs$year[idx_CENSUS_obs]])
-} else {
-  CENSUS_obs = data.frame(x_obs = numeric(0),
-                      year = numeric(0))
-}
+rw_iter_C = t(post_rw[,inds_C])
+rw_iter_C = data.frame(rw_iter_C)
+rw_iter_C = data.frame(year=years[yrinds_C], rw_iter_C)
 
+rw_mean_C = apply(rw_iter_C[,2:ncol(rw_iter_C)], 1, mean, na.rm=TRUE)
+rw_quant_C = t(apply(rw_iter_C[,2:ncol(rw_iter_C)], 1, 
+                     function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
+
+rw_tree_C = data.frame(x_mean = rw_mean_C, 
+                       x_median = rw_quant_C[,2], 
+                       x_lo = rw_quant_C[,1], 
+                       x_hi = rw_quant_C[,3], 
+                       year = years[yrinds_C],
+                       model = 'Census')
+
+rw_tree = rw_tree_C
+
+
+rw_obs = data.frame(x_obs = numeric(0),
+                    year = numeric(0))
 
 p2 = ggplot() +
-  geom_ribbon(data=CENSUS_tree, aes(x=year, ymin=x_lo, ymax=x_hi, fill=model), alpha=0.5) +
-  geom_line(data=CENSUS_tree, aes(x=year, y=x_median, colour=model)) +
-  geom_point(data=CENSUS_obs, aes(x=year, y=x_obs), size=2, alpha=0.4) +
+  geom_ribbon(data=rw_tree, aes(x=year, ymin=x_lo, ymax=x_hi, fill=model), alpha=0.5) +
+  geom_line(data=rw_tree, aes(x=year, y=x_median, colour=model)) +
+  geom_point(data=rw_obs, aes(x=year, y=x_obs), size=2, alpha=0.4) +
   xlab('year') +
-  ylab('CENSUS (mm)') +
+  ylab('rw (mm)') +
   xlim(c(year_lo, year_hi)) +
-  theme_bw(16)  #+
+  theme_bw(16)
 
 grid.arrange(p1, p2, nrow = 2)
-
-  
-  p2 = ggplot() +
-    # geom_line(data=dbh_tree, aes(x=year, y=d_mean)) +
-    # geom_ribbon(data=rw_tree, aes(x=year, ymin=x_lo, ymax=x_hi), fill='lightgrey') +
-    geom_ribbon(data=rw_tree, aes(x=year, ymin=x_lo, ymax=x_hi, fill=model), alpha=0.5) +
-    geom_line(data=rw_tree, aes(x=year, y=x_median, colour=model)) +
-    geom_point(data=rw_obs, aes(x=year, y=x_obs), size=2, alpha=0.4) +
-    # geom_dog(data=rw_obs, aes(x=year, y=x_obs, dog='glasses'), size=2) +
-    # ylim(c(0,500)) +
-    xlab('year') +
-    ylab('rw (mm)') +
-    xlim(c(year_lo, year_hi)) +
-    theme_bw(16)  #+
-  # ggtitle(paste0('Tree ', i)) +
-  # annotation_custom(grob)
-  
-  print(p2)
 
 ```
 
@@ -518,14 +314,14 @@ head(choj)
 #| echo: FALSE
 #| warning: false
 # first for CENSUS only model (no census)
-dbh_array_CENSUS = array(NA, dim = c(N_Tr, N_years, iter))
-agb_array_CENSUS = array(NA, dim = c(N_Tr, N_years, iter))
+dbh_array_CENSUS = array(NA, dim = c(N_C, N_years, iter))
+agb_array_CENSUS = array(NA, dim = c(N_C, N_years, iter))
 
-for (t in 1:N_Tr){
+for (t in 1:N_C){
   
   # determine which estimates correspond to this tree
-  inds = which(X2Tr == t)
-  yrinds = X2year[inds]
+  inds = which(X2C == t)
+  yrinds = X2year_C[inds]
   
   # extract diameter data
   dbh_array_CENSUS[t,yrinds,] = t(post_d[,inds])
@@ -550,7 +346,7 @@ colnames(dbh_melt) = c('tree','year','iter','value')
 dbh_melt = dbh_melt %>% filter(!is.na(value))
 dbh_melt$year = years[dbh_melt$year]
 #dbh_melt$plot = plot[dbh_melt$tree]
-dbh_melt$taxon = taxon[dbh_melt$tree]
+dbh_melt$taxon = taxon_C[dbh_melt$tree]
 dbh_melt$model = rep("CENSUS-only", nrow(dbh_melt))
 dbh_melt$type = rep('dbh',nrow(dbh_melt))
 # rm(dbh_array)
@@ -561,7 +357,7 @@ colnames(agb_melt) = c('tree','year','iter','value')
 agb_melt = agb_melt %>% filter(!is.na(value))
 agb_melt$year = years[agb_melt$year]
 #agb_melt$plot = plot[agb_melt$tree]
-agb_melt$taxon = taxon[agb_melt$tree]
+agb_melt$taxon = taxon_C[agb_melt$tree]
 agb_melt$model = rep("CENSUS-only", nrow(agb_melt))
 agb_melt$type = rep('ab',nrow(agb_melt))
 
@@ -604,7 +400,7 @@ colnames(abi_melt) = c('tree', 'year', 'iter', 'value')
 abi_melt = abi_melt %>% filter(!is.na(value))
 abi_melt$year = years[abi_melt$year]
 # abi_melt$plot = plot[abi_melt$tree]
-abi_melt$taxon = taxon[abi_melt$tree]
+abi_melt$taxon = taxon_C[abi_melt$tree]
 abi_melt$model = rep("CENSUS-only", nrow(abi_melt))
 abi_melt$type = rep('abi',nrow(abi_melt))
 
@@ -636,7 +432,7 @@ In this workflow we only consider trees that are above 5 cm diameter. To satisfy
 
 ```{R}
 # first for CENSUS only model
-for (tree in 1:N_Tr){
+for (tree in 1:N_C){
   for (year in 1:N_years){
     
     # determine mean DBH for this year and tree
@@ -668,8 +464,8 @@ agb_melt = melt(agb_array_CENSUS)
 colnames(agb_melt) = c('tree','year','iter','value')
 agb_melt = agb_melt %>% filter(!is.na(value))
 agb_melt$year = years[agb_melt$year]
-agb_melt$plot = plot[agb_melt$tree]
-agb_melt$taxon = taxon[agb_melt$tree]
+agb_melt$plot = plot_C[agb_melt$tree]
+agb_melt$taxon = taxon_C[agb_melt$tree]
 agb_melt$model = rep("CENSUS-only", nrow(agb_melt))
 agb_melt$type = rep('ab',nrow(agb_melt))
 
@@ -680,8 +476,8 @@ abi_melt = melt(abi)
 colnames(abi_melt) = c('tree', 'year', 'iter', 'value')
 abi_melt = abi_melt %>% filter(!is.na(value))
 abi_melt$year = years[abi_melt$year]
-abi_melt$plot = plot[abi_melt$tree]
-abi_melt$taxon = taxon[abi_melt$tree]
+abi_melt$plot = plot_C[abi_melt$tree]
+abi_melt$taxon = taxon_C[abi_melt$tree]
 abi_melt$model = rep("CENSUS-only", nrow(abi_melt))
 abi_melt$type = rep('abi',nrow(abi_melt))
 
@@ -699,10 +495,10 @@ agb_taxon_by_iter = agb_melt %>%
   # 
   # get the mean value across plots for each iteration:
   group_by(year, iter, taxon, model) %>%
-   # dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
-   #                  .groups='keep')
-   dplyr::summarize(AGB.iter.mean = mean(AGB.taxon.plot, na.rm = TRUE),
-                     .groups='keep')
+  # dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
+  #                  .groups='keep')
+  dplyr::summarize(AGB.iter.mean = mean(AGB.taxon.plot, na.rm = TRUE),
+                   .groups='keep')
 
 agb_taxon_summary = agb_taxon_by_iter %>%ungroup() %>% 
   group_by(year, taxon, model) %>% 
@@ -756,7 +552,7 @@ agb_all_plot_by_iter <- agb_melt |>
   group_by(year, iter, plot, model) |>
   # sums all of the trees by plot
   dplyr::summarize(AGB.sum = sum(value),
-            .groups = 'keep') 
+                   .groups = 'keep') 
 
 agb_site_by_iter <- agb_all_plot_by_iter |>
   group_by(year, iter, model) |>
@@ -766,7 +562,7 @@ agb_site_by_iter <- agb_all_plot_by_iter |>
 agb_site_summary = agb_site_by_iter %>%
   group_by(year, model) %>%
   dplyr::summarize(abmean = mean(AGB.iter, na.rm=T),
-    ab025 = quantile(AGB.iter, 0.025),
+                   ab025 = quantile(AGB.iter, 0.025),
                    ab50 = quantile(AGB.iter, 0.5),
                    ab975 = quantile(AGB.iter, 0.975), 
                    .groups = 'keep') %>% 
@@ -777,7 +573,7 @@ agb_site_summary = agb_site_by_iter %>%
 abi_all_plot_by_iter <- abi_melt |>
   group_by(year, iter, plot, model) |>
   dplyr::summarize(ABI.sum = sum(value),
-            .groups = 'keep') 
+                   .groups = 'keep') 
 
 abi_site_by_iter <- abi_all_plot_by_iter |>
   group_by(year, iter, model) |>
@@ -787,7 +583,7 @@ abi_site_by_iter <- abi_all_plot_by_iter |>
 abi_site_summary = abi_site_by_iter %>%
   group_by(year, model) %>%
   dplyr::summarize(abimean = mean(ABI.iter, na.rm=T),
-    abi025 = quantile(ABI.iter, 0.025),
+                   abi025 = quantile(ABI.iter, 0.025),
                    abi50 = quantile(ABI.iter, 0.5),
                    abi975 = quantile(ABI.iter, 0.975), 
                    .groups = 'keep') %>% 
@@ -813,8 +609,4 @@ ggplot(data = abi_site_summary)+
   theme_light(18) +
   ylab('biomass (mg/ha)')
 
-```
-
-```{R}
-# plot total and by taxa
 ```
