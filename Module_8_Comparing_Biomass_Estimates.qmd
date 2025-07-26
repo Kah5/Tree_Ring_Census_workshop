@@ -369,307 +369,44 @@ tree <- 1
 
 ```
 
-### 2. Estimate biomass 
+### 2. Read in estimated biomass from all 3 models
 
 ```{r}
-#| warning: FALSE
-choj = read.csv('data/acronym_to_chojnacky_v0.1.csv', stringsAsFactors = FALSE)
+abi_site_CENSUS <- readRDS( "summary/abi_site_summary_CENSUS.RDS")
+agb_site_CENSUS <- readRDS("summary/agb_site_summary_CENSUS.RDS")
 
-# use HAVI (average of all hardwoods) for those species not found in chojnacky equations
-gen = choj[which(choj$acronym == 'HAVI'),]
-choj = choj %>% filter(acronym %in% unique(taxon_C))
+abi_taxon_CENSUS <- readRDS( "summary/abi_taxon_summary_CENSUS.RDS")
+agb_taxon_CENSUS <- readRDS("summary/agb_taxon_summary_CENSUS.RDS")
 
-# first for RW only model (no census)
+abi_site_TR <- readRDS( "summary/abi_site_summary_TR.RDS")
+agb_site_TR <- readRDS("summary/agb_site_summary_TR.RDS")
 
-dbh_array_RW = array(NA, dim = c(N_Tr, N_years, iter))
-agb_array_RW = array(NA, dim = c(N_Tr, N_years, iter))
-
-for (t in 1:N_Tr){
-
-  # determine which estimates correspond to this tree
-  inds = which(X2Tr == t)
-  yrinds = X2year[inds]
-
-  # extract diameter data
-  dbh_array_RW[t,yrinds,] = t(post_d[[1]][,inds])
-
-  # get equation coefficients based on taxon
-  beta0 = choj$beta0[which(choj$acronym == taxon[t])]
-  beta1 = choj$beta1[which(choj$acronym == taxon[t])]
-
-  if (length(beta0)==0){
-    beta0 = gen$beta0
-    beta1 = gen$beta1
-  }
-
-  # use biomass equation to estimate biomass from diameter
-  agb_array_RW[t,,] = exp(beta0 + beta1 * log(dbh_array_RW[t,,]))
-}
-
-# next for RW + Census Model (if applicable)
-dbh_array_C = array(NA, dim = c(N_C, N_years, iter))
-agb_array_C = array(NA, dim = c(N_C, N_years, iter))
-
-dbh_array_RWC = array(NA, dim = c(N_C, N_years, iter))
-agb_array_RWC = array(NA, dim = c(N_C, N_years, iter))
-
-for (t in 1:N_C){
-
-  # determine which estimates correspond to this tree
-  inds = which(X2C == t)
-  yrinds = X2year_C[inds]
-
-  # extract diameter data
-  dbh_array_C[t,yrinds,] = t(post_d[[2]][,inds])
-  dbh_array_RWC[t,yrinds,] = t(post_d[[3]][,inds])
-
-  # get equation coefficients based on taxon
-  beta0 = choj$beta0[which(choj$acronym == taxon_C[t])]
-  beta1 = choj$beta1[which(choj$acronym == taxon_C[t])]
-
-  # use biomass equation to estimate biomass from diameter
-  agb_array_C[t,,] = exp(beta0 + beta1 * log(dbh_array_C[t,,]))
-  agb_array_RWC[t,,] = exp(beta0 + beta1 * log(dbh_array_RWC[t,,]))
-}
+abi_taxon_TR <- readRDS( "summary/abi_taxon_summary_TR.RDS")
+agb_taxon_TR <- readRDS("summary/agb_taxon_summary_TR.RDS")
 
 
+abi_site_TR_CENSUS <- readRDS( "summary/abi_site_summary_TR_CENSUS.RDS")
+agb_site_TR_CENSUS <- readRDS("summary/agb_site_summary_TR_CENSUS.RDS")
+
+abi_taxon_TR_CENSUS <- readRDS( "summary/abi_taxon_summary_TR_CENSUS.RDS")
+agb_taxon_TR_CENSUS <- readRDS("summary/agb_taxon_summary_TR_CENSUS.RDS")
 ```
 
-# remove biomass from small trees:
-```{r}
-# first for RW only model
-for (tree in 1:N_Tr){
-  for (year in 1:N_years){
 
-    # determine mean DBH for this year and tree
-    dbh_mean = mean(dbh_array_RW[tree, year, ], na.rm=TRUE)
-
-    # if smaller than 5 cm., eliminate the data
-    if (is.na(dbh_mean) | dbh_mean >= 5) next
-    dbh_array_RW[tree, year, ] = rep(NA, iter)
-    agb_array_RW[tree, year, ] = rep(NA, iter)
-  }
-}
-
-# second for RW + Census model
-for (tree in 1:N_C){
-  for (year in 1:N_years){
-
-    # determine mean DBH for this year and tree
-    dbh_mean_C = mean(dbh_array_C[tree, year, ], na.rm=TRUE)
-
-    # if smaller than 5 cm., eliminate the data
-    if (is.na(dbh_mean_C) | dbh_mean_C >= 5) next
-    dbh_array_C[tree, year, ] = rep(NA, iter)
-    agb_array_C[tree, year, ] = rep(NA, iter)
-  }
-}
-
-
-
-for (tree in 1:N_C){
-  for (year in 1:N_years){
-
-    # determine mean DBH for this year and tree
-    dbh_mean_RWC = mean(dbh_array_RWC[tree, year, ], na.rm=TRUE)
-
-    # if smaller than 5 cm., eliminate the data
-    if (is.na(dbh_mean_RWC) | dbh_mean_RWC >= 5) next
-    dbh_array_RWC[tree, year, ] = rep(NA, iter)
-    agb_array_RWC[tree, year, ] = rep(NA, iter)
-  }
-}
-
-```
-
-### Apply census smoothing (RW + CENSUS MODEL)
-```{r}
-# If the census is the final record of a tree and the tree was not alive for all of the censuses,
-# we need to determine the year in which the tree died stochastically since it could have been anytime
-# between the censuses.
-# determine which trees we need to consider for smoothing (all those marked as "dead" in finalCond)
-smoothIDs = unique(dat$Dobs$stat_id[which(dat$Dobs$finalCond == 'dead')])
-
-# loop through all of the trees
-for (id in smoothIDs){
-
-  # get last census year
-  cYr = max(dat$Dobs$year[which(dat$Dobs$stat_id == id)])
-  if (cYr == -Inf) next
-
-  # get last data year
-  dYr = X2year_C[dat$idx_C$lastidx[which(dat$idx_C$stat_id == id)]]
-
-  timeRange = seq(cYr, dYr)
-
-  # loop through all iterations and stochastically choose the last year the tree lived
-  for (k in 1:iter){
-    lYr = sample(timeRange, 1)
-    if (lYr != dYr){
-      agb_array_C[id,((lYr+1):dYr),k] = rep(NA, length(c((lYr+1):dYr)))
-      agb_array_RWC[id,((lYr+1):dYr),k] = rep(NA, length(c((lYr+1):dYr)))
-    }
-  }
-}
-```
-
-###  Calculate biomass increment
-```{R}
-# determine biomass increment
-
-# first for RW only model
-abi = apply(agb_array_RW, c(1,3), function(x) diff(x))
-abi = aperm(abi, c(2, 1, 3))
-abi_melt = melt(abi)
-colnames(abi_melt) = c('tree', 'year', 'iter', 'value')
-abi_melt = abi_melt %>% filter(!is.na(value))
-abi_melt$year = years[abi_melt$year]
-abi_melt$plot = plot[abi_melt$tree]
-abi_melt$taxon = taxon[abi_melt$tree]
-abi_melt$model = rep("RW", nrow(abi_melt))
-abi_melt$type = rep('abi',nrow(abi_melt))
-# rm(abi)
-
-# then for RW + census model
-abi_C = apply(agb_array_C, c(1,3), function(x) diff(x))
-abi_C = aperm(abi_C, c(2, 1, 3))
-abi_melt_C = melt(abi_C)
-colnames(abi_melt_C) = c('tree', 'year', 'iter', 'value')
-abi_melt_C = abi_melt_C %>% filter(!is.na(value))
-abi_melt_C$year = years[abi_melt_C$year]
-abi_melt_C$plot = plot_C[abi_melt_C$tree]
-abi_melt_C$taxon = taxon_C[abi_melt_C$tree]
-abi_melt_C$model = rep("Census", nrow(abi_melt_C))
-abi_melt_C$type = rep('abi',nrow(abi_melt_C))
-abi_melt = rbind(abi_melt, abi_melt_C)
-
-abi_RWC = apply(agb_array_RWC, c(1,3), function(x) diff(x))
-abi_RWC = aperm(abi_RWC, c(2, 1, 3))
-abi_melt_RWC = melt(abi_RWC)
-colnames(abi_melt_RWC) = c('tree', 'year', 'iter', 'value')
-abi_melt_RWC = abi_melt_RWC %>% filter(!is.na(value))
-abi_melt_RWC$year = years[abi_melt_RWC$year]
-abi_melt_RWC$plot = plot_C[abi_melt_RWC$tree]
-abi_melt_RWC$taxon = taxon_C[abi_melt_RWC$tree]
-abi_melt_RWC$model = rep("RW + Census", nrow(abi_melt_RWC))
-abi_melt_RWC$type = rep('abi',nrow(abi_melt_RWC))
-abi_melt = rbind(abi_melt, abi_melt_RWC)
-```
-
-```{r}
-# melt down dbh_array to data frame
-dbh_melt = melt(dbh_array_RW)
-colnames(dbh_melt) = c('tree','year','iter','value')
-dbh_melt = dbh_melt %>% filter(!is.na(value))
-dbh_melt$year = years[dbh_melt$year]
-dbh_melt$plot = plot[dbh_melt$tree]
-dbh_melt$taxon = taxon[dbh_melt$tree]
-dbh_melt$model = rep("RW", nrow(dbh_melt))
-dbh_melt$type = rep('dbh',nrow(dbh_melt))
-# rm(dbh_array)
-
-# melt down agb_array to data frame
-agb_melt = melt(agb_array_RW)
-colnames(agb_melt) = c('tree','year','iter','value')
-agb_melt = agb_melt %>% filter(!is.na(value))
-agb_melt$year = years[agb_melt$year]
-agb_melt$plot = plot[agb_melt$tree]
-agb_melt$taxon = taxon[agb_melt$tree]
-agb_melt$model = rep("RW", nrow(agb_melt))
-agb_melt$type = rep('ab',nrow(agb_melt))
-
-
-
-  # melt down dbh_array_C to data frame
-  dbh_melt_C = melt(dbh_array_C)
-  colnames(dbh_melt_C) = c('tree','year','iter','value')
-  dbh_melt_C = dbh_melt_C %>% filter(!is.na(value))
-  dbh_melt_C$year = years[dbh_melt_C$year]
-  dbh_melt_C$plot = plot_C[dbh_melt_C$tree]
-  dbh_melt_C$taxon = taxon_C[dbh_melt_C$tree]
-  dbh_melt_C$model = rep("Census", nrow(dbh_melt_C))
-  dbh_melt_C$type = rep('dbh',nrow(dbh_melt_C))
-  dbh_melt = rbind(dbh_melt, dbh_melt_C)
-  # rm(dbh_array_C,dbh_melt_C)
-
-  # melt down agb_array_C to data frame
-  agb_melt_C = melt(agb_array_C)
-  colnames(agb_melt_C) = c('tree','year','iter','value')
-  agb_melt_C = agb_melt_C %>% filter(!is.na(value))
-  agb_melt_C$year = years[agb_melt_C$year]
-  agb_melt_C$plot = plot_C[agb_melt_C$tree]
-  agb_melt_C$taxon = taxon_C[agb_melt_C$tree]
-  agb_melt_C$model = rep("Census", nrow(agb_melt_C))
-  agb_melt_C$type = rep('ab',nrow(agb_melt_C))
-  agb_melt = rbind(agb_melt, agb_melt_C)
-
-  # melt down dbh_array_C to data frame
-  dbh_melt_RWC = melt(dbh_array_RWC)
-  colnames(dbh_melt_RWC) = c('tree','year','iter','value')
-  dbh_melt_RWC = dbh_melt_RWC %>% filter(!is.na(value))
-  dbh_melt_RWC$year = years[dbh_melt_RWC$year]
-  dbh_melt_RWC$plot = plot_C[dbh_melt_RWC$tree]
-  dbh_melt_RWC$taxon = taxon_C[dbh_melt_RWC$tree]
-  dbh_melt_RWC$model = rep("RW + Census", nrow(dbh_melt_RWC))
-  dbh_melt_RWC$type = rep('dbh',nrow(dbh_melt_RWC))
-  dbh_melt = rbind(dbh_melt, dbh_melt_RWC)
-
-  # melt down agb_array_C to data frame
-  agb_melt_RWC = melt(agb_array_RWC)
-  colnames(agb_melt_RWC) = c('tree','year','iter','value')
-  agb_melt_RWC = agb_melt_RWC %>% filter(!is.na(value))
-  agb_melt_RWC$year = years[agb_melt_RWC$year]
-  agb_melt_RWC$plot = plot_C[agb_melt_RWC$tree]
-  agb_melt_RWC$taxon = taxon_C[agb_melt_RWC$tree]
-  agb_melt_RWC$model = rep("RW + Census", nrow(agb_melt_RWC))
-  agb_melt_RWC$type = rep('ab',nrow(agb_melt_RWC))
-  agb_melt = rbind(agb_melt, agb_melt_RWC)
-
-```
 
 ### Plot up total AGB and AGBI over time for each method
 ## Taxon-level Aboveground Biomass (AGB) and Aboveground Biomass Increment (AGBI)
 
+
 ```{R}
-agb_taxon_by_iter = agb_melt %>%
-  group_by(year, iter, taxon, plot, model) %>% 
-  # # sum up the taxon-level information by plot, iteration, year
-  summarise( AGB.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
-  # 
-  # get the mean value across plots for each iteration:
-  group_by(year, iter, taxon, model) %>%
-   # dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
-   #                  .groups='keep')
-   dplyr::summarize(AGB.iter.mean = mean(AGB.taxon.plot, na.rm = TRUE),
-                     .groups='keep')
+agb_site_summary <- rbind(agb_site_TR, agb_site_CENSUS, agb_site_TR_CENSUS)
+abi_site_summary <- rbind(abi_site_TR, abi_site_CENSUS, abi_site_TR_CENSUS)
 
-agb_taxon_summary = agb_taxon_by_iter %>%ungroup() %>% 
-  group_by(year, taxon, model) %>% 
-  dplyr::summarize(AGB.mean = mean(AGB.iter.mean, na.rm = TRUE),
-                   AGB.sd = sd(AGB.iter.mean, na.rm=TRUE),
-                   AGB.lo = quantile(AGB.iter.mean, c(0.025), na.rm=TRUE),
-                   AGB.hi = quantile(AGB.iter.mean, c(0.975), na.rm=TRUE), 
-                   .groups='keep')
-
-abi_taxon_by_iter = abi_melt %>%
-  group_by(year, iter, taxon, plot, model) %>% 
-  summarise( AGBI.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
-  group_by(year, iter, taxon, model) %>% 
-  dplyr::summarize(ABI.iter.mean = mean(AGBI.taxon.plot, na.rm = TRUE),
-                   .groups='keep')
-
-#taxon summary data without plot 
-abi_taxon_summary = abi_taxon_by_iter %>% ungroup() %>%
-  group_by(year, taxon, model) %>% 
-  dplyr::summarize(ABI.mean = mean(ABI.iter.mean, na.rm = TRUE),
-                   ABI.sd = sd(ABI.iter.mean, na.rm=TRUE),
-                   ABI.lo = quantile(ABI.iter.mean, c(0.025), na.rm=TRUE),
-                   ABI.hi = quantile(ABI.iter.mean, c(0.975), na.rm=TRUE), 
-                   .groups='keep')
+agb_taxon_summary <- rbind(agb_taxon_TR, agb_taxon_CENSUS, agb_taxon_TR_CENSUS)
+abi_taxon_summary <- rbind(abi_taxon_TR, abi_taxon_CENSUS, abi_taxon_TR_CENSUS)
 
 ```
-
-```{R, fig.width=8, fig.height=12}
+```{R, fig.height = 8, fig.width = 10}
 
 
 ggplot(data = agb_taxon_summary)+
@@ -679,6 +416,39 @@ ggplot(data = agb_taxon_summary)+
   theme_light(18) +
   ylab('biomass (mg/ha)')
 ```
+```{R, fig.height = 8, fig.width = 10}
+
+ggplot(data = abi_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=ABI.lo, ymax=ABI.hi, colour=model, fill=model), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = ABI.mean, color = model))+
+  facet_grid(taxon~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass increment (mg/ha)')
+
+```
+## Stand-level Biomass and Biomass increment
+
+
+```{R}
+
+
+ggplot(data = agb_site_summary)+
+  geom_ribbon(aes(x=year, ymin=ab025, ymax=ab975, fill = model), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abmean, color = model))+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass (mg/ha)')
+
+
+ggplot(data = abi_site_summary)+
+  geom_ribbon(aes(x=year, ymin=abi025, ymax=abi975, fill = model), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abimean, color = model))+
+  
+  theme_light(18) +
+  ylab('biomass (mg/ha)')
+
+```
+
 
 ```{R,fig.width=8, fig.height=12}
 ggplot(data = abi_taxon_summary)+
@@ -691,51 +461,6 @@ ggplot(data = abi_taxon_summary)+
 ```
 
 ## Stand-level Biomass and Biomass increment
-
-```{R}
-
-agb_all_plot_by_iter <- agb_melt |>
-  group_by(year, iter, plot, model) |>
-  # sums all of the trees by plot
-  dplyr::summarize(AGB.sum = sum(value),
-            .groups = 'keep') 
-
-agb_site_by_iter <- agb_all_plot_by_iter |>
-  group_by(year, iter, model) |>
-  dplyr::summarize(AGB.iter = mean(AGB.sum),
-                   .groups = 'keep') 
-
-agb_site_summary = agb_site_by_iter %>%
-  group_by(year, model) %>%
-  dplyr::summarize(abmean = mean(AGB.iter, na.rm=T),
-    ab025 = quantile(AGB.iter, 0.025),
-                   ab50 = quantile(AGB.iter, 0.5),
-                   ab975 = quantile(AGB.iter, 0.975), 
-                   .groups = 'keep') %>% 
-  ungroup()
-
-
-
-abi_all_plot_by_iter <- abi_melt |>
-  group_by(year, iter, plot, model) |>
-  dplyr::summarize(ABI.sum = sum(value),
-            .groups = 'keep') 
-
-abi_site_by_iter <- abi_all_plot_by_iter |>
-  group_by(year, iter, model) |>
-  dplyr::summarize(ABI.iter = mean(ABI.sum),
-                   .groups = 'keep') 
-
-abi_site_summary = abi_site_by_iter %>%
-  group_by(year, model) %>%
-  dplyr::summarize(abimean = mean(ABI.iter, na.rm=T),
-    abi025 = quantile(ABI.iter, 0.025),
-                   abi50 = quantile(ABI.iter, 0.5),
-                   abi975 = quantile(ABI.iter, 0.975), 
-                   .groups = 'keep') %>% 
-  ungroup()
-
-```
 
 ### Plot up stand-scale AGB over time for each method
 ```{R}

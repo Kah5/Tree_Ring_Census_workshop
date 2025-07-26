@@ -102,7 +102,7 @@ We will load the output from the fitted model (fitted model object and parameter
 iter = 500
 nchains = 1
 
-fit_CENSUS = readRDS('output/model_fit_CENSUS_HARVARD.RDS')
+#fit_CENSUS = readRDS('output/model_fit_CENSUS_HARVARD.RDS')
 
 post_CENSUS = readRDS('output/model_post_CENSUS_HARVARD.RDS')
 
@@ -588,6 +588,12 @@ abi_site_summary = abi_site_by_iter %>%
                    abi975 = quantile(ABI.iter, 0.975), 
                    .groups = 'keep') %>% 
   ungroup()
+
+saveRDS(abi_site_summary, "summary/abi_site_summary_CENSUS.RDS")
+saveRDS(agb_site_summary, "summary/agb_site_summary_CENSUS.RDS")
+
+saveRDS(abi_taxon_summary, "summary/abi_taxon_summary_CENSUS.RDS")
+saveRDS(agb_taxon_summary, "summary/agb_taxon_summary_CENSUS.RDS")
 
 ```
 

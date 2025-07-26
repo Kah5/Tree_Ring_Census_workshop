@@ -1093,4 +1093,10 @@ ggplot(data = abi_site_summary)+
   theme_light(18) +
   ylab('Site-level Biomass Increment (mg/ha)')
 
+saveRDS(abi_site_summary, "summary/abi_site_summary_TR.RDS")
+saveRDS(agb_site_summary, "summary/agb_site_summary_TR.RDS")
+
+saveRDS(abi_taxon_summary, "summary/abi_taxon_summary_TR.RDS")
+saveRDS(agb_taxon_summary, "summary/agb_taxon_summary_TR.RDS")
+
 ```

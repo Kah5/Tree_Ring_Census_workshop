@@ -11,9 +11,9 @@ project:
       - Module_3_Biomass_estimation.qmd
       - Module_4_Growth_model_Introduction.qmd
       - Module_5_RingWidth_only_model.qmd
-      - Module_6_RingWidth_and_Census.qmd
-      - Module_7_Comparing_Biomass_Estimates.qmd
-      - Module_8_TR_and_Census_model_w_climate.qmd
+      - Module_6_Census_only.qmd
+      - Module_7_RingWidth_and_Census.qmd
+      - Module_8_Comparing_Biomass_Estimates.qmd
 
 website:
   title: "State Space Model Workshop 2025, Livingstone, Zambia"
@@ -33,13 +33,16 @@ website:
     contents:
       - about.qmd
       - index.qmd
+      - about.qmd
+      - index.qmd
       - Module_1_Introduction.qmd
       - Module_2_Data.qmd
       - Module_3_Biomass_estimation.qmd
-      - Module_4_RingWidth_only_model.qmd
-      - Module_5_RingWidth_and_Census.qmd
-      - Module_6_Comparing_Biomass_Estimates.qmd
-      - Module_7_TR_and_Census_model_w_climate.qmd
+      - Module_4_Growth_model_Introduction.qmd
+      - Module_5_RingWidth_only_model.qmd
+      - Module_6_Census_only.qmd
+      - Module_7_RingWidth_and_Census.qmd
+      - Module_8_Comparing_Biomass_Estimates.qmd
   page-navigation: true
 
 format:

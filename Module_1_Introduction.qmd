@@ -54,3 +54,7 @@ We will work through a series of modules
 ## Two options for how to work through this workshop:
 1. No-code: Work though on this website
 2. Running .qmd files on Posit Cloud--.qmd files can be run similarly to rmarkdown files
+
+
+Instructions for POSIT cloud:
+

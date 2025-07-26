@@ -66,6 +66,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./Module_4_Growth_model_Introduction.html" rel="next">
 <link href="./Module_2_Data.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -188,6 +189,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome and Schedule</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./Module_1_Introduction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Module 1: Introduction</span></a>
   </div>
@@ -205,17 +218,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
         <li class="sidebar-item">
- <span class="menu-text">Module_4_RingWidth_only_model.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_4_Growth_model_Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 4: Model Introduction</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_5_RingWidth_and_Census.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_5_RingWidth_only_model.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 5: Ring-width only model (RW-only)</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_6_Comparing_Biomass_Estimates.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_6_Census_only.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 6: Census only model</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_7_TR_and_Census_model_w_climate.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_7_RingWidth_and_Census.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 6: Ring Width and Census Data Model (RW + Census)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Module_8_Comparing_Biomass_Estimates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 7: Comparing RW only, the Census only, and RW + Census model</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -356,23 +387,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> <span class="fu">gt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
-<div id="pxrnxqqkyq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#pxrnxqqkyq table {
+<div id="ingxtzqkhy" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#ingxtzqkhy table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#pxrnxqqkyq thead, #pxrnxqqkyq tbody, #pxrnxqqkyq tfoot, #pxrnxqqkyq tr, #pxrnxqqkyq td, #pxrnxqqkyq th {
+#ingxtzqkhy thead, #ingxtzqkhy tbody, #ingxtzqkhy tfoot, #ingxtzqkhy tr, #ingxtzqkhy td, #ingxtzqkhy th {
   border-style: none;
 }
 
-#pxrnxqqkyq p {
+#ingxtzqkhy p {
   margin: 0;
   padding: 0;
 }
 
-#pxrnxqqkyq .gt_table {
+#ingxtzqkhy .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -398,12 +429,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-left-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_caption {
+#ingxtzqkhy .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#pxrnxqqkyq .gt_title {
+#ingxtzqkhy .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -415,7 +446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-width: 0;
 }
 
-#pxrnxqqkyq .gt_subtitle {
+#ingxtzqkhy .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -427,7 +458,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-width: 0;
 }
 
-#pxrnxqqkyq .gt_heading {
+#ingxtzqkhy .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -439,13 +470,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_bottom_border {
+#ingxtzqkhy .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_col_headings {
+#ingxtzqkhy .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -460,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_col_heading {
+#ingxtzqkhy .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -480,7 +511,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#pxrnxqqkyq .gt_column_spanner_outer {
+#ingxtzqkhy .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -492,15 +523,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 4px;
 }
 
-#pxrnxqqkyq .gt_column_spanner_outer:first-child {
+#ingxtzqkhy .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#pxrnxqqkyq .gt_column_spanner_outer:last-child {
+#ingxtzqkhy .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#pxrnxqqkyq .gt_column_spanner {
+#ingxtzqkhy .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -512,11 +543,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   width: 100%;
 }
 
-#pxrnxqqkyq .gt_spanner_row {
+#ingxtzqkhy .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#pxrnxqqkyq .gt_group_heading {
+#ingxtzqkhy .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -542,7 +573,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   text-align: left;
 }
 
-#pxrnxqqkyq .gt_empty_group_heading {
+#ingxtzqkhy .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -557,15 +588,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: middle;
 }
 
-#pxrnxqqkyq .gt_from_md > :first-child {
+#ingxtzqkhy .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#pxrnxqqkyq .gt_from_md > :last-child {
+#ingxtzqkhy .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#pxrnxqqkyq .gt_row {
+#ingxtzqkhy .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -584,7 +615,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   overflow-x: hidden;
 }
 
-#pxrnxqqkyq .gt_stub {
+#ingxtzqkhy .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -597,7 +628,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pxrnxqqkyq .gt_stub_row_group {
+#ingxtzqkhy .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -611,15 +642,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   vertical-align: top;
 }
 
-#pxrnxqqkyq .gt_row_group_first td {
+#ingxtzqkhy .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#pxrnxqqkyq .gt_row_group_first th {
+#ingxtzqkhy .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#pxrnxqqkyq .gt_summary_row {
+#ingxtzqkhy .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -629,16 +660,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pxrnxqqkyq .gt_first_summary_row {
+#ingxtzqkhy .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_first_summary_row.thick {
+#ingxtzqkhy .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#pxrnxqqkyq .gt_last_summary_row {
+#ingxtzqkhy .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -648,7 +679,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_grand_summary_row {
+#ingxtzqkhy .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -658,7 +689,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pxrnxqqkyq .gt_first_grand_summary_row {
+#ingxtzqkhy .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -668,7 +699,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-top-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_last_grand_summary_row_top {
+#ingxtzqkhy .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -678,11 +709,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_striped {
+#ingxtzqkhy .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#pxrnxqqkyq .gt_table_body {
+#ingxtzqkhy .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -691,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-bottom-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_footnotes {
+#ingxtzqkhy .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -705,7 +736,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_footnote {
+#ingxtzqkhy .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -714,7 +745,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pxrnxqqkyq .gt_sourcenotes {
+#ingxtzqkhy .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -728,7 +759,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   border-right-color: #D3D3D3;
 }
 
-#pxrnxqqkyq .gt_sourcenote {
+#ingxtzqkhy .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -736,63 +767,63 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   padding-right: 5px;
 }
 
-#pxrnxqqkyq .gt_left {
+#ingxtzqkhy .gt_left {
   text-align: left;
 }
 
-#pxrnxqqkyq .gt_center {
+#ingxtzqkhy .gt_center {
   text-align: center;
 }
 
-#pxrnxqqkyq .gt_right {
+#ingxtzqkhy .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#pxrnxqqkyq .gt_font_normal {
+#ingxtzqkhy .gt_font_normal {
   font-weight: normal;
 }
 
-#pxrnxqqkyq .gt_font_bold {
+#ingxtzqkhy .gt_font_bold {
   font-weight: bold;
 }
 
-#pxrnxqqkyq .gt_font_italic {
+#ingxtzqkhy .gt_font_italic {
   font-style: italic;
 }
 
-#pxrnxqqkyq .gt_super {
+#ingxtzqkhy .gt_super {
   font-size: 65%;
 }
 
-#pxrnxqqkyq .gt_footnote_marks {
+#ingxtzqkhy .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#pxrnxqqkyq .gt_asterisk {
+#ingxtzqkhy .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#pxrnxqqkyq .gt_indent_1 {
+#ingxtzqkhy .gt_indent_1 {
   text-indent: 5px;
 }
 
-#pxrnxqqkyq .gt_indent_2 {
+#ingxtzqkhy .gt_indent_2 {
   text-indent: 10px;
 }
 
-#pxrnxqqkyq .gt_indent_3 {
+#ingxtzqkhy .gt_indent_3 {
   text-indent: 15px;
 }
 
-#pxrnxqqkyq .gt_indent_4 {
+#ingxtzqkhy .gt_indent_4 {
   text-indent: 20px;
 }
 
-#pxrnxqqkyq .gt_indent_5 {
+#ingxtzqkhy .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -2133,6 +2164,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="./Module_4_Growth_model_Introduction.html" class="pagination-link" aria-label="Module 4: Model Introduction">
+        <span class="nav-page-text">Module 4: Model Introduction</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

@@ -66,6 +66,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./Module_6_Census_only.html" rel="next">
+<link href="./Module_4_Growth_model_Introduction.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -182,7 +184,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Module 5: Ring-width only model (RW-only)</li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Module_5_RingWidth_only_model.html">Module 5: Ring-width only model (RW-only)</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -216,6 +218,18 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome and Schedule</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./Module_1_Introduction.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Module 1: Introduction</span></a>
   </div>
@@ -233,17 +247,35 @@ window.Quarto = {
   </div>
 </li>
         <li class="sidebar-item">
- <span class="menu-text">Module_4_RingWidth_only_model.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_4_Growth_model_Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 4: Model Introduction</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_5_RingWidth_and_Census.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_5_RingWidth_only_model.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Module 5: Ring-width only model (RW-only)</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_6_Comparing_Biomass_Estimates.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_6_Census_only.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 6: Census only model</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">Module_7_TR_and_Census_model_w_climate.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./Module_7_RingWidth_and_Census.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 6: Ring Width and Census Data Model (RW + Census)</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Module_8_Comparing_Biomass_Estimates.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 7: Comparing RW only, the Census only, and RW + Census model</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -1802,6 +1834,14 @@ You can override using the `.groups` argument.</code></pre>
 </figure>
 </div>
 </div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(abi_site_summary, <span class="st">"summary/abi_site_summary_TR.RDS"</span>)</span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(agb_site_summary, <span class="st">"summary/agb_site_summary_TR.RDS"</span>)</span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(abi_taxon_summary, <span class="st">"summary/abi_taxon_summary_TR.RDS"</span>)</span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(agb_taxon_summary, <span class="st">"summary/agb_taxon_summary_TR.RDS"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 
 
@@ -2373,6 +2413,18 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./Module_4_Growth_model_Introduction.html" class="pagination-link" aria-label="Module 4: Model Introduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Module 4: Model Introduction</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./Module_6_Census_only.html" class="pagination-link" aria-label="Module 6: Census only model">
+        <span class="nav-page-text">Module 6: Census only model</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 
 
