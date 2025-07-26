@@ -1,0 +1,122 @@
+---
+title: "Module 6: Ring Width and Census Data Model (RW + Census)"
+author: "Andria Dawson and Kelly Heilman"
+format:
+  html:
+    code-fold: true
+---
+
+## State-space model for estimating biomass at HF with only tree ring time-series and the diameter at time of coring
+
+## Load packages to be used
+
+We estimate the parameters of this state-space model in a program called `stan` which interfaces to `R` via a package called `rstan` (`cmdstan` is another package that is used.)
+
+```{R}
+#| warning: FALSE
+library(rstan)
+library(dplyr)
+library(reshape2)
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(tidyr)
+```
+
+# load the model data
+
+```{r}
+# load built dataset 
+dat = readRDS('data/tree_data_HARVARD.RDS')
+
+class(dat)
+
+names(dat)
+
+taxa = dat$taxa # the taxa abbreviations
+years = dat$years # the years where we will estimate increments
+
+# STAN requires you to tell it the dimensions of the inputs and outputs, so we need to define these: 
+N_years = dat$N_years # number of years
+N_Tr = dat$N_Tr # number of trees
+N_taxa = dat$N_taxa # number of taxa
+X2Tr = dat$X2Tr # vector of tree ids
+X2year = dat$X2year # vector of years for each tree
+Tr = dat$Tr %>% arrange(stat_id) # arrange the Tree data by ids, and save as Tr
+taxon = Tr$taxon # vector of taxon ids
+plot = Tr$plot # vector of plot ids
+years = dat$years # vector of calendar years
+year_lo = min(years) # minimum year
+year_hi = max(years) # maximum year
+pdbh = exp(dat$logTr) #vector of diameters
+
+
+list2env(dat, envir = globalenv())# load all the data objects into the environment
+
+N_C = dat$N_C # vector of Census ids
+X2C = dat$X2C # links the Census tree to the increment measurements
+X2year_C = dat$X2year_C
+
+allTrees = dat$allTrees %>% arrange(stat_id)
+taxon_C = allTrees$taxon
+plot_C = allTrees$plot
+distance = allTrees$distance
+
+```
+
+### Stan Model - RW and Census module
+
+
+The `stan` model code is stored in the `models/` folder. The RW + Census model is the `growth_model_RW_CENSUS.stan`. If you are working through this tutorial on R, you can view this file in your environment. We won't dive too deep into how to write your own stan model, but note that this model includes several blocks:
+
+```{r}
+#| class-output: stan
+writeLines(readLines("models/growth_model_RW_CENSUS.stan"))
+```
+
+# add the math notation of the model here:
+
+## Running the model: Example for a short run
+
+```{r}
+#| eval: FALSE
+
+# settings
+iter = 500
+nchains = 1
+
+compiled_RW_CENSUS = stan_model(file = paste0('models/growth_model_RW_CENSUS.stan'))
+
+fit_RW_CENSUS = sampling(compiled_RW_CENSUS, 
+                  data = dat, 
+                  iter = iter, 
+                  chains = nchains,
+                  verbose=TRUE)
+
+```
+
+## The RW + CENSUS model outputs
+
+We will load the output from the fitted model (fitted model object and parameter posterior distributions).
+
+```{R, echo=FALSE}
+iter = 500
+nchains = 1
+
+fit_RW_CENSUS = readRDS('output/model_fit_RW_CENSUS_HARVARD.RDS')
+
+post_RW_CENSUS = readRDS('output/model_post_RW_CENSUS_HARVARD.RDS')
+
+```
+
+## convert tree diameters to AGB
+
+```{R}
+# code to estimate biomass
+```
+
+## Plot of AGB and AGBI with uncertainty
+
+```{R}
+# plot total and by taxa
+```
