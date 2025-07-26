@@ -41,23 +41,12 @@ library(allodb)
 library(tidyverse)
 library(dplR)
 library(gt)
-library(FIESTA)
+
 library(reshape2)
 HARV <- readRDS("data/tree_data_HARVARD_STAN_v3.1_102020.RDS")
 
-taxon.conversion <- data.frame(taxon = HARV$taxa, # TAXA abbreviation
-                               SPCD = c(261, # Eastern Hemlock
-                                        833, # Northern Red Oak
-                                        316, # Red Maple
-                                        371, # Yellow Birch
-                                        531, # American beech
-                                        129, # White Pine
-                                        372, # Grey/Sweet Birch
-                                        837, # Black Oak
-                                        7331# Witch hazel (Hamamelis virginiana) 
-                                        ) # using FIA species codes:
-) %>% left_join(., FIESTA::ref_species %>% select(SPCD, COMMON_NAME, GENUS, SPECIES))%>%
-  mutate(`Scientific Name` = paste(GENUS, SPECIES))
+
+taxon.conversion <- readRDS("data/taxon_conversion.RDS")
 
 Tree.ring <- HARV$Xobs %>% left_join(., HARV$Tr)
 
