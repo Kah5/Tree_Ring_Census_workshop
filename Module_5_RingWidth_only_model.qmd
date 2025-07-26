@@ -991,7 +991,7 @@ p1 = ggplot() +
   geom_line(data=agb_tree_quants, aes(x=year, y=agb_median, colour = model)) +
   geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGB_kg)) + 
   xlab('year') +
-  ylab('agb (kg)') +
+  ylab('Tree Level Biomass (kg)') +
   xlim(c(year_lo, year_hi)) +
   theme_bw(16)  +
   # ggtitle(paste0('Tree ', i)) +
@@ -1004,7 +1004,7 @@ p2 = ggplot() +
   geom_line(data=abi_tree_quants, aes(x=year, y=abi_median, colour = model)) +
   geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGBI_kg)) + 
   xlab('year') +
-  ylab('abi (kg / year)') +
+  ylab('Tree-level Biomass Increment (kg / year)') +
   xlim(c(year_lo, year_hi)) +
   theme_bw(16) 
 print(p2)
@@ -1025,13 +1025,21 @@ TAXA.AGB <- TR_AGB %>% group_by(taxon, COMMON_NAME, GENUS, SPECIES, cal.year, pl
   
   summarise(AGB_Mg_ha_taxa = mean(AGB_Mg_ha_taxa_plot, na.rm = TRUE), 
             AGBI_Mg_ha_taxa = mean(AGBI_Mg_ha_taxa_plot, na.rm =TRUE)) #%>%
-  # ungroup() %>%
-  # group_by(taxon, COMMON_NAME, GENUS, SPECIES) %>%
-  # 
-  # arrange(cal.year) %>% 
-  # 
-  # mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa)) 
 
+
+site.AGB <- TR_AGB %>% group_by(cal.year, plot) %>% 
+  
+  summarise(AGB_Mg_ha_plot = sum(AGB_kg*tph_corr), 
+            AGBI_Mg_ha_plot = sum(AGBI_kg*tph_corr)) %>% 
+  
+  filter(cal.year <= 2010) %>% 
+  
+  ungroup() %>% 
+  
+  group_by( cal.year) %>%
+  
+  summarise(AGB_Mg_ha = mean(AGB_Mg_ha_plot, na.rm = TRUE), 
+            AGBI_Mg_ha = mean(AGBI_Mg_ha_plot, na.rm =TRUE)) 
 
 ggplot(data = agb_taxon_summary)+
   geom_ribbon(aes(x=year, ymin=AGB.lo, ymax=AGB.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
@@ -1039,7 +1047,7 @@ ggplot(data = agb_taxon_summary)+
    geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa), size = 1)+
   #facet_grid(model~., scales='free_y') +
   theme_light(18) +
-  ylab('biomass (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
+  ylab('Taxa Biomass (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
 
 
 ggplot(data = abi_taxon_summary)+
@@ -1048,6 +1056,25 @@ ggplot(data = abi_taxon_summary)+
   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI_Mg_ha_taxa), size = 1)+
   #facet_grid(model~., scales='free_y') +
   theme_light(18) +
-  ylab('biomass increment (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
+  ylab('Taxa Biomass Increment (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
+
+
+# site -level AGB:
+ggplot(data = agb_site_summary)+
+  geom_ribbon(aes(x=year, ymin=ab025, ymax=ab975), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abmean))+
+  geom_line(data = site.AGB, aes(x = cal.year, y = AGB_Mg_ha), linetype = 3)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('Site-level Biomass (mg/ha)')
+
+
+ggplot(data = abi_site_summary)+
+  geom_ribbon(aes(x=year, ymin=abi025, ymax=abi975), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abimean))+
+  geom_line(data = site.AGB, aes(x = cal.year, y = AGBI_Mg_ha), linetype = 3)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('Site-level Biomass Increment (mg/ha)')
 
 ```
