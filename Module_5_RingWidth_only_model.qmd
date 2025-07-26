@@ -113,6 +113,9 @@ We will load the output from the fitted model (fitted model object and parameter
 
 ```{R, echo=FALSE}
 
+iter = 500
+nchains = 1
+
 fit_RW = readRDS('output/model_fit_RW_HARVARD.RDS')
 
 post_RW = readRDS('output/model_post_RW_HARVARD.RDS')
@@ -965,75 +968,75 @@ ggplot(data = abi_site_summary)+
 
 ```
 
-# 4. Compare with data only
+<!-- # 4. Compare with data only -->
 
-```{R}
-# 
+<!-- ```{R} -->
+<!-- #  -->
 
-TR_AGB = readRDS('data/TR_AGB_ests_allodb.rds')
+<!-- TR_AGB = readRDS('data/TR_AGB_ests_allodb.rds') -->
 
-TR_AGB = TR_AGB %>% group_by(tree) %>% 
-  
-  arrange(cal.year) %>% 
-  
-  mutate(AGBI_kg = AGB_kg - lag(AGB_kg))
+<!-- TR_AGB = TR_AGB %>% group_by(tree) %>%  -->
 
-head(TR_AGB)
+<!--   arrange(cal.year) %>%  -->
 
-TR_AGB$tree = allTrees$stat_id[match(TR_AGB$id, allTrees$ID)]
-TR_AGB_sub = subset(TR_AGB, tree==1)
+<!--   mutate(AGBI_kg = AGB_kg - lag(AGB_kg)) -->
 
+<!-- head(TR_AGB) -->
 
-p1 = ggplot() +
-  geom_ribbon(data = agb_tree_quants, aes(x = year, ymin = agb_lo, ymax = agb_hi, fill = model), alpha=0.5) +
-  geom_line(data=agb_tree_quants, aes(x=year, y=agb_median, colour = model)) +
-  geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGB_kg)) + 
-  xlab('year') +
-  ylab('agb (kg)') +
-  xlim(c(year_lo, year_hi)) +
-  theme_bw(16)  +
-  # ggtitle(paste0('Tree ', i)) +
-  annotation_custom(grob)
-print(p1)
+<!-- TR_AGB$tree = allTrees$stat_id[match(TR_AGB$id, allTrees$ID)] -->
+<!-- TR_AGB_sub = subset(TR_AGB, tree==1) -->
 
 
-p2 = ggplot() +
-  geom_ribbon(data = abi_tree_quants, aes(x = year, ymin = abi_lo, ymax = abi_hi, fill = model), alpha=0.5) +
-  geom_line(data=abi_tree_quants, aes(x=year, y=abi_median, colour = model)) +
-  geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGBI_kg)) + 
-  xlab('year') +
-  ylab('abi (kg / year)') +
-  xlim(c(year_lo, year_hi)) +
-  theme_bw(16) 
-print(p2)
-
-```
-
-```{R}
-TAXA.AGB <- TR_AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>% 
-  
-  summarise(AGB_Mg_ha_taxa = sum(AGB_Mg_ha)) %>% 
-  
-  filter(cal.year <= 2010) %>% 
-  
-  ungroup() %>% 
-  
-  group_by(COMMON_NAME, GENUS, SPECIES, plot) %>%
-  
-  arrange(cal.year) %>% 
-  
-  mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa)) 
+<!-- p1 = ggplot() + -->
+<!--   geom_ribbon(data = agb_tree_quants, aes(x = year, ymin = agb_lo, ymax = agb_hi, fill = model), alpha=0.5) + -->
+<!--   geom_line(data=agb_tree_quants, aes(x=year, y=agb_median, colour = model)) + -->
+<!--   geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGB_kg)) +  -->
+<!--   xlab('year') + -->
+<!--   ylab('agb (kg)') + -->
+<!--   xlim(c(year_lo, year_hi)) + -->
+<!--   theme_bw(16)  + -->
+<!--   # ggtitle(paste0('Tree ', i)) + -->
+<!--   annotation_custom(grob) -->
+<!-- print(p1) -->
 
 
+<!-- p2 = ggplot() + -->
+<!--   geom_ribbon(data = abi_tree_quants, aes(x = year, ymin = abi_lo, ymax = abi_hi, fill = model), alpha=0.5) + -->
+<!--   geom_line(data=abi_tree_quants, aes(x=year, y=abi_median, colour = model)) + -->
+<!--   geom_line(data=TR_AGB_sub, aes(x=cal.year, y=AGBI_kg)) +  -->
+<!--   xlab('year') + -->
+<!--   ylab('abi (kg / year)') + -->
+<!--   xlim(c(year_lo, year_hi)) + -->
+<!--   theme_bw(16)  -->
+<!-- print(p2) -->
 
-ggplot()+
-  
-  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot)
+<!-- ``` -->
+
+<!-- ```{R} -->
+<!-- TAXA.AGB <- TR_AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>%  -->
+
+<!--   summarise(AGB_Mg_ha_taxa = sum(AGB_Mg_ha)) %>%  -->
+
+<!--   filter(cal.year <= 2010) %>%  -->
+
+<!--   ungroup() %>%  -->
+
+<!--   group_by(COMMON_NAME, GENUS, SPECIES, plot) %>% -->
+
+<!--   arrange(cal.year) %>%  -->
+
+<!--   mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa))  -->
 
 
 
-ggplot()+
-  
-  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI.taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot)
+<!-- ggplot()+ -->
 
-```
+<!--   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot) -->
+
+
+
+<!-- ggplot()+ -->
+
+<!--   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI.taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot) -->
+
+<!-- ``` -->
