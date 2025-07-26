@@ -24,7 +24,7 @@ library(gridExtra)
 library(tidyr)
 ```
 
-### Read in all of the outputs of each model
+# 1. Read in all of the outputs of each model
 
 ```{R}
 nchains = 1
@@ -369,7 +369,7 @@ tree <- 1
 
 ```
 
-### 2. Read in estimated biomass from all 3 models
+# 2. Read in estimated biomass from all 3 models
 
 ```{r}
 abi_site_CENSUS <- readRDS( "summary/abi_site_summary_CENSUS.RDS")
@@ -392,11 +392,9 @@ abi_taxon_TR_CENSUS <- readRDS( "summary/abi_taxon_summary_TR_CENSUS.RDS")
 agb_taxon_TR_CENSUS <- readRDS("summary/agb_taxon_summary_TR_CENSUS.RDS")
 ```
 
+# 3. Plot up total AGB and AGBI over time for each method
 
-
-### Plot up total AGB and AGBI over time for each method
 ## Taxon-level Aboveground Biomass (AGB) and Aboveground Biomass Increment (AGBI)
-
 
 ```{R}
 agb_site_summary <- rbind(agb_site_TR, agb_site_CENSUS, agb_site_TR_CENSUS)
@@ -406,6 +404,7 @@ agb_taxon_summary <- rbind(agb_taxon_TR, agb_taxon_CENSUS, agb_taxon_TR_CENSUS)
 abi_taxon_summary <- rbind(abi_taxon_TR, abi_taxon_CENSUS, abi_taxon_TR_CENSUS)
 
 ```
+
 ```{R, fig.height = 8, fig.width = 10}
 
 
@@ -414,8 +413,9 @@ ggplot(data = agb_taxon_summary)+
   geom_line(aes(x = year, y = AGB.mean, color = model))+
   facet_grid(taxon~., scales='free_y') +
   theme_light(18) +
-  ylab('biomass (mg/ha)')
+  ylab('Taxa Aboveground Biomass (mg/ha)')
 ```
+
 ```{R, fig.height = 8, fig.width = 10}
 
 ggplot(data = abi_taxon_summary)+
@@ -423,46 +423,14 @@ ggplot(data = abi_taxon_summary)+
   geom_line(aes(x = year, y = ABI.mean, color = model))+
   facet_grid(taxon~., scales='free_y') +
   theme_light(18) +
-  ylab('biomass increment (mg/ha)')
-
-```
-## Stand-level Biomass and Biomass increment
-
-
-```{R}
-
-
-ggplot(data = agb_site_summary)+
-  geom_ribbon(aes(x=year, ymin=ab025, ymax=ab975, fill = model), alpha=0.4, linetype=2) +
-  geom_line(aes(x = year, y = abmean, color = model))+
-  #facet_grid(model~., scales='free_y') +
-  theme_light(18) +
-  ylab('biomass (mg/ha)')
-
-
-ggplot(data = abi_site_summary)+
-  geom_ribbon(aes(x=year, ymin=abi025, ymax=abi975, fill = model), alpha=0.4, linetype=2) +
-  geom_line(aes(x = year, y = abimean, color = model))+
-  
-  theme_light(18) +
-  ylab('biomass (mg/ha)')
-
-```
-
-
-```{R,fig.width=8, fig.height=12}
-ggplot(data = abi_taxon_summary)+
-  geom_ribbon(aes(x=year, ymin=ABI.lo, ymax=ABI.hi, colour=model, fill=model), alpha=0.4, linetype=2) +
-  geom_line(aes(x = year, y = ABI.mean, color = model))+
-  facet_grid(taxon~., scales='free_y') +
-  theme_light(18) +
-  ylab('biomass increment (mg/ha)')
+  ylab('Taxa biomass increment (mg/ha)')
 
 ```
 
 ## Stand-level Biomass and Biomass increment
 
 ### Plot up stand-scale AGB over time for each method
+
 ```{R}
 
 
@@ -475,7 +443,8 @@ ggplot(data = agb_site_summary)+
 
 ```
 
-### Plot up stand-scale AGB over time for each method
+### Plot up stand-scale AGBI over time for each method
+
 ```{R}
 ggplot(data = abi_site_summary)+
   geom_ribbon(aes(x=year, ymin=abi025, ymax=abi975, fill = model), alpha=0.4, linetype=2) +
@@ -485,5 +454,3 @@ ggplot(data = abi_site_summary)+
   ylab('biomass increment (mg/ha)')
 
 ```
-
-
