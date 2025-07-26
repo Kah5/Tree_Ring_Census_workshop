@@ -10,11 +10,12 @@ format:
 
 ```{R}
 #| warning: false
+packages <- c("ggplot2", "tidyverse", "rstan", "dplR", "reshape2")
+install.packages(setdiff(packages, rownames(installed.packages())))  
+
 library(ggplot2)
 library(tidyverse)
 library(rstan)
-library(gt)
-#library(FIESTA)
 
 ```
 
@@ -54,7 +55,7 @@ Citation on tree ring dataset: Dye, A. Barker Plotkin, D. Bishop, N. Pederson, B
 ```{R}
 #| warning: false
 # code to plot the tree ring data, by species
-HARV <- readRDS("data/tree_data_HARVARD_STAN_v3.1_102020.RDS")
+HARV <- readRDS("data/tree_data_HARVARD_STAN.RDS")
 taxon.conversion <- readRDS("data/taxon_conversion.RDS")
 
 # Xobs contains the increment data for all the cored trees

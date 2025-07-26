@@ -40,7 +40,7 @@ devtools::install_github("ropensci/allodb",upgrade = "never")
 library(allodb)
 library(tidyverse)
 library(dplR)
-library(gt)
+#library(gt)
 
 library(reshape2)
 HARV <- readRDS("data/tree_data_HARVARD_STAN_v3.1_102020.RDS")

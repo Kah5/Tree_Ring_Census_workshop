@@ -4,6 +4,7 @@ author: "Andria Dawson and Kelly Heilman"
 format:
   html:
     code-fold: true
+
 ---
 
 # Ring-width only
@@ -13,8 +14,9 @@ This module introduces the workflow for the case where the only data informing t
 This workflow involves:
 
 1.  Inferring tree growth using the state-space model;
-2.  Using inferred growth to determine biomass; and
-3.  Calculating biomass increment from biomass.
+2.  Sampling models in STAN: A (very brief) overview
+3.  Using inferred growth to determine biomass; and
+4.  Calculating biomass increment from biomass.
 
 ## 1. Inferring Growth
 
