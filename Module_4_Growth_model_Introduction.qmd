@@ -6,89 +6,113 @@ format:
     code-fold: true
 ---
 
-## State-space model for estimating biomass
+# State-space model for estimating biomass
 
-## Load packages to be used
+We are using Bayesian statistical inference to estimate tree growth given RW and/or Census data. This workflow is motivated by the desire to: account for and quantify the uncertainty in our understanding (of data and processes) of tree growth; integrate multiple data types that inform about tree growth; and using a framework that allows for estimation of growth for trees with incomplete data.
 
-We estimate the parameters of this state-space model in a program called `stan` which interfaces to `R` via a package called `rstan` (`cmdstan` is another package that is used.)
+Bayesian inference makes it possible to achieve these objectives.
 
-```{R}
-library(rstan)
-```
+## Observed growth
 
-# Uncertainty in Diameter reconstructions:
+There are two types of observations of tree growth considered here: RW and Census.
 
-## Increment Uncertainty
-Here is an example:
-Our reconstruction of biomass uncertainty from Module 2 was created with one incrment core per tree. But reconstructions with multiple cores per tree highlight how cores from different parts of the trees can yield different growth and biomass estimates.
-```{r}
+The ring width datasets we are working with contain both ring-width time series from one or more tree cores and dbh at the time of coring. The census datasets contain repeat dbh measurements for some number of trees. Census remeasurement intervals are often 5-10 years.
 
-```
+So in short: RW data is annually resolved, while census data is not.
 
-## Diameter Uncertainty
-Tree diameter measurements can vary due to observer errors, measurements at slightly different heights, furrows in the bark, etc. Here we show an example of multiple observers measuring the same tree diameters on the same day.
-
-# Modelling data uncertainty
-We can create data models that include these measurement and data uncertainties.
-
-# change to DAG with 
 ::: {style="text-align:center"}
-<img src="pics/Bioscience_fig.png" width="450"/>
+<img src="DAGs/DAG_1.png" width="800"/>
 :::
 
-# Adding State-Space Process Model
-# load the model data
 
-```{r}
+### RW
 
-```
+We denote the ring-width observations by $\text{Xobs}$. For tree number $i$, core $j$, and year $t$, the observed ring-width is represented by $\text{Xobs}_{i, j, t}$.
 
-# Stan Model
+Note that not all trees need to have RW observations for all years in this framework (so it's not a problem that the temporal extent of the ring-width time series vary among trees), and not all trees need to have the same number of cores.
 
-```{r}
-# add R stan code here
-```
+### DBH
 
-# add the math notation of the model here:
+We denote the diameter observations by $\text{Dobs}$. For tree number $i$ and year $t$, the observed diameter is represented by $\text{Dobs}_{i, t}$.
 
-## Running the model: Example for a short run
+Now we note that not all trees need have diameter observations for each year, and the years for which trees do have measurements need not be the same among all trees.
 
-```{r}
-# run a version with a small # of iterations here to show the output
-```
+Also, if it were the case that diameter was measured multiple times when census (for example if each of the three field techs measured the diameter of each tree), then we could include an additional subscript as we did for the ring-width observations.
 
-## The model outputs
-Highlight the range of model outputs
+## Inferred growth
 
-Here, the main outputs that we are most interested in are growth and tree size, so we will focus on those in this workshop. Examples of these outputs and timeseries are shown below:
-```{R}
-# load the Full TR only model outputs
-# put some example exploration of the model outputs here
-```
+The objective is to quantify tree growth with uncertainty. We assume that there are some latent (unobserved) states that represent what we sometimes call the true increment and diameter. This description itself isn't quite the truth (pun intended). These latent states quantify the best estimate of increment and diameter given the data and model. Tree growth isn't perfectly circular; for a given year, ring-width might vary among cores.
 
-## Model Checking in stan:
-In addition to the growth and diameter estimates, there are other model outputs and diagnostics that one would need to check and explore to assess
+### Increment
 
-```{R}
-# traceplots
-# checking model diagnostics
+We denote the latent increment by $\text{X}$. For tree number $i$, and year $t$, the latent increment is represented by $\text{X}_{i, t}$.
 
-```
+### Diameter
 
-## Model Validation:
+We denote the latent diameter by $\text{D}$. For tree number $i$, and year $t$, the latent diameter is represented by $\text{D}_{i, t}$.
 
-```{r}
-# comparing estimates of diameter increment to observations
-```
+## Observation uncertainty
 
-## convert tree diameters to AGB
+We account for observation uncertainty in both the RW and diameter data. This uncertainty represents not only measurement uncertainty, but also uncertainty related to processes that result in observations that vary around the latent increment and diameter. For example, asymmetric growth processes.
 
-```{R}
-# code to estimate biomass
-```
+Both increment and diameter observations vary around distributions with a central tendency determined by the latent increment and diameter, and with spread (dispersion) determined by parameters $\sigma_\text{Xobs}$ and $\sigma_\text{Dobs}$.
 
-## Plot of AGB and AGBI with uncertainty
+More formally we write
 
-```{R}
-# plot total and by taxa
-```
+$\text{Xobs}_{i, j, t} \sim [\text{X}_{i, t}, \sigma_\text{Xobs}]$
+
+and
+
+$\text{Dobs}_{i, t} \sim [\text{D}_{i, t}, \sigma_\text{Dobs}]$.
+
+## Growth process
+
+In this workflow, latent increment is distributed with a central tendency that is the sum of a tree specific effect ($\beta_i$, for tree $i$) and a species-time effect ($\beta_{t, k}$), and a spread (dispersion) described by $\sigma_{\text{x}}$.
+
+This species-time effect $\beta_{t, k}$ is analogous to a forest growth chronology: it describes the common growth signal through time for each species.
+
+This increment model can be extended to account for additional processes that determine annual growth. For example, we could include size, competition, or climate effects.
+
+Using statistical notation, we write that
+
+$\text{X}_{i, t} \sim [\beta_i + \beta_{t, k}, \sigma_{\text{x}}]$
+
+Then, latent diameter for tree $i$ at time $t$, $\text{D}_{i, t}$ is a deterministic function equal to the diameter of that tree from the previous year, $\text{D}_{i, t-1}$, plus twice the increment $\text{X}_{i, t}$ (making sure the units are consistent). In formal notation, we have
+
+$\text{D}_{i, t} = \text{D}_{i, t-1} + 2 \cdot \text{X}_{i, t}$.
+
+## Initial diameter
+
+## Priors
+
+In Bayesian inference, the posterior distribution which describes $P(model|data)$ is proportional to the likelihood $P(data|model)$ times the prior $P(model)$. We need to define prior distributions for model parameters. There are many different ways to define prior distributions.
+
+For example,
+
+$\beta_i \sim \text{normal}(\beta_0, \beta_\text{SD})$ and
+
+$\beta_0 \sim \text{normal}(0, 1000)$ and
+
+$\beta_\text{SD} \sim \text{uniform}(0, 1000)$.
+
+Other model parameters also require defined prior distributions.
+
+## Parameter estimation
+
+After formulating the Bayesian state space model, we would like to be able to infer the parameter posterior distributions. In a Bayesian paradigm, this typically requires using a sampling algorithm- a set of rules that we follow to get posterior distribution samples. There are different algorithms we can use, and different software that implements these algorithms.
+
+Most algorithms rely on a markov chain monte carlo algorithm. These algorithms involve iteratively:  proposing new states (parameters), using a predefined criterion to decide if they are accepted, and either moving to this state (acceptance) or remaining in the current state (rejected). This iterative process is repeated many times, and makes it possible to explore the posterior distribution. The result is a set of posterior samples used to make inference about the parameters of interest.
+
+## Stan
+
+Here we use the statistical software `Stan` to estimate parameters. `Stan` interfaces to `R` via a package called `rstan` (`cmdstan` is another package that is used.)
+
+`Stan` by default uses something called the Hamiltonian Monte Carlo sampling algorithm.
+
+To use `Stan`, the model needs to be written in the `Stan` language (a text file with a `.stan` extension).
+
+
+
+
+
+
