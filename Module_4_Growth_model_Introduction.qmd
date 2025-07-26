@@ -21,13 +21,12 @@ The ring width datasets we are working with contain both ring-width time series 
 So in short: RW data is annually resolved, while census data is not.
 
 ::: {style="text-align:center"}
-<img src="DAGs/DAG_1.png" width="800"/>
+<img src="DAGs/Slide1.png" width="800"/>
 :::
-
 
 ### RW
 
-We denote the ring-width observations by $\text{Xobs}$. For tree number $i$, core $j$, and year $t$, the observed ring-width is represented by $\text{Xobs}_{i, j, t}$.
+We denote the ring-width observations by $\text{Robs}$. For tree number $i$, core $j$, and year $t$, the observed ring-width is represented by $\text{Robs}_{i, j, t}$.
 
 Note that not all trees need to have RW observations for all years in this framework (so it's not a problem that the temporal extent of the ring-width time series vary among trees), and not all trees need to have the same number of cores.
 
@@ -45,11 +44,15 @@ The objective is to quantify tree growth with uncertainty. We assume that there 
 
 ### Increment
 
-We denote the latent increment by $\text{X}$. For tree number $i$, and year $t$, the latent increment is represented by $\text{X}_{i, t}$.
+We denote the latent increment by $\text{R}$. For tree number $i$, and year $t$, the latent increment is represented by $\text{R}_{i, t}$.
 
 ### Diameter
 
 We denote the latent diameter by $\text{D}$. For tree number $i$, and year $t$, the latent diameter is represented by $\text{D}_{i, t}$.
+
+::: {style="text-align:center"}
+<img src="DAGs/Slide2.png" width="800"/>
+:::
 
 ## Observation uncertainty
 
@@ -59,11 +62,15 @@ Both increment and diameter observations vary around distributions with a centra
 
 More formally we write
 
-$\text{Xobs}_{i, j, t} \sim [\text{X}_{i, t}, \sigma_\text{Xobs}]$
+$\text{Robs}_{i, j, t} \sim [\text{R}_{i, t}, \sigma_\text{Xobs}]$
 
 and
 
 $\text{Dobs}_{i, t} \sim [\text{D}_{i, t}, \sigma_\text{Dobs}]$.
+
+::: {style="text-align:center"}
+<img src="DAGs/Slide3.png" width="800"/>
+:::
 
 ## Growth process
 
@@ -75,11 +82,15 @@ This increment model can be extended to account for additional processes that de
 
 Using statistical notation, we write that
 
-$\text{X}_{i, t} \sim [\beta_i + \beta_{t, k}, \sigma_{\text{x}}]$
+$\text{R}_{i, t} \sim [\beta_i + \beta_{t, k}, \sigma_{\text{x}}]$
 
-Then, latent diameter for tree $i$ at time $t$, $\text{D}_{i, t}$ is a deterministic function equal to the diameter of that tree from the previous year, $\text{D}_{i, t-1}$, plus twice the increment $\text{X}_{i, t}$ (making sure the units are consistent). In formal notation, we have
+Then, latent diameter for tree $i$ at time $t$, $\text{D}_{i, t}$ is a deterministic function equal to the diameter of that tree from the previous year, $\text{D}_{i, t-1}$, plus twice the increment $\text{R}_{i, t}$ (making sure the units are consistent). In formal notation, we have
 
-$\text{D}_{i, t} = \text{D}_{i, t-1} + 2 \cdot \text{X}_{i, t}$.
+$\text{D}_{i, t} = \text{D}_{i, t-1} + 2 \cdot \text{R}_{i, t}$.
+
+::: {style="text-align:center"}
+<img src="DAGs/Slide7.png" width="800"/>
+:::
 
 ## Initial diameter
 
@@ -101,18 +112,91 @@ Other model parameters also require defined prior distributions.
 
 After formulating the Bayesian state space model, we would like to be able to infer the parameter posterior distributions. In a Bayesian paradigm, this typically requires using a sampling algorithm- a set of rules that we follow to get posterior distribution samples. There are different algorithms we can use, and different software that implements these algorithms.
 
-Most algorithms rely on a markov chain monte carlo algorithm. These algorithms involve iteratively:  proposing new states (parameters), using a predefined criterion to decide if they are accepted, and either moving to this state (acceptance) or remaining in the current state (rejected). This iterative process is repeated many times, and makes it possible to explore the posterior distribution. The result is a set of posterior samples used to make inference about the parameters of interest.
+Most algorithms rely on a markov chain monte carlo algorithm. These algorithms involve iteratively: proposing new states (parameters), using a predefined criterion to decide if they are accepted, and either moving to this state (acceptance) or remaining in the current state (rejected). This iterative process is repeated many times, and makes it possible to explore the posterior distribution. The result is a set of posterior samples used to make inference about the parameters of interest.
 
 ## Stan
 
-Here we use the statistical software `Stan` to estimate parameters. `Stan` interfaces to `R` via a package called `rstan` (`cmdstan` is another package that is used.)
+Here we use the statistical software [`Stan`](https://mc-stan.org/docs/) to estimate parameters. `Stan` interfaces to `R` via a package called [`rstan`](https://mc-stan.org/rstan/) ([`cmdstan`](https://mc-stan.org/docs/cmdstan-guide/) is another package that is used.)
 
 `Stan` by default uses something called the Hamiltonian Monte Carlo sampling algorithm.
 
-To use `Stan`, the model needs to be written in the `Stan` language (a text file with a `.stan` extension).
+In this workshop, we are going to implement the model ourselves using Stan. To do this, we need a model written in Stan (file with .stan extension). Then we will fit this model using the RStan interface (R script). To use `Stan`, the model needs to be written in the `Stan` language (a text file with a `.stan` extension). A Stan model has three required blocks:
 
+1.  data block: declare data types, their dimensions, restrictions, and names.
 
+2.  parameters block: declare parameter types, dimensions, restrictions, and names.
 
+3.  model block: include sampling statements.
+
+We won't talk to much about the NUTS and bolts of STAN programming in this workshop, refer to: [Stan language manual](https://mc-stan.org/docs/reference-manual/). (Stan uses what is called a NUTS algorithm so this is a terrible pun.)
+
+## Example linear regression model specification 
+### Data Block
+```{#| class-output: stan}
+
+data {
+  int<lower=1> N; // number of observations
+  vector[N] x;    // the predictor 
+  vector[N] y;    // the outcome
+} 
+
+```
+
+### Parameter Block
+```{#| class-output: stan}
+
+parameters {
+  real alpha;  // intercept
+  real beta;   // slope
+  real<lower=0> sigma; // standard deviation
+}
+
+```
+### Model Block
+```{#| class-output: stan}
+
+model {
+  
+  // priors
+  alpha ~ normal(0, 10);
+  beta  ~ normal(0, 10);  // priors for beta
+  sigma ~ cauchy(0, 5);  // prior for sigma
+  
+  // likelihood
+  y ~ normal(alpha+beta*x, sigma);
+}
+
+```
+
+# As an example, a linear regression in stan would be defined as follows:
+```{#| class-output: stan}
+data {
+  int<lower=1> N; // number of observations
+  vector[N] x;    // the predictor 
+  vector[N] y;    // the outcome
+} 
+parameters {
+  real alpha;  // intercept
+  real beta;   // slope
+  real<lower=0> sigma; // standard deviation
+}
+model {
+  
+  // priors
+  alpha ~ normal(0, 10);
+  beta  ~ normal(0, 10);  // priors for beta
+  sigma ~ cauchy(0, 5);  // prior for sigma
+  
+  // likelihood
+  y ~ normal(alpha+beta*x, sigma);
+}
+
+```
+
+# The Growth Model outlined above is a bit more complex than a linear regression, but as a dynamic linear model, it has a linear model in the liklihood function of the Ring Width process model:
+$\text{R}_{i, t} \sim [\beta_i + \beta_{t, k}, \sigma_{\text{x}}]$
+
+In the next module, we will show an example of how to fit the state-space growth model to estimate growth and diameter from trees using only ring width data.
 
 
 
