@@ -6,7 +6,7 @@ format:
     code-fold: true
 ---
 
-## State-space model for estimating biomass at HF with only tree ring time-series and the diameter at time of coring
+## State-space model for estimating biomass at HF with tree ring time-series, the diameter at time of coring, and census
 
 ## Load packages to be used
 
@@ -29,9 +29,9 @@ library(tidyr)
 # load built dataset 
 dat = readRDS('data/tree_data_HARVARD.RDS')
 
-class(dat)
-
-names(dat)
+# class(dat)
+# 
+# names(dat)
 
 taxa = dat$taxa # the taxa abbreviations
 years = dat$years # the years where we will estimate increments
@@ -66,7 +66,6 @@ distance = allTrees$distance
 
 ### Stan Model - RW and Census module
 
-
 The `stan` model code is stored in the `models/` folder. The RW + Census model is the `growth_model_RW_CENSUS.stan`. If you are working through this tutorial on R, you can view this file in your environment. We won't dive too deep into how to write your own stan model, but note that this model includes several blocks:
 
 ```{r}
@@ -85,9 +84,9 @@ writeLines(readLines("models/growth_model_RW_CENSUS.stan"))
 iter = 500
 nchains = 1
 
-compiled_RW_CENSUS = stan_model(file = paste0('models/growth_model_RW_CENSUS.stan'))
+compiled_CENSUS = stan_model(file = paste0('models/growth_model_CENSUS.stan'))
 
-fit_RW_CENSUS = sampling(compiled_RW_CENSUS, 
+fit_CENSUS = sampling(compiled_CENSUS, 
                   data = dat, 
                   iter = iter, 
                   chains = nchains,
@@ -95,7 +94,7 @@ fit_RW_CENSUS = sampling(compiled_RW_CENSUS,
 
 ```
 
-## The RW + CENSUS model outputs
+## The CENSUS + CENSUS model outputs
 
 We will load the output from the fitted model (fitted model object and parameter posterior distributions).
 
@@ -109,14 +108,606 @@ post_RW_CENSUS = readRDS('output/model_post_RW_CENSUS_HARVARD.RDS')
 
 ```
 
-## convert tree diameters to AGB
+```{r}
+variables = names(post_RW_CENSUS[1,1,])
+allSX = grep('sig_x\\[',variables)
 
+post_sx = post_RW_CENSUS[,,allSX]
+
+dim(post_sx)
+
+colnames(post_sx) = taxa
+post_sx_melt = melt(post_sx)
+colnames(post_sx_melt) = c('iteration', 'species_code', 'sigma_x')
+post_sx_melt$model = 'RW + CENSUS'
+
+sig_x_mean = post_sx_melt %>% 
+  group_by(species_code) %>%
+  dplyr::summarize(sig_x_mean = mean(sigma_x))
+sig_x_mean = sig_x_mean[order(sig_x_mean$sig_x_mean),]
+
+post_sx_melt$species_code = factor(post_sx_melt$species_code, levels=sig_x_mean$species_code)
+
+# plot up the species level increment uncertainties
+p = ggplot(data=post_sx_melt) +
+  # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
+  geom_violin(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
+  theme_bw(14) +
+  xlab('Species') +
+  ylab('sigma_x')
+print(p)
+
+```
 ```{R}
-# code to estimate biomass
+variables = names(post_RW_CENSUS[1,1,])
+allSXOBS = grep('sig_x_obs',variables)
+
+post_sxobs = post_RW_CENSUS[,,allSXOBS]
+
+# head(post_sx)
+# dim(post_sx)
+
+post_sxobs = data.frame(post_sxobs)
+post_sxobs$iteration = seq(1, nrow(post_sxobs))
+colnames(post_sxobs) = c('sigma_x_obs', 'iteration')
+post_sxobs$model = 'CENSUS-only'
+saveRDS(post_sxobs, "data/post_sxobs_CENSUS.rds")
+
+p = ggplot(data=post_sxobs) +
+  # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
+  geom_violin(aes(x=model, y=sigma_x_obs, colour=model, fill=model), alpha=0.5) +
+  theme_bw(14) +
+  #xlab('Species') +
+  ylab('sigma_x')
+print(p)
+
+
+p = ggplot(data=post_sxobs) +
+  geom_histogram(aes(x=sigma_x_obs, y=after_stat(density), colour=model, fill=model)) +
+  theme_bw(14) 
+print(p)
+
+p = ggplot(data=post_sxobs) +
+  geom_line(aes(x=iteration, y=sigma_x_obs)) +
+  geom_point(aes(x=iteration, y=sigma_x_obs)) +
+  theme_bw(14) +
+  xlab('Iteration') +
+  ylab('sigma_x_obs') 
+print(p)
 ```
 
+## 4. Visualizing chronology-like effects: year random effects
+
+Here we will also look at some summary figures for the `beta_t` parameter. For each species, there is a `beta_t` parameter for each year. This parameter is conceptually the same as a forest chronology; it is a time series that describes the common forest growth signal for a given species.
+
+We could look at summary plots for the posterior samples for a given year for a given species, and do the same for all year BY species combinations. This would be (9 species) x (115 years) = 1035 trace plots, so we don't look at all of them here.
+
+We do want to visualize the `beta_t` chronology-like parameters as species-specific time series.
+
+```{R, fig.width=8, fig.height=12}
+
+allBTs = grep('beta_t\\[',variables)
+post_bt = post_RW_CENSUS[,,allBTs]
+
+post_bt_melt = melt(post_bt)
+post_bt_melt$model = 'RW + CENSUS'
+
+bt_pars_split = strsplit(as.vector(post_bt_melt$parameters), '\\[|\\,|\\]')
+
+post_bt_melt$species_code = taxa[sapply(bt_pars_split, function(x) as.numeric(x[[3]]))]
+post_bt_melt$year = years[sapply(bt_pars_split, function(x) as.numeric(x[[2]]))]
+colnames(post_bt_melt) = c('iteration', 'parameter', 'beta_t', 'model', 'species_code', 'year')
+
+beta_t_quant = post_bt_melt %>% 
+  group_by(model, species_code, year) %>%
+  dplyr::summarize(beta_t_lo = quantile(beta_t, 0.025),
+                   beta_t_mid = quantile(beta_t, 0.5),
+                   beta_t_hi = quantile(beta_t, 0.975),
+                   beta_t_mean = mean(beta_t), 
+                   .groups = 'keep')
+
+p = ggplot(data=beta_t_quant) +
+  geom_hline(aes(yintercept=0), lty=2, lwd=1.2) +
+  geom_point(aes(x=year, y=beta_t_mid)) +
+  geom_linerange(aes(x=year, ymin=beta_t_lo, ymax=beta_t_hi)) +
+  xlab('year') +
+  ylab('beta_t') +
+  # xlim(c(year_lo, year_hi)) +
+  theme_bw(16) +
+  facet_grid(species_code~.)
+print(p)
+
+```
+Here we visualize inferred and observed diameter data for one tree (Tree 1). Filled circles indicate the diameter measurement included in this model and hollow circles are census diameter measurements not included in the model. 
+
+```{R}
+
+allDs = grep('D\\[',variables)
+post_d = post_RW_CENSUS[,,allDs]
+
+tree = 1
+
+
+ print(tree)
+  in.RW = tree %in% X2Tr
+  
+  # if (in.RW){
+  #   inds = which(X2Tr == tree)
+  #   yrinds = X2year[inds]
+  #   
+  #   dbh_iter = t(post_d[[1]][,inds])
+  #   dbh_iter = data.frame(dbh_iter)
+  #   dbh_iter = data.frame(year=years[yrinds], dbh_iter)
+  #   
+  #   dbh_mean = apply(dbh_iter[,2:ncol(dbh_iter)], 1, mean, na.rm=TRUE)
+  #   dbh_quant = t(apply(dbh_iter[,2:ncol(dbh_iter)], 1, 
+  #                       function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
+  #   
+  #   dbh_tree = data.frame(d_mean = dbh_mean, 
+  #                         d_median = dbh_quant[,2], 
+  #                         d_lo = dbh_quant[,1], 
+  #                         d_hi = dbh_quant[,3], 
+  #                         year = years[yrinds],
+  #                         model = 'RW')
+  #   
+  # }
+  
+  # determine which estimates correspond to this tree
+  inds_C = which(X2Tr_C == tree)
+  yrinds_C = X2year_C[inds_C]
+
+  # # C
+  # dbh_iter_C = t(post_d[,inds_C])
+  # dbh_iter_C = data.frame(dbh_iter_C)
+  # dbh_iter_C = data.frame(year=years[yrinds_C], dbh_iter_C)
+  # 
+  # dbh_mean_C = apply(dbh_iter_C[,2:ncol(dbh_iter_C)], 1, mean, na.rm=TRUE)
+  # dbh_quant_C = t(apply(dbh_iter_C[,2:ncol(dbh_iter_C)], 1, 
+  #                       function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
+  # 
+  # dbh_tree_C = data.frame(d_mean = dbh_mean_C, 
+  #                         d_median = dbh_quant_C[,2], 
+  #                         d_lo = dbh_quant_C[,1], 
+  #                         d_hi = dbh_quant_C[,3], 
+  #                         year = years[yrinds_C],
+  #                         model = 'Census')
+
+    # RWC
+  dbh_iter_RWC = t(post_d[[3]][,inds_C])
+  dbh_iter_RWC = data.frame(dbh_iter_RWC)
+  dbh_iter_RWC = data.frame(year=years[yrinds_C], dbh_iter_RWC)
+  
+  dbh_mean_RWC = apply(dbh_iter_RWC[,2:ncol(dbh_iter_RWC)], 1, mean, na.rm=TRUE)
+  dbh_quant_RWC = t(apply(dbh_iter_RWC[,2:ncol(dbh_iter_RWC)], 1, 
+                          function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
+  
+  dbh_tree_RWC = data.frame(d_mean = dbh_mean_RWC, 
+                            d_median = dbh_quant_RWC[,2], 
+                            d_lo = dbh_quant_RWC[,1], 
+                            d_hi = dbh_quant_RWC[,3], 
+                            year = years[yrinds_C],
+                            model = 'RW + Census')
+
+  dbh_tree = dbh_tree_RWC
+  
+  idx_d_obs_C = which(Dobs$stat_id == tree)
+  
+  dbh_obs_C = data.frame(d_obs = Dobs$dbh[idx_d_obs_C],
+                         year = years[Dobs$year[idx_d_obs_C]])
+  
+  stem_id = Dobs$ID[idx_d_obs_C][1]
+  
+  if (in.RW){
+    idx_d_obs = which(Tr$stat_id == tree)
+    
+    dbh_obs = data.frame(d_obs = Tr$dbh[idx_d_obs],
+                         year = years[Tr$year[idx_d_obs]])
+    
+  } else {
+    dbh_obs = data.frame(d_obs = numeric(0),
+                         year = numeric(0))
+  }
+
+  
+# Create a text
+grob = grobTree(textGrob(paste0('Tree ', tree, '; ID ', stem_id, '; Species ', taxon_C[tree] ), x=0.05,  y=0.9, hjust=0,
+                         gp=gpar(col="black", fontsize=18)))
+
+p1 = ggplot() +
+  geom_ribbon(data=dbh_tree, aes(x=year, ymin=d_lo, ymax=d_hi, fill=model), alpha=0.5) +
+  geom_line(data=dbh_tree, aes(x=year, y=d_median, colour=model)) +
+  geom_point(data=dbh_obs, aes(x=year, y=d_obs), size=2) +
+  geom_point(data=dbh_obs_C, aes(x=year, y=d_obs), size=2, shape=1) +
+  xlab('year') +
+  ylab('dbh (cm)') +
+  xlim(c(year_lo, year_hi)) +
+  theme_bw(16)  +
+  annotation_custom(grob)
+
+print(p1)
+```
+
+
+```{R}
+
+allRWs = grep('X\\[',variables)
+post_RW_CENSUS = post_RW_CENSUS[,,allRWs]
+
+
+  
+  inds_C = which(X2Tr_C == tree)
+  yrinds_C = X2year_C[inds_C]
+  
+  rw_iter_RWC = t(post_rw[,inds_C])
+  rw_iter_RWC = data.frame(rw_iter_RWC)
+  rw_iter_RWC = data.frame(year=years[yrinds_C], rw_iter_RWC)
+  
+  rw_mean_RWC = apply(rw_iter_RWC[,2:ncol(rw_iter_RWC)], 1, mean, na.rm=TRUE)
+  rw_quant_RWC = t(apply(rw_iter_RWC[,2:ncol(rw_iter_RWC)], 1, 
+                         function(x) quantile(x, c(0.025, 0.5, 0.975), na.rm=TRUE)))
+  
+  rw_tree_RWC = data.frame(x_mean = rw_mean_RWC, 
+                           x_median = rw_quant_RWC[,2], 
+                           x_lo = rw_quant_RWC[,1], 
+                           x_hi = rw_quant_RWC[,3], 
+                           year = years[yrinds_C],
+                           model = 'RW + Census')
+
+  rw_tree = rw_tree_RWC
+  
+
+  if (in.RW){
+    idx_rw_obs = which(Xobs$stat_id == tree)
+    
+    rw_obs = data.frame(x_obs = Xobs$incr[idx_rw_obs],
+                        year = years[Xobs$year[idx_rw_obs]])
+  } else {
+    rw_obs = data.frame(x_obs = numeric(0),
+                        year = numeric(0))
+  }
+
+
+  
+  
+
+p2 = ggplot() +
+  geom_ribbon(data=CENSUS_tree, aes(x=year, ymin=x_lo, ymax=x_hi, fill=model), alpha=0.5) +
+  geom_line(data=CENSUS_tree, aes(x=year, y=x_median, colour=model)) +
+  geom_point(data=CENSUS_obs, aes(x=year, y=x_obs), size=2, alpha=0.4) +
+  xlab('year') +
+  ylab('CENSUS (mm)') +
+  xlim(c(year_lo, year_hi)) +
+  theme_bw(16)  #+
+
+grid.arrange(p1, p2, nrow = 2)
+
+  
+  p2 = ggplot() +
+    # geom_line(data=dbh_tree, aes(x=year, y=d_mean)) +
+    # geom_ribbon(data=rw_tree, aes(x=year, ymin=x_lo, ymax=x_hi), fill='lightgrey') +
+    geom_ribbon(data=rw_tree, aes(x=year, ymin=x_lo, ymax=x_hi, fill=model), alpha=0.5) +
+    geom_line(data=rw_tree, aes(x=year, y=x_median, colour=model)) +
+    geom_point(data=rw_obs, aes(x=year, y=x_obs), size=2, alpha=0.4) +
+    # geom_dog(data=rw_obs, aes(x=year, y=x_obs, dog='glasses'), size=2) +
+    # ylim(c(0,500)) +
+    xlab('year') +
+    ylab('rw (mm)') +
+    xlim(c(year_lo, year_hi)) +
+    theme_bw(16) 
+  
+  print(p2)
+
+```
+
+# Estimate CENSUS only model biomass:
+```{R}
+# code to estimate biomass
+choj = read.csv('data/acronym_to_chojnacky_v0.1.csv', stringsAsFactors = FALSE)
+
+# use HAVI (average of all hardwoods) for those species not found in chojnacky equations
+gen = choj[which(choj$acronym == 'HAVI'),]
+choj = choj %>% filter(acronym %in% unique(taxon_C))
+
+head(choj)
+
+```
+
+```{R}
+#| echo: FALSE
+#| warning: false
+# first for RW + CENSUS model 
+dbh_array_RWC = array(NA, dim = c(N_C, N_years, iter))
+agb_array_RWC = array(NA, dim = c(N_C, N_years, iter))
+
+for (t in 1:N_C){
+  
+  # determine which estimates correspond to this tree
+  inds = which(X2C == t)
+  yrinds = X2year_C[inds]
+  
+  # extract diameter data
+  dbh_array_RWC[t,yrinds,] = t(post_d[,inds])
+  
+  # get equation coefficients based on taxon
+  beta0 = choj$beta0[which(choj$acronym == taxon[t])]
+  beta1 = choj$beta1[which(choj$acronym == taxon[t])]
+  
+  if (length(beta0)==0){
+    beta0 = gen$beta0
+    beta1 = gen$beta1
+  }
+  
+  # use biomass equation to estimate biomass from diameter
+  agb_array_RWC[t,,] = exp(beta0 + beta1 * log(dbh_array_RWC[t,,]))
+}
+
+
+# melt down dbh_array to data frame
+dbh_melt = melt(dbh_array_RWC)
+colnames(dbh_melt) = c('tree','year','iter','value')
+dbh_melt = dbh_melt %>% filter(!is.na(value))
+dbh_melt$year = years[dbh_melt$year]
+#dbh_melt$plot = plot[dbh_melt$tree]
+dbh_melt$taxon = taxon_C[dbh_melt$tree]
+dbh_melt$model = rep("RW + CENSUS", nrow(dbh_melt))
+dbh_melt$type = rep('dbh',nrow(dbh_melt))
+# rm(dbh_array)
+
+# melt down agb_array to data frame
+agb_melt = melt(agb_array_RWC)
+colnames(agb_melt) = c('tree','year','iter','value')
+agb_melt = agb_melt %>% filter(!is.na(value))
+agb_melt$year = years[agb_melt$year]
+#agb_melt$plot = plot[agb_melt$tree]
+agb_melt$taxon = taxon_C[agb_melt$tree]
+agb_melt$model = rep("RW + CENSUS", nrow(agb_melt))
+agb_melt$type = rep('ab',nrow(agb_melt))
+
+```
+
+Now we visualize biomass for a single tree through time.
+
+```{R}
+tree = 1 
+
+agb_tree = agb_melt[which(agb_melt$tree == tree),]
+agb_tree_quants = agb_tree %>%
+  dplyr::group_by(tree, year, model) %>%
+  dplyr::summarize(agb_mean = mean(value, na.rm=TRUE),
+                   agb_median = quantile(value, c(0.5)),
+                   agb_lo = quantile(value, c(0.025)),
+                   agb_hi = quantile(value, c(0.975)), .groups = 'keep')
+
+species_id = agb_tree$taxon[1]
+stem_id = Tr$id[which(Tr$stat_id == tree)]
+
+grob <- grobTree(textGrob(paste0('Tree ', tree, '; Stem ID ', stem_id, '; Species ', species_id ), x=0.05,  y=0.9, hjust=0,
+                          gp=gpar(col="black", fontsize=22)))
+
+p1 = ggplot() +
+  geom_ribbon(data = agb_tree_quants, aes(x = year, ymin = agb_lo, ymax = agb_hi, fill = model), alpha=0.5) +
+  geom_line(data=agb_tree_quants, aes(x=year, y=agb_median, colour = model)) +
+  xlab('year') +
+  ylab('agb (kg)') +
+  xlim(c(year_lo, year_hi)) +
+  theme_bw(16)  +
+  # ggtitle(paste0('Tree ', i)) +
+  annotation_custom(grob)
+
+abi = apply(agb_array_RWC, c(1,3), function(x) diff(x))
+abi = aperm(abi, c(2, 1, 3))
+abi_melt = melt(abi)
+colnames(abi_melt) = c('tree', 'year', 'iter', 'value')
+abi_melt = abi_melt %>% filter(!is.na(value))
+abi_melt$year = years[abi_melt$year]
+# abi_melt$plot = plot[abi_melt$tree]
+abi_melt$taxon = taxon[abi_melt$tree]
+abi_melt$model = rep("RW + CENSUS", nrow(abi_melt))
+abi_melt$type = rep('abi',nrow(abi_melt))
+
+tree=1
+abi_tree = abi_melt[which(abi_melt$tree == tree),]
+abi_tree_quants = abi_tree %>%
+  dplyr::group_by(tree, year, model) %>%
+  dplyr::summarize(abi_mean = mean(value, na.rm=TRUE),
+                   abi_median = quantile(value, c(0.5)),
+                   abi_lo = quantile(value, c(0.025)),
+                   abi_hi = quantile(value, c(0.975)), .groups = 'keep')
+
+p2 = ggplot() +
+  geom_ribbon(data = abi_tree_quants, aes(x = year, ymin = abi_lo, ymax = abi_hi, fill = model), alpha=0.5) +
+  geom_line(data=abi_tree_quants, aes(x=year, y=abi_median, colour = model)) +
+  xlab('year') +
+  ylab('abi (kg / year)') +
+  xlim(c(year_lo, year_hi)) +
+  theme_bw(16)  #+
+# ggtitle(paste0('Tree ', i)) +
+# annotation_custom(grob)
+# print(p1)
+
+grid.arrange(p1, p2, nrow = 2)
+
+```
+
+In this workflow we only consider trees that are above 5 cm diameter. To satisfy this constraint we need to filter out all model inferred tree diameters that are less than 5 cm. For a given tree, for a given year, if the mean diameter (across all iterations) is less than 5 cm, the samples are replaced with NA. This step ensures they won't contribute to the species and site total biomass we will calculate.
+
+```{R}
+# first for CENSUS only model
+for (tree in 1:N_C){
+  for (year in 1:N_years){
+    
+    # determine mean DBH for this year and tree
+    dbh_mean = mean(dbh_array_RWC[tree, year, ], na.rm=TRUE)
+    
+    # if smaller than 5 cm., eliminate the data
+    if (is.na(dbh_mean) | dbh_mean >= 5) next
+    dbh_array_RWC[tree, year, ] = rep(NA, iter)
+    agb_array_RWC[tree, year, ] = rep(NA, iter)
+  }
+}
+```
+
+The sampling protocol used at Harvard Forest for the CENSUS trees is 
+
+```{R}
+
+# we need to adjust the biomass units from kg/plot to Mg/ha
+outer_factor = (1 / (pi*20^2)) * (1/0.0001) * (1/1000)
+agb_array_RWC[,,] = agb_array_RWC[,,] * outer_factor
+
+```
 ## Plot of AGB and AGBI with uncertainty
 
 ```{R}
-# plot total and by taxa
+
+# melt down agb_array to data frame
+agb_melt = melt(agb_array_RWC)
+colnames(agb_melt) = c('tree','year','iter','value')
+agb_melt = agb_melt %>% filter(!is.na(value))
+agb_melt$year = years[agb_melt$year]
+agb_melt$plot = plot_C[agb_melt$tree]
+agb_melt$taxon = taxon_C[agb_melt$tree]
+agb_melt$model = rep("RW + CENSUS", nrow(agb_melt))
+agb_melt$type = rep('ab',nrow(agb_melt))
+
+# first for CENSUS only model
+abi = apply(agb_array_RWC, c(1,3), function(x) diff(x))
+abi = aperm(abi, c(2, 1, 3))
+abi_melt = melt(abi)
+colnames(abi_melt) = c('tree', 'year', 'iter', 'value')
+abi_melt = abi_melt %>% filter(!is.na(value))
+abi_melt$year = years[abi_melt$year]
+abi_melt$plot = plot_C[abi_melt$tree]
+abi_melt$taxon = taxon_C[abi_melt$tree]
+abi_melt$model = rep("RW + CENSUS", nrow(abi_melt))
+abi_melt$type = rep('abi',nrow(abi_melt))
+
+```
+
+
+## Taxon-level Aboveground Biomass (AGB) and Aboveground Biomass Increment (AGBI)
+
+
+```{R}
+agb_taxon_by_iter = agb_melt %>%
+  group_by(year, iter, taxon, plot, model) %>% 
+  # # sum up the taxon-level information by plot, iteration, year
+  summarise( AGB.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
+  # 
+  # get the mean value across plots for each iteration:
+  group_by(year, iter, taxon, model) %>%
+   # dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
+   #                  .groups='keep')
+   dplyr::summarize(AGB.iter.mean = mean(AGB.taxon.plot, na.rm = TRUE),
+                     .groups='keep')
+
+agb_taxon_summary = agb_taxon_by_iter %>%ungroup() %>% 
+  group_by(year, taxon, model) %>% 
+  dplyr::summarize(AGB.mean = mean(AGB.iter.mean, na.rm = TRUE),
+                   AGB.sd = sd(AGB.iter.mean, na.rm=TRUE),
+                   AGB.lo = quantile(AGB.iter.mean, c(0.025), na.rm=TRUE),
+                   AGB.hi = quantile(AGB.iter.mean, c(0.975), na.rm=TRUE), 
+                   .groups='keep')
+
+abi_taxon_by_iter = abi_melt %>%
+  group_by(year, iter, taxon, plot, model) %>% 
+  summarise( AGBI.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
+  group_by(year, iter, taxon, model) %>% 
+  dplyr::summarize(ABI.iter.mean = mean(AGBI.taxon.plot, na.rm = TRUE),
+                   .groups='keep')
+
+#taxon summary data without plot 
+abi_taxon_summary = abi_taxon_by_iter %>% ungroup() %>%
+  group_by(year, taxon, model) %>% 
+  dplyr::summarize(ABI.mean = mean(ABI.iter.mean, na.rm = TRUE),
+                   ABI.sd = sd(ABI.iter.mean, na.rm=TRUE),
+                   ABI.lo = quantile(ABI.iter.mean, c(0.025), na.rm=TRUE),
+                   ABI.hi = quantile(ABI.iter.mean, c(0.975), na.rm=TRUE), 
+                   .groups='keep')
+
+```
+```{R}
+
+
+ggplot(data = agb_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=AGB.lo, ymax=AGB.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = AGB.mean, color = taxon))+
+  facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass (mg/ha)')
+
+
+ggplot(data = abi_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=ABI.lo, ymax=ABI.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = ABI.mean, color = taxon))+
+  facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass increment (mg/ha)')
+
+```
+## Stand-level Biomass and Biomass increment
+
+```{R}
+
+agb_all_plot_by_iter <- agb_melt |>
+  group_by(year, iter, plot, model) |>
+  # sums all of the trees by plot
+  dplyr::summarize(AGB.sum = sum(value),
+            .groups = 'keep') 
+
+agb_site_by_iter <- agb_all_plot_by_iter |>
+  group_by(year, iter, model) |>
+  dplyr::summarize(AGB.iter = mean(AGB.sum),
+                   .groups = 'keep') 
+
+agb_site_summary = agb_site_by_iter %>%
+  group_by(year, model) %>%
+  dplyr::summarize(abmean = mean(AGB.iter, na.rm=T),
+    ab025 = quantile(AGB.iter, 0.025),
+                   ab50 = quantile(AGB.iter, 0.5),
+                   ab975 = quantile(AGB.iter, 0.975), 
+                   .groups = 'keep') %>% 
+  ungroup()
+
+
+
+abi_all_plot_by_iter <- abi_melt |>
+  group_by(year, iter, plot, model) |>
+  dplyr::summarize(ABI.sum = sum(value),
+            .groups = 'keep') 
+
+abi_site_by_iter <- abi_all_plot_by_iter |>
+  group_by(year, iter, model) |>
+  dplyr::summarize(ABI.iter = mean(ABI.sum),
+                   .groups = 'keep') 
+
+abi_site_summary = abi_site_by_iter %>%
+  group_by(year, model) %>%
+  dplyr::summarize(abimean = mean(ABI.iter, na.rm=T),
+    abi025 = quantile(ABI.iter, 0.025),
+                   abi50 = quantile(ABI.iter, 0.5),
+                   abi975 = quantile(ABI.iter, 0.975), 
+                   .groups = 'keep') %>% 
+  ungroup()
+
+```
+
+```{R}
+
+
+ggplot(data = agb_site_summary)+
+  geom_ribbon(aes(x=year, ymin=ab025, ymax=ab975), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abmean))+
+  facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass (mg/ha)')
+
+
+ggplot(data = abi_site_summary)+
+  geom_ribbon(aes(x=year, ymin=abi025, ymax=abi975), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = abimean))+
+  facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass (mg/ha)')
+
 ```
