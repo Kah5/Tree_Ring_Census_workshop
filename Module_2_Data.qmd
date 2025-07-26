@@ -121,7 +121,9 @@ Census <- HARV$Dobs %>% left_join(., year.df) %>%
 ggplot(data = Census)+geom_point(aes(x = cal.year, y = dbh, group = ID, color = `Scientific Name`, shape = finalCond), alpha = 0.5)+ geom_line(aes(x = cal.year, y = dbh, group = ID, color = `Scientific Name`)) + facet_wrap(~site, ncol = 3)+ylab("DBH (cm)")+xlab("Year")+theme_bw()
 
 ```
+
 # Note that for two of the plots at Harvard Forest, the census was split over mutiple years (1985-1990), creating an "inventory year" variable will allow us to compare tree estimates over each census
+
 ```{R}
 ggplot(data = Census)+
   geom_bar(aes(x = cal.year, fill = `Scientific Name`), stat = "count")+  facet_wrap(~site, ncol = 3)+xlab("Year")+theme_bw()
@@ -142,5 +144,4 @@ We will learn how to back-calculate tree diameters from tree ring data and how t
 
 Some tree census data sources of regional interest include:
 
-\- [ForestGEO forest census plots](http://ctfs.si.edu/datarequest/index.php/main/region/tree/africa) (Cameroon, Congo, Gabon, Kenya, Nigeria)
-\-
+\- [ForestGEO forest census plots](http://ctfs.si.edu/datarequest/index.php/main/region/tree/africa) (Cameroon, Congo, Gabon, Kenya, Nigeria) -

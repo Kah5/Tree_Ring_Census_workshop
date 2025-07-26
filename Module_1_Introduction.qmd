@@ -37,11 +37,15 @@ Forest censuses, which re-measure individual trees over time, (e.g. Nationwide f
 
 ### Forest Dynamics and Demography
 
-Estimates of forest carbon and tree-level biomass over time are useful for a variaty of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time
+Estimates of forest carbon and tree-level biomass over time are useful for a variety of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time
 
-## Introduction to the tutorial and State-Space Model
+## Workshop Outline:
 
-1.  Introduce the state-space approach that links tree ring data with forest census data
+1.  Introduction & how to work through this tutorial (i.e. this page)
+2.  Introduction of Harvard Forest Census and Tree Ring Data
+3.  
+
+## Introduce the state-space approach that links tree ring data with forest census data
 
 ## Introduction to Bayesian Statistics
 
