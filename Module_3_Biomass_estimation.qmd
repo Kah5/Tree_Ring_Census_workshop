@@ -85,7 +85,6 @@ Census <- Census %>%
 
 ```
 
-
 Here, we will focus on species from Harvard Forest, so lets see which species we have in our census data. This information is stored in the `taxon` column in the `Census` object:
 
 ```{R}
@@ -188,7 +187,7 @@ Census.AGB <- rbind(Census.LF1, Census.LF2, Census.LF3) %>%
   #mutate(AGB_Mg_ha = AGB_kg*) # convert the tree level AGB to MG/ha)
 
 
-# convert the tree level AGB to MG/ha
+
 ggplot(data = Census.AGB)+
   geom_point(aes(x = INV.YEAR, y = AGB_kg, group = ID, color = `Scientific Name`))+
   geom_line(aes(x = INV.YEAR, y = AGB_kg, group = ID, color = `Scientific Name`))+
@@ -206,10 +205,10 @@ Which species are increasing the most over time? Is this what you expected based
 ```{R}
 #| warning: false
 
-ggplot(data = Census.AGB)+
-  geom_point(aes(x = INV.YEAR, y =AGB_Mg_ha, group = ID, color = `Scientific Name`))+
-  geom_line(aes(x = INV.YEAR, y = AGB_Mg_ha, group = ID, color = `Scientific Name`))+
-  facet_wrap(~site)+theme_bw()+ylab("Tree Aboveground Biomass (Mg/ha)")+xlab("Year")
+# ggplot(data = Census.AGB)+
+#   geom_point(aes(x = INV.YEAR, y =AGB_Mg_ha, group = ID, color = `Scientific Name`))+
+#   geom_line(aes(x = INV.YEAR, y = AGB_Mg_ha, group = ID, color = `Scientific Name`))+
+#   facet_wrap(~site)+theme_bw()+ylab("Tree Aboveground Biomass (Mg/ha)")+xlab("Year")
 
 Census.AGB.sums <- Census.AGB %>% group_by(taxon, `Scientific Name`, site, INV.YEAR) %>% 
   summarise(AGB_Mg_ha_taxon = sum(AGB_kg*tph_corr, na.rm =TRUE))
@@ -261,7 +260,6 @@ ggplot(data = recruit.code.census) +
 ```
 
 There are some mortality events that remove AGB
-
 
 ```{R}
 #| echo: FALSE
@@ -557,6 +555,7 @@ ggplot()+
 ```
 
 ### Comparing Census and tree-ring derived Aboveground biomass and Carbon
+
 ```{r}
 Census.totals <- Census.AGB.sums %>% left_join(.,taxon.conversion) %>% 
   group_by(COMMON_NAME, INV.YEAR) %>% 
@@ -589,9 +588,9 @@ ggplot()+
 
 -   Approach in this module ignore uncertainty in our estimates due to information from different cores
 
--   We assume that the census diameter closest to the time of coring is \"truth,\" but diameter measurements also have measurement uncertainty
+-   We assume that the census diameter closest to the time of coring is "truth," but diameter measurements also have measurement uncertainty
 
--   Lack of demographic data prior to coring leads contributes to an underestimation of AGB in the past; i.e. the \"Fading-record\" problem, where we miss AGB from trees that have died and prior to coring (and were not sampled).
+-   Lack of demographic data prior to coring leads contributes to an underestimation of AGB in the past; i.e. the "Fading-record" problem, where we miss AGB from trees that have died and prior to coring (and were not sampled).
 
 -   Often, we may not have a dendroecological sample with a core from all the trees.
 
