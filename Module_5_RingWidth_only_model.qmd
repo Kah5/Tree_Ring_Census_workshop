@@ -12,14 +12,13 @@ This module introduces the workflow for the case where the only data informing t
 
 This workflow involves:
 
-
 1.  Inferring growth using the state-space model;
 2.  Sampling models in STAN: A (very brief) overview
 3.  Visualizing process and data uncertainty
 4.  Visualizing chronology-like effects: year random effects
 5.  Using inferred growth to determine tree-level biomass
 6.  Comparing tree-level RW-only model to data-based biomass estimates
-6.  Scaling to stand & Calculating biomass increment from biomass.
+7.  Scaling to stand & Calculating biomass increment from biomass.
 
 ## 1. Inferring growth using the state-space model;
 
@@ -84,6 +83,12 @@ plot_C = allTrees$plot
 distance = allTrees$distance
 ```
 
+::: {.callout-note collapse="false"}
+### Note the use of X instead of R for increments
+
+In the last module, the true increment for tree i at time t were refered to as $\text{R}_{i, t}$, but here we use $\text{X}_{i, t}$ as using R might be confusing as this is the name of our statistical software and R is not often used as a parameter name
+:::
+
 We will also load a previous estimate of the DBH data uncertainty `sig_d_obs`, and add this to our dataset. This estimate is used as data in the RW-only of the model. We will estimate the DBH data uncertainty in the models that include census measurements.
 
 ```{R}
@@ -96,17 +101,17 @@ dat$sig_d_obs = sig_d_obs
 The `stan` model code is stored in the `models/` folder. The RW only model is the `growth_model_RW.stan`. If you are working through this tutorial on R, you can view this file in your environment. We won't dive too deep into how to write your own stan model, but note that this model includes several blocks:
 
 1.  `data{}`: inputs read in and used as "data" in the model
-2.  `parameters`{}: defines the parameters that will be estimated in the model (we will draw samples from these in the model block)
-3.  `transformed parameters`{}: defines the parameters that are calculated from other parameters (we will draw samples from parameters and transform them into quantities we care about in this block)
-4.  `model`{}: This is where the increment data model, diameter data model and liklihood function are defined
+2.  `parameters`: defines the parameters that will be estimated in the model (we will draw samples from these in the model block)
+3.  `transformed parameters`: defines the parameters that are calculated from other parameters (we will draw samples from parameters and transform them into quantities we care about in this block)
+4.  `model`: This is where the increment data model, diameter data model and liklihood function are defined
 
 ```{R}
 #| class-output: stan
 writeLines(readLines("models/growth_model_RW.stan"))
 ```
 
+## 2. Sampling models in STAN: A (very brief) overview
 
-## 2.  Sampling models in STAN: A (very brief) overview
 ### Running the model: Example for a short run
 
 To estimate growth using the growth model via `Stan`, we need to compile the model `Stan` code, and then sample from the parameter posterior distributions. The sampling function requires that we tell it the model we are using, the dataset we are using, the number of iterations, and the number of chains. The compute time for the sampling function can be quite long, depending on the model, data, and sampling algorithm settings (number of iterations and chains).
@@ -161,13 +166,12 @@ summary(fit_RW, pars = c('sig_x', 'sig_x_obs'), probs = c(0.1, 0.9))$summary
 
 ```
 
-## Evaluating model convergence--how do we know we have enough iterations sampled? 
-While not a complete list, we will look at 3 ways of evaluating the stan model fit itself:
-1. Effective sample size
-2. Rhat
-3. Visualizing traceplots
+## Evaluating model convergence--how do we know we have enough iterations sampled?
+
+While not a complete list, we will look at 3 ways of evaluating the stan model fit itself: 1. Effective sample size 2. Rhat 3. Visualizing traceplots
 
 ### Effective Sample Size
+
 The summary table also includes columns for effective sample size (`n_eff`) and `Rhat`. The effective sample size is a statistic used to estimate the number of posterior samples after accounting for autocorrelation. We want this number to be large. There is no definitive rule about the minimum `n_eff` needed to conclude that you have enough samples to make inference about model parameters, but the generally accepted minimum is 100 or 200 ESS for each parameter. In some cases the effective sample size can be larger than the total number of iterations.
 
 We can use `stan_ess` to plot a histogram of the ratio of the effective sample size to the total number of iterations. The larger this value the better. Note than it can be larger than 1 because the ESS can be larger than the total number of iterations.
@@ -176,20 +180,33 @@ We can use `stan_ess` to plot a histogram of the ratio of the effective sample s
 #| eval: TRUE
 stan_ess(fit_RW)
 ```
+
 ### Rhat
+
 `Rhat` is a statistic that estimates model convergence. It is one way to try to answer the question: has the sampler converged sufficiently so that we are getting samples from the posterior distribution? At convergence, `Rhat` is equal to 1. Perfect convergence is hard to achieve in practice, so generally we want `Rhat` smaller than 1.01 (but this is not always possible for all parameters for some complex models).
 
 ```{r}
 #| eval: TRUE
 stan_rhat(fit_RW)
 ```
+
 ### Traceplots
-Traceplots are useful to visualize if all the different chains are converging on a similar estimate for each value. Here we only show one chain, so it may not be as useful, but we can see that this estimate is varying around a mean value (and not slowly trending up/down over the number of samples).
+
+Traceplots are useful to visualize if all the different chains are converging on a similar estimate for each value. If you think of an unknown parameter as a prime camping spot (or an old tree that you want to core), that you know is somewhere on a hillside, but not sure where. You might start wandering around randomly until you find the best camping spot. Your friends (who all started at different trailheads) represent different chains (random samplers) are also wandering around the same hillside until they find the best campsite. Hopefully, you all will converge (i.e. meet) at the same general spot on the hillside.
+
+::: {style="text-align:center"}
+\<img src="DAGs/Convergence.png" width="800"/\>
+:::
+
+Here we only show one chain, so it may not be as useful, but we can see that this estimate is varying around a mean value (and not slowly trending up/down over the number of samples).
+
 ```{r}
 #| eval: TRUE
 traceplot(fit_RW, pars = c('sig_x_obs'))
 ```
+
 ## 3. Visualizing process and data uncertainty
+
 We will want to work with posterior samples for the model parameters, and we can get these by extracting them from the model output object into an easier to work with object. This object is a three dimensional array, which dimensions equal to the number of iterations BY the number of chains BY the number of parameters.
 
 ```{r}
@@ -341,12 +358,14 @@ p = ggplot(data=beta_t_quant) +
 print(p)
 
 ```
-## 5.  Using inferred growth to determine tree-level biomass
+
+## 5. Using inferred growth to determine tree-level biomass
+
 #### RW-only model estimated Tree Daimaeter and Growth plots (for some trees)
 
 For the purpose of this workflow, we are most interested in the model inferred tree growth. For each tree, we have parameter estimates that describe increment and diameter growth through for each year.
 
-Here we visualize inferred and observed diameter data for one tree (Tree 1). Filled circles indicate the diameter measurement included in this model and hollow circles are census diameter measurements not included in the model. 
+Here we visualize inferred and observed diameter data for one tree (Tree 1). Filled circles indicate the diameter measurement included in this model and hollow circles are census diameter measurements not included in the model.
 
 ```{R}
 
@@ -634,7 +653,6 @@ q = ggplot(data=rw_validate) +
 print(q)
 ```
 
-
 # 2. Growth to Biomass
 
 We will use the model inferred tree growth to determine tree biomass. This is done using allometric equations, which are used to determine tree biomass based on tree size. In this workflow, we will use the allometric equations from Chojnacky et al. (XXXX). For each species, tree biomass is determined by tree diameter using the equation AGB = exp(beta0 + beta1 \* log(DBH)), where beta0 and beta1 are published parameter values (estimated using destructive sampling that involves cutting down and weighing trees).
@@ -836,9 +854,7 @@ abi_melt$type = rep('abi',nrow(abi_melt))
 
 ```
 
-
 ## Taxon-level Aboveground Biomass (AGB) and Aboveground Biomass Increment (AGBI)
-
 
 ```{R}
 agb_taxon_by_iter = agb_melt %>%
@@ -879,7 +895,6 @@ abi_taxon_summary = abi_taxon_by_iter %>% ungroup() %>%
 
 ```
 
-
 ```{R}
 
 
@@ -899,6 +914,7 @@ ggplot(data = abi_taxon_summary)+
   ylab('biomass increment (mg/ha)')
 
 ```
+
 ## Stand-level Biomass and Biomass increment
 
 ```{R}
