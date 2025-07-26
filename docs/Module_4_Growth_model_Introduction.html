@@ -2,14 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.42">
+<meta name="generator" content="quarto-1.5.43">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Andria Dawson and Kelly Heilman">
 <meta name="dcterms.date" content="2025-07-26">
 
-<title>Module 4: Model Introduction – State Space Model Workshop 2025, Livingstone, Zambia</title>
+<title>State Space Model Workshop 2025, Livingstone, Zambia – Module 4: Model Introduction</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,40 +22,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -66,19 +32,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./Module_5_RingWidth_only_model.html" rel="next">
-<link href="./Module_3_Biomass_estimation.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark-b53751a350365c71b6c909e95f209ed1.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-731721f27bc67fe1f3091fcf2dc0932e.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark-ce2403a685e42321d21802772b3db879.min.css" rel="prefetch" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,6 +71,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -129,13 +122,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.qmd"> 
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <span class="nav-link">
-<span class="menu-text">about.qmd</span>
-    </span>
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
@@ -156,7 +148,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Module_4_Growth_model_Introduction.html">Module 4: Model Introduction</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Module 4: Model Introduction</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -177,11 +169,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
- <span class="menu-text">about.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">About</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
- <span class="menu-text">index.qmd</span>
-  </li>
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome and Schedule</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./Module_1_Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Module 1: Introduction</span></a>
+  </div>
+</li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./Module_2_Data.html" class="sidebar-item-text sidebar-link">
@@ -195,35 +199,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_4_Growth_model_Introduction.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Module 4: Model Introduction</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_4_RingWidth_only_model.qmd</span>
+  </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_5_RingWidth_only_model.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 5: Ring-width only model (RW-only)</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_5_RingWidth_and_Census.qmd</span>
+  </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_6_RingWidth_and_Census.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 6: Ring Width and Census Data Model (RW + Census)</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_6_Comparing_Biomass_Estimates.qmd</span>
+  </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_7_Comparing_Biomass_Estimates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 7: Comparing RW only and RW + Census model</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_8_TR_and_Census_model_w_climate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 8: Regression with annual climate drivers within the RW + Census model</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_7_TR_and_Census_model_w_climate.qmd</span>
+  </li>
     </ul>
     </div>
 </nav>
@@ -234,27 +220,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#state-space-model-for-estimating-biomass" id="toc-state-space-model-for-estimating-biomass" class="nav-link active" data-scroll-target="#state-space-model-for-estimating-biomass">State-space model for estimating biomass</a></li>
-  <li><a href="#load-packages-to-be-used" id="toc-load-packages-to-be-used" class="nav-link" data-scroll-target="#load-packages-to-be-used">Load packages to be used</a></li>
-  <li><a href="#uncertainty-in-diameter-reconstructions" id="toc-uncertainty-in-diameter-reconstructions" class="nav-link" data-scroll-target="#uncertainty-in-diameter-reconstructions">Uncertainty in Diameter reconstructions:</a>
+  <li><a href="#state-space-model-for-estimating-biomass" id="toc-state-space-model-for-estimating-biomass" class="nav-link active" data-scroll-target="#state-space-model-for-estimating-biomass">State-space model for estimating biomass</a>
   <ul class="collapse">
-  <li><a href="#increment-uncertainty" id="toc-increment-uncertainty" class="nav-link" data-scroll-target="#increment-uncertainty">Increment Uncertainty</a></li>
-  <li><a href="#diameter-uncertainty" id="toc-diameter-uncertainty" class="nav-link" data-scroll-target="#diameter-uncertainty">Diameter Uncertainty</a></li>
-  </ul></li>
-  <li><a href="#modelling-data-uncertainty" id="toc-modelling-data-uncertainty" class="nav-link" data-scroll-target="#modelling-data-uncertainty">Modelling data uncertainty</a></li>
-  <li><a href="#change-to-dag-with" id="toc-change-to-dag-with" class="nav-link" data-scroll-target="#change-to-dag-with">change to DAG with</a></li>
-  <li><a href="#adding-state-space-process-model" id="toc-adding-state-space-process-model" class="nav-link" data-scroll-target="#adding-state-space-process-model">Adding State-Space Process Model</a></li>
-  <li><a href="#load-the-model-data" id="toc-load-the-model-data" class="nav-link" data-scroll-target="#load-the-model-data">load the model data</a></li>
-  <li><a href="#stan-model" id="toc-stan-model" class="nav-link" data-scroll-target="#stan-model">Stan Model</a></li>
-  <li><a href="#add-the-math-notation-of-the-model-here" id="toc-add-the-math-notation-of-the-model-here" class="nav-link" data-scroll-target="#add-the-math-notation-of-the-model-here">add the math notation of the model here:</a>
+  <li><a href="#observed-growth" id="toc-observed-growth" class="nav-link" data-scroll-target="#observed-growth">Observed growth</a>
   <ul class="collapse">
-  <li><a href="#running-the-model-example-for-a-short-run" id="toc-running-the-model-example-for-a-short-run" class="nav-link" data-scroll-target="#running-the-model-example-for-a-short-run">Running the model: Example for a short run</a></li>
-  <li><a href="#the-model-outputs" id="toc-the-model-outputs" class="nav-link" data-scroll-target="#the-model-outputs">The model outputs</a></li>
-  <li><a href="#model-checking-in-stan" id="toc-model-checking-in-stan" class="nav-link" data-scroll-target="#model-checking-in-stan">Model Checking in stan:</a></li>
-  <li><a href="#model-validation" id="toc-model-validation" class="nav-link" data-scroll-target="#model-validation">Model Validation:</a></li>
-  <li><a href="#convert-tree-diameters-to-agb" id="toc-convert-tree-diameters-to-agb" class="nav-link" data-scroll-target="#convert-tree-diameters-to-agb">convert tree diameters to AGB</a></li>
-  <li><a href="#plot-of-agb-and-agbi-with-uncertainty" id="toc-plot-of-agb-and-agbi-with-uncertainty" class="nav-link" data-scroll-target="#plot-of-agb-and-agbi-with-uncertainty">Plot of AGB and AGBI with uncertainty</a></li>
+  <li><a href="#rw" id="toc-rw" class="nav-link" data-scroll-target="#rw">RW</a></li>
+  <li><a href="#dbh" id="toc-dbh" class="nav-link" data-scroll-target="#dbh">DBH</a></li>
   </ul></li>
+  <li><a href="#inferred-growth" id="toc-inferred-growth" class="nav-link" data-scroll-target="#inferred-growth">Inferred growth</a>
+  <ul class="collapse">
+  <li><a href="#increment" id="toc-increment" class="nav-link" data-scroll-target="#increment">Increment</a></li>
+  <li><a href="#diameter" id="toc-diameter" class="nav-link" data-scroll-target="#diameter">Diameter</a></li>
+  </ul></li>
+  <li><a href="#observation-uncertainty" id="toc-observation-uncertainty" class="nav-link" data-scroll-target="#observation-uncertainty">Observation uncertainty</a></li>
+  <li><a href="#growth-process" id="toc-growth-process" class="nav-link" data-scroll-target="#growth-process">Growth process</a></li>
+  <li><a href="#initial-diameter" id="toc-initial-diameter" class="nav-link" data-scroll-target="#initial-diameter">Initial diameter</a></li>
+  <li><a href="#priors" id="toc-priors" class="nav-link" data-scroll-target="#priors">Priors</a></li>
+  <li><a href="#parameter-estimation" id="toc-parameter-estimation" class="nav-link" data-scroll-target="#parameter-estimation">Parameter estimation</a></li>
+  <li><a href="#stan" id="toc-stan" class="nav-link" data-scroll-target="#stan">Stan</a></li>
+  <li><a href="#example-linear-regression-model-specification" id="toc-example-linear-regression-model-specification" class="nav-link" data-scroll-target="#example-linear-regression-model-specification">Example linear regression model specification</a>
+  <ul class="collapse">
+  <li><a href="#data-block" id="toc-data-block" class="nav-link" data-scroll-target="#data-block">Data Block</a></li>
+  <li><a href="#parameter-block" id="toc-parameter-block" class="nav-link" data-scroll-target="#parameter-block">Parameter Block</a></li>
+  <li><a href="#model-block" id="toc-model-block" class="nav-link" data-scroll-target="#model-block">Model Block</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#as-an-example-a-linear-regression-in-stan-would-be-defined-as-follows" id="toc-as-an-example-a-linear-regression-in-stan-would-be-defined-as-follows" class="nav-link" data-scroll-target="#as-an-example-a-linear-regression-in-stan-would-be-defined-as-follows">As an example, a linear regression in stan would be defined as follows:</a></li>
+  <li><a href="#the-growth-model-outlined-above-is-a-bit-more-complex-than-a-linear-regression-but-as-a-dynamic-linear-model-it-has-a-linear-model-in-the-liklihood-function-of-the-ring-width-process-model" id="toc-the-growth-model-outlined-above-is-a-bit-more-complex-than-a-linear-regression-but-as-a-dynamic-linear-model-it-has-a-linear-model-in-the-liklihood-function-of-the-ring-width-process-model" class="nav-link" data-scroll-target="#the-growth-model-outlined-above-is-a-bit-more-complex-than-a-linear-regression-but-as-a-dynamic-linear-model-it-has-a-linear-model-in-the-liklihood-function-of-the-ring-width-process-model">The Growth Model outlined above is a bit more complex than a linear regression, but as a dynamic linear model, it has a linear model in the liklihood function of the Ring Width process model:</a></li>
   </ul>
 </nav>
     </div>
@@ -292,134 +284,168 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="state-space-model-for-estimating-biomass" class="level2">
-<h2 class="anchored" data-anchor-id="state-space-model-for-estimating-biomass">State-space model for estimating biomass</h2>
-</section>
-<section id="load-packages-to-be-used" class="level2">
-<h2 class="anchored" data-anchor-id="load-packages-to-be-used">Load packages to be used</h2>
-<p>We estimate the parameters of this state-space model in a program called <code>stan</code> which interfaces to <code>R</code> via a package called <code>rstan</code> (<code>cmdstan</code> is another package that is used.)</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rstan)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: StanHeaders</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-rstan version 2.32.7 (Stan version 2.32.2)</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>For execution on a local, multicore CPU with excess RAM we recommend calling
-options(mc.cores = parallel::detectCores()).
-To avoid recompilation of unchanged Stan programs, we recommend calling
-rstan_options(auto_write = TRUE)
-For within-chain threading using `reduce_sum()` or `map_rect()` Stan functions,
-change `threads_per_chain` option:
-rstan_options(threads_per_chain = 1)</code></pre>
-</div>
-</div>
-</section>
-<section id="uncertainty-in-diameter-reconstructions" class="level1">
-<h1>Uncertainty in Diameter reconstructions:</h1>
-<section id="increment-uncertainty" class="level2">
-<h2 class="anchored" data-anchor-id="increment-uncertainty">Increment Uncertainty</h2>
-<p>Here is an example: Our reconstruction of biomass uncertainty from Module 2 was created with one incrment core per tree. But reconstructions with multiple cores per tree highlight how cores from different parts of the trees can yield different growth and biomass estimates.</p>
-</section>
-<section id="diameter-uncertainty" class="level2">
-<h2 class="anchored" data-anchor-id="diameter-uncertainty">Diameter Uncertainty</h2>
-<p>Tree diameter measurements can vary due to observer errors, measurements at slightly different heights, furrows in the bark, etc. Here we show an example of multiple observers measuring the same tree diameters on the same day.</p>
-</section>
-</section>
-<section id="modelling-data-uncertainty" class="level1">
-<h1>Modelling data uncertainty</h1>
-<p>We can create data models that include these measurement and data uncertainties.</p>
-</section>
-<section id="change-to-dag-with" class="level1">
-<h1>change to DAG with</h1>
+<section id="state-space-model-for-estimating-biomass" class="level1">
+<h1>State-space model for estimating biomass</h1>
+<p>We are using Bayesian statistical inference to estimate tree growth given RW and/or Census data. This workflow is motivated by the desire to: account for and quantify the uncertainty in our understanding (of data and processes) of tree growth; integrate multiple data types that inform about tree growth; and using a framework that allows for estimation of growth for trees with incomplete data.</p>
+<p>Bayesian inference makes it possible to achieve these objectives.</p>
+<section id="observed-growth" class="level2">
+<h2 class="anchored" data-anchor-id="observed-growth">Observed growth</h2>
+<p>There are two types of observations of tree growth considered here: RW and Census.</p>
+<p>The ring width datasets we are working with contain both ring-width time series from one or more tree cores and dbh at the time of coring. The census datasets contain repeat dbh measurements for some number of trees. Census remeasurement intervals are often 5-10 years.</p>
+<p>So in short: RW data is annually resolved, while census data is not.</p>
 <div style="text-align:center">
-<p><img src="DAGs/DAG_1.png" width="800"></p>
+<p><img src="DAGs/Slide1.png" width="800"></p>
+</div>
+<section id="rw" class="level3">
+<h3 class="anchored" data-anchor-id="rw">RW</h3>
+<p>We denote the ring-width observations by <span class="math inline">\(\text{Robs}\)</span>. For tree number <span class="math inline">\(i\)</span>, core <span class="math inline">\(j\)</span>, and year <span class="math inline">\(t\)</span>, the observed ring-width is represented by <span class="math inline">\(\text{Robs}_{i, j, t}\)</span>.</p>
+<p>Note that not all trees need to have RW observations for all years in this framework (so it’s not a problem that the temporal extent of the ring-width time series vary among trees), and not all trees need to have the same number of cores.</p>
+</section>
+<section id="dbh" class="level3">
+<h3 class="anchored" data-anchor-id="dbh">DBH</h3>
+<p>We denote the diameter observations by <span class="math inline">\(\text{Dobs}\)</span>. For tree number <span class="math inline">\(i\)</span> and year <span class="math inline">\(t\)</span>, the observed diameter is represented by <span class="math inline">\(\text{Dobs}_{i, t}\)</span>.</p>
+<p>Now we note that not all trees need have diameter observations for each year, and the years for which trees do have measurements need not be the same among all trees.</p>
+<p>Also, if it were the case that diameter was measured multiple times when census (for example if each of the three field techs measured the diameter of each tree), then we could include an additional subscript as we did for the ring-width observations.</p>
+</section>
+</section>
+<section id="inferred-growth" class="level2">
+<h2 class="anchored" data-anchor-id="inferred-growth">Inferred growth</h2>
+<p>The objective is to quantify tree growth with uncertainty. We assume that there are some latent (unobserved) states that represent what we sometimes call the true increment and diameter. This description itself isn’t quite the truth (pun intended). These latent states quantify the best estimate of increment and diameter given the data and model. Tree growth isn’t perfectly circular; for a given year, ring-width might vary among cores.</p>
+<section id="increment" class="level3">
+<h3 class="anchored" data-anchor-id="increment">Increment</h3>
+<p>We denote the latent increment by <span class="math inline">\(\text{R}\)</span>. For tree number <span class="math inline">\(i\)</span>, and year <span class="math inline">\(t\)</span>, the latent increment is represented by <span class="math inline">\(\text{R}_{i, t}\)</span>.</p>
+</section>
+<section id="diameter" class="level3">
+<h3 class="anchored" data-anchor-id="diameter">Diameter</h3>
+<p>We denote the latent diameter by <span class="math inline">\(\text{D}\)</span>. For tree number <span class="math inline">\(i\)</span>, and year <span class="math inline">\(t\)</span>, the latent diameter is represented by <span class="math inline">\(\text{D}_{i, t}\)</span>.</p>
+<div style="text-align:center">
+<p><img src="DAGs/Slide2.png" width="800"></p>
 </div>
 </section>
-<section id="adding-state-space-process-model" class="level1">
-<h1>Adding State-Space Process Model</h1>
 </section>
-<section id="load-the-model-data" class="level1">
-<h1>load the model data</h1>
-</section>
-<section id="stan-model" class="level1">
-<h1>Stan Model</h1>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># add R stan code here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<section id="observation-uncertainty" class="level2">
+<h2 class="anchored" data-anchor-id="observation-uncertainty">Observation uncertainty</h2>
+<p>We account for observation uncertainty in both the RW and diameter data. This uncertainty represents not only measurement uncertainty, but also uncertainty related to processes that result in observations that vary around the latent increment and diameter. For example, asymmetric growth processes.</p>
+<p>Both increment and diameter observations vary around distributions with a central tendency determined by the latent increment and diameter, and with spread (dispersion) determined by parameters <span class="math inline">\(\sigma_\text{Xobs}\)</span> and <span class="math inline">\(\sigma_\text{Dobs}\)</span>.</p>
+<p>More formally we write</p>
+<p><span class="math inline">\(\text{Robs}_{i, j, t} \sim [\text{R}_{i, t}, \sigma_\text{Xobs}]\)</span></p>
+<p>and</p>
+<p><span class="math inline">\(\text{Dobs}_{i, t} \sim [\text{D}_{i, t}, \sigma_\text{Dobs}]\)</span>.</p>
+<div style="text-align:center">
+<p><img src="DAGs/Slide3.png" width="800"></p>
 </div>
 </section>
-<section id="add-the-math-notation-of-the-model-here" class="level1">
-<h1>add the math notation of the model here:</h1>
-<section id="running-the-model-example-for-a-short-run" class="level2">
-<h2 class="anchored" data-anchor-id="running-the-model-example-for-a-short-run">Running the model: Example for a short run</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># run a version with a small # of iterations here to show the output</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
+<section id="growth-process" class="level2">
+<h2 class="anchored" data-anchor-id="growth-process">Growth process</h2>
+<p>In this workflow, latent increment is distributed with a central tendency that is the sum of a tree specific effect (<span class="math inline">\(\beta_i\)</span>, for tree <span class="math inline">\(i\)</span>) and a species-time effect (<span class="math inline">\(\beta_{t, k}\)</span>), and a spread (dispersion) described by <span class="math inline">\(\sigma_{\text{x}}\)</span>.</p>
+<p>This species-time effect <span class="math inline">\(\beta_{t, k}\)</span> is analogous to a forest growth chronology: it describes the common growth signal through time for each species.</p>
+<p>This increment model can be extended to account for additional processes that determine annual growth. For example, we could include size, competition, or climate effects.</p>
+<p>Using statistical notation, we write that</p>
+<p><span class="math inline">\(\text{R}_{i, t} \sim [\beta_i + \beta_{t, k}, \sigma_{\text{x}}]\)</span></p>
+<p>Then, latent diameter for tree <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span>, <span class="math inline">\(\text{D}_{i, t}\)</span> is a deterministic function equal to the diameter of that tree from the previous year, <span class="math inline">\(\text{D}_{i, t-1}\)</span>, plus twice the increment <span class="math inline">\(\text{R}_{i, t}\)</span> (making sure the units are consistent). In formal notation, we have</p>
+<p><span class="math inline">\(\text{D}_{i, t} = \text{D}_{i, t-1} + 2 \cdot \text{R}_{i, t}\)</span>.</p>
+<div style="text-align:center">
+<p><img src="DAGs/Slide7.png" width="800"></p>
 </div>
 </section>
-<section id="the-model-outputs" class="level2">
-<h2 class="anchored" data-anchor-id="the-model-outputs">The model outputs</h2>
-<p>Highlight the range of model outputs</p>
-<p>Here, the main outputs that we are most interested in are growth and tree size, so we will focus on those in this workshop. Examples of these outputs and timeseries are shown below:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load the Full TR only model outputs</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># put some example exploration of the model outputs here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<section id="initial-diameter" class="level2">
+<h2 class="anchored" data-anchor-id="initial-diameter">Initial diameter</h2>
 </section>
-<section id="model-checking-in-stan" class="level2">
-<h2 class="anchored" data-anchor-id="model-checking-in-stan">Model Checking in stan:</h2>
-<p>In addition to the growth and diameter estimates, there are other model outputs and diagnostics that one would need to check and explore to assess</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># traceplots</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># checking model diagnostics</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<section id="priors" class="level2">
+<h2 class="anchored" data-anchor-id="priors">Priors</h2>
+<p>In Bayesian inference, the posterior distribution which describes <span class="math inline">\(P(model|data)\)</span> is proportional to the likelihood <span class="math inline">\(P(data|model)\)</span> times the prior <span class="math inline">\(P(model)\)</span>. We need to define prior distributions for model parameters. There are many different ways to define prior distributions.</p>
+<p>For example,</p>
+<p><span class="math inline">\(\beta_i \sim \text{normal}(\beta_0, \beta_\text{SD})\)</span> and</p>
+<p><span class="math inline">\(\beta_0 \sim \text{normal}(0, 1000)\)</span> and</p>
+<p><span class="math inline">\(\beta_\text{SD} \sim \text{uniform}(0, 1000)\)</span>.</p>
+<p>Other model parameters also require defined prior distributions.</p>
 </section>
-<section id="model-validation" class="level2">
-<h2 class="anchored" data-anchor-id="model-validation">Model Validation:</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># comparing estimates of diameter increment to observations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<section id="parameter-estimation" class="level2">
+<h2 class="anchored" data-anchor-id="parameter-estimation">Parameter estimation</h2>
+<p>After formulating the Bayesian state space model, we would like to be able to infer the parameter posterior distributions. In a Bayesian paradigm, this typically requires using a sampling algorithm- a set of rules that we follow to get posterior distribution samples. There are different algorithms we can use, and different software that implements these algorithms.</p>
+<p>Most algorithms rely on a markov chain monte carlo algorithm. These algorithms involve iteratively: proposing new states (parameters), using a predefined criterion to decide if they are accepted, and either moving to this state (acceptance) or remaining in the current state (rejected). This iterative process is repeated many times, and makes it possible to explore the posterior distribution. The result is a set of posterior samples used to make inference about the parameters of interest.</p>
 </section>
-<section id="convert-tree-diameters-to-agb" class="level2">
-<h2 class="anchored" data-anchor-id="convert-tree-diameters-to-agb">convert tree diameters to AGB</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code to estimate biomass</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<section id="stan" class="level2">
+<h2 class="anchored" data-anchor-id="stan">Stan</h2>
+<p>Here we use the statistical software <a href="https://mc-stan.org/docs/"><code>Stan</code></a> to estimate parameters. <code>Stan</code> interfaces to <code>R</code> via a package called <a href="https://mc-stan.org/rstan/"><code>rstan</code></a> (<a href="https://mc-stan.org/docs/cmdstan-guide/"><code>cmdstan</code></a> is another package that is used.)</p>
+<p><code>Stan</code> by default uses something called the Hamiltonian Monte Carlo sampling algorithm.</p>
+<p>In this workshop, we are going to implement the model ourselves using Stan. To do this, we need a model written in Stan (file with .stan extension). Then we will fit this model using the RStan interface (R script). To use <code>Stan</code>, the model needs to be written in the <code>Stan</code> language (a text file with a <code>.stan</code> extension). A Stan model has three required blocks:</p>
+<ol type="1">
+<li><p>data block: declare data types, their dimensions, restrictions, and names.</p></li>
+<li><p>parameters block: declare parameter types, dimensions, restrictions, and names.</p></li>
+<li><p>model block: include sampling statements.</p></li>
+</ol>
+<p>We won’t talk to much about the NUTS and bolts of STAN programming in this workshop, refer to: <a href="https://mc-stan.org/docs/reference-manual/">Stan language manual</a>. (Stan uses what is called a NUTS algorithm so this is a terrible pun.)</p>
 </section>
-<section id="plot-of-agb-and-agbi-with-uncertainty" class="level2">
-<h2 class="anchored" data-anchor-id="plot-of-agb-and-agbi-with-uncertainty">Plot of AGB and AGBI with uncertainty</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot total and by taxa</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<section id="example-linear-regression-model-specification" class="level2">
+<h2 class="anchored" data-anchor-id="example-linear-regression-model-specification">Example linear regression model specification</h2>
+<section id="data-block" class="level3">
+<h3 class="anchored" data-anchor-id="data-block">Data Block</h3>
+<pre class="{#| class-output: stan}"><code>
+data {
+  int&lt;lower=1&gt; N; // number of observations
+  vector[N] x;    // the predictor 
+  vector[N] y;    // the outcome
+} 
+</code></pre>
+</section>
+<section id="parameter-block" class="level3">
+<h3 class="anchored" data-anchor-id="parameter-block">Parameter Block</h3>
+<pre class="{#| class-output: stan}"><code>
+parameters {
+  real alpha;  // intercept
+  real beta;   // slope
+  real&lt;lower=0&gt; sigma; // standard deviation
+}
+</code></pre>
+</section>
+<section id="model-block" class="level3">
+<h3 class="anchored" data-anchor-id="model-block">Model Block</h3>
+<pre class="{#| class-output: stan}"><code>
+model {
+  
+  // priors
+  alpha ~ normal(0, 10);
+  beta  ~ normal(0, 10);  // priors for beta
+  sigma ~ cauchy(0, 5);  // prior for sigma
+  
+  // likelihood
+  y ~ normal(alpha+beta*x, sigma);
+}
+</code></pre>
+</section>
+</section>
+</section>
+<section id="as-an-example-a-linear-regression-in-stan-would-be-defined-as-follows" class="level1">
+<h1>As an example, a linear regression in stan would be defined as follows:</h1>
+<pre class="{#| class-output: stan}"><code>data {
+  int&lt;lower=1&gt; N; // number of observations
+  vector[N] x;    // the predictor 
+  vector[N] y;    // the outcome
+} 
+parameters {
+  real alpha;  // intercept
+  real beta;   // slope
+  real&lt;lower=0&gt; sigma; // standard deviation
+}
+model {
+  
+  // priors
+  alpha ~ normal(0, 10);
+  beta  ~ normal(0, 10);  // priors for beta
+  sigma ~ cauchy(0, 5);  // prior for sigma
+  
+  // likelihood
+  y ~ normal(alpha+beta*x, sigma);
+}
+</code></pre>
+</section>
+<section id="the-growth-model-outlined-above-is-a-bit-more-complex-than-a-linear-regression-but-as-a-dynamic-linear-model-it-has-a-linear-model-in-the-liklihood-function-of-the-ring-width-process-model" class="level1">
+<h1>The Growth Model outlined above is a bit more complex than a linear regression, but as a dynamic linear model, it has a linear model in the liklihood function of the Ring Width process model:</h1>
+<p><span class="math inline">\(\text{R}_{i, t} \sim [\beta_i + \beta_{t, k}, \sigma_{\text{x}}]\)</span></p>
+<p>In the next module, we will show an example of how to fit the state-space growth model to estimate growth and diameter from trees using only ring width data.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -649,6 +675,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   });
   clipboard.on('success', onCopySuccess);
   if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
     const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
       text: getTextToCopy,
       container: window.document.getElementById('quarto-embedded-source-code-modal')
@@ -759,6 +787,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
+      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
@@ -984,18 +1013,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="./Module_3_Biomass_estimation.html" class="pagination-link" aria-label="Module 3: Estimating Biomass From Tree Ring Data">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Module 3: Estimating Biomass From Tree Ring Data</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="./Module_5_RingWidth_only_model.html" class="pagination-link" aria-label="Module 5: Ring-width only model (RW-only)">
-        <span class="nav-page-text">Module 5: Ring-width only model (RW-only)</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 

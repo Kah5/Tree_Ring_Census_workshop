@@ -66,8 +66,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./Module_6_RingWidth_and_Census.html" rel="next">
-<link href="./Module_4_Growth_model_Introduction.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -107,6 +105,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -155,7 +182,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./Module_5_RingWidth_only_model.html">Module 5: Ring-width only model (RW-only)</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Module 5: Ring-width only model (RW-only)</li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -206,35 +233,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_4_Growth_model_Introduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 4: Model Introduction</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_4_RingWidth_only_model.qmd</span>
+  </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_5_RingWidth_only_model.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Module 5: Ring-width only model (RW-only)</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_5_RingWidth_and_Census.qmd</span>
+  </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_6_RingWidth_and_Census.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 6: Ring Width and Census Data Model (RW + Census)</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_6_Comparing_Biomass_Estimates.qmd</span>
+  </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_7_Comparing_Biomass_Estimates.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 7: Comparing RW only and RW + Census model</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./Module_8_TR_and_Census_model_w_climate.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Module 8: Regression with annual climate drivers within the RW + Census model</span></a>
-  </div>
-</li>
+ <span class="menu-text">Module_7_TR_and_Census_model_w_climate.qmd</span>
+  </li>
     </ul>
     </div>
 </nav>
@@ -408,6 +417,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>plot_C <span class="ot">=</span> allTrees<span class="sc">$</span>plot</span>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>distance <span class="ot">=</span> allTrees<span class="sc">$</span>distance</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+</div>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note the use of X instead of R for increments
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
+<p>In the last module, the true increment for tree i at time t were refered to as <span class="math inline">\(\text{R}_{i, t}\)</span>, but here we use <span class="math inline">\(\text{X}_{i, t}\)</span> as using R might be confusing as this is the name of our statistical software and R is not often used as a parameter name</p>
+</div>
+</div>
 </div>
 <p>We will also load a previous estimate of the DBH data uncertainty <code>sig_d_obs</code>, and add this to our dataset. This estimate is used as data in the RW-only of the model. We will estimate the DBH data uncertainty in the models that include census measurements.</p>
 <div class="cell">
@@ -650,7 +675,11 @@ sig_x_obs 1.0010834</code></pre>
 </section>
 <section id="traceplots" class="level3">
 <h3 class="anchored" data-anchor-id="traceplots">Traceplots</h3>
-<p>Traceplots are useful to visualize if all the different chains are converging on a similar estimate for each value. Here we only show one chain, so it may not be as useful, but we can see that this estimate is varying around a mean value (and not slowly trending up/down over the number of samples).</p>
+<p>Traceplots are useful to visualize if all the different chains are converging on a similar estimate for each value. If you think of an unknown parameter as a prime camping spot (or an old tree that you want to core), that you know is somewhere on a hillside, but not sure where. You might start wandering around randomly until you find the best camping spot. Your friends (who all started at different trailheads) represent different chains (random samplers) are also wandering around the same hillside until they find the best campsite. Hopefully, you all will converge (i.e.&nbsp;meet) at the same general spot on the hillside.</p>
+<div style="text-align:center">
+<p>&lt;img src=“DAGs/Convergence.png” width=“800”/&gt;</p>
+</div>
+<p>Here we only show one chain, so it may not be as useful, but we can see that this estimate is varying around a mean value (and not slowly trending up/down over the number of samples).</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -2344,18 +2373,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="./Module_4_Growth_model_Introduction.html" class="pagination-link" aria-label="Module 4: Model Introduction">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Module 4: Model Introduction</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="./Module_6_RingWidth_and_Census.html" class="pagination-link" aria-label="Module 6: Ring Width and Census Data Model (RW + Census)">
-        <span class="nav-page-text">Module 6: Ring Width and Census Data Model (RW + Census)</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
