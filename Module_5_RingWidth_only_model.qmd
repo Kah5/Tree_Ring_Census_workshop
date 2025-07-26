@@ -12,12 +12,16 @@ This module introduces the workflow for the case where the only data informing t
 
 This workflow involves:
 
-1.  Inferring tree growth using the state-space model;
-2.  Sampling models in STAN: A (very brief) overview
-3.  Using inferred growth to determine biomass; and
-4.  Calculating biomass increment from biomass.
 
-## 1. Inferring Growth
+1.  Inferring growth using the state-space model;
+2.  Sampling models in STAN: A (very brief) overview
+3.  Visualizing process and data uncertainty
+4.  Visualizing chronology-like effects: year random effects
+5.  Using inferred growth to determine tree-level biomass
+6.  Comparing tree-level RW-only model to data-based biomass estimates
+6.  Scaling to stand & Calculating biomass increment from biomass.
+
+## 1. Inferring growth using the state-space model;
 
 First we will infer tree growth using the state space model introduced in Module 4. We will use `Stan` to implement the model and estimate the model parameters. `Stan` which interfaces to `R` via a package called `rstan`.
 
@@ -26,7 +30,6 @@ We will also make use of several other packages to organize, summarize, and visu
 ### load the packages
 
 ```{R}
-#| echo: FALSE
 #| warning: FALSE
 library(rstan)
 library(dplyr)
@@ -102,6 +105,8 @@ The `stan` model code is stored in the `models/` folder. The RW only model is th
 writeLines(readLines("models/growth_model_RW.stan"))
 ```
 
+
+## 2.  Sampling models in STAN: A (very brief) overview
 ### Running the model: Example for a short run
 
 To estimate growth using the growth model via `Stan`, we need to compile the model `Stan` code, and then sample from the parameter posterior distributions. The sampling function requires that we tell it the model we are using, the dataset we are using, the number of iterations, and the number of chains. The compute time for the sampling function can be quite long, depending on the model, data, and sampling algorithm settings (number of iterations and chains).
@@ -136,7 +141,7 @@ post_RW = readRDS('output/model_post_RW_HARVARD.RDS')
 
 ```
 
-## show summary table of model fit
+## 3. Summarizing model fit--Visualizing process and data uncertainty
 
 The model output is a `stanfit` object. We can use this object to assess model fit, and to extract posterior distribution samples for the model parameters.
 
@@ -184,7 +189,7 @@ Traceplots are useful to visualize if all the different chains are converging on
 #| eval: TRUE
 traceplot(fit_RW, pars = c('sig_x_obs'))
 ```
-## Visualizing the model estimates:
+## 3. Visualizing process and data uncertainty
 We will want to work with posterior samples for the model parameters, and we can get these by extracting them from the model output object into an easier to work with object. This object is a three dimensional array, which dimensions equal to the number of iterations BY the number of chains BY the number of parameters.
 
 ```{r}
@@ -294,7 +299,7 @@ p = ggplot(data=post_sxobs) +
 print(p)
 ```
 
-#### Visualizing chronology-like effects: year random effects
+## 4. Visualizing chronology-like effects: year random effects
 
 Here we will also look at some summary figures for the `beta_t` parameter. For each species, there is a `beta_t` parameter for each year. This parameter is conceptually the same as a forest chronology; it is a time series that describes the common forest growth signal for a given species.
 
@@ -302,7 +307,7 @@ We could look at summary plots for the posterior samples for a given year for a 
 
 We do want to visualize the `beta_t` chronology-like parameters as species-specific time series.
 
-```{R, fig.width=5, fig.height=7}
+```{R, fig.width=8, fig.height=12}
 
 allBTs = grep('beta_t\\[',variables)
 post_bt = post_RW[,,allBTs]
@@ -336,7 +341,7 @@ p = ggplot(data=beta_t_quant) +
 print(p)
 
 ```
-
+## 5.  Using inferred growth to determine tree-level biomass
 #### RW-only model estimated Tree Daimaeter and Growth plots (for some trees)
 
 For the purpose of this workflow, we are most interested in the model inferred tree growth. For each tree, we have parameter estimates that describe increment and diameter growth through for each year.
@@ -538,7 +543,7 @@ p1 = ggplot() +
   theme_bw(16)  +
   annotation_custom(grob)
 
-print(p1)
+#print(p1)
 
 if (in.RW){
   inds = which(X2Tr == tree)
@@ -831,22 +836,24 @@ abi_melt$type = rep('abi',nrow(abi_melt))
 
 ```
 
-## taxon
 
-## site
+## Taxon-level Aboveground Biomass (AGB) and Aboveground Biomass Increment (AGBI)
 
-# XXX
-
-# taxon summary data across plots
 
 ```{R}
 agb_taxon_by_iter = agb_melt %>%
-  group_by(year, iter, taxon, model) %>% 
-  dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
-                   .groups='keep')
+  group_by(year, iter, taxon, plot, model) %>% 
+  # # sum up the taxon-level information by plot, iteration, year
+  summarise( AGB.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
+  # 
+  # get the mean value across plots for each iteration:
+  group_by(year, iter, taxon, model) %>%
+   # dplyr::summarize(AGB.iter.mean = mean(value, na.rm = TRUE),
+   #                  .groups='keep')
+   dplyr::summarize(AGB.iter.mean = mean(AGB.taxon.plot, na.rm = TRUE),
+                     .groups='keep')
 
-#taxon summary data without plot 
-agb_taxon_summary = agb_taxon_by_iter %>%
+agb_taxon_summary = agb_taxon_by_iter %>%ungroup() %>% 
   group_by(year, taxon, model) %>% 
   dplyr::summarize(AGB.mean = mean(AGB.iter.mean, na.rm = TRUE),
                    AGB.sd = sd(AGB.iter.mean, na.rm=TRUE),
@@ -855,12 +862,14 @@ agb_taxon_summary = agb_taxon_by_iter %>%
                    .groups='keep')
 
 abi_taxon_by_iter = abi_melt %>%
+  group_by(year, iter, taxon, plot, model) %>% 
+  summarise( AGBI.taxon.plot = sum(value, na.rm =TRUE)) %>% ungroup() %>%
   group_by(year, iter, taxon, model) %>% 
-  dplyr::summarize(ABI.iter.mean = mean(value, na.rm = TRUE),
+  dplyr::summarize(ABI.iter.mean = mean(AGBI.taxon.plot, na.rm = TRUE),
                    .groups='keep')
 
 #taxon summary data without plot 
-abi_taxon_summary = abi_taxon_by_iter %>%
+abi_taxon_summary = abi_taxon_by_iter %>% ungroup() %>%
   group_by(year, taxon, model) %>% 
   dplyr::summarize(ABI.mean = mean(ABI.iter.mean, na.rm = TRUE),
                    ABI.sd = sd(ABI.iter.mean, na.rm=TRUE),
@@ -870,43 +879,6 @@ abi_taxon_summary = abi_taxon_by_iter %>%
 
 ```
 
-```{R}
-# sum annual biomass across taxa for each year, iteration, and plot 
-# also remove incomplete final years if applicable
-agb_taxa = agb_melt %>%
-  # filter(year <= finalyr) %>%
-  dplyr::group_by(taxon, year, plot, iter, model) %>% 
-  dplyr::summarize(ab = sum(value), .groups='keep')
-
-# sum annual biomass across taxa for each year, iteration, and plot 
-# also remove incomplete final years if applicable
-abi_taxa = abi_melt %>%
-  # filter(year <= finalyr) %>%
-  dplyr::group_by(taxon, year, plot, iter, model) %>% 
-  dplyr::summarize(abi = sum(value), .groups='keep')
-
-
-# determine quantiles for graphing 
-agb_plot = agb_taxa %>%
-  dplyr::group_by(model, plot, taxon, year) %>%
-  dplyr::summarize(ab025 = quantile(ab, 0.025),
-                   ab50 = quantile(ab, 0.5),
-                   ab975 = quantile(ab, 0.975), 
-                   .groups = 'keep') %>% 
-  ungroup()
-
-agb_plot$plot =  as.numeric(agb_plot$plot)
-
-sum_plot = agb_taxa %>%
-  dplyr::group_by(model, plot, year, iter) %>%
-  dplyr::summarize(ab = sum(ab), .groups = 'keep') %>%
-  ungroup() %>% 
-  group_by(model, plot, year) %>%
-  dplyr::summarize(ab025 = quantile(ab, 0.025),
-                   ab50 = quantile(ab, 0.5),
-                   ab975 = quantile(ab, 0.975), 
-                   .groups = 'keep')
-```
 
 ```{R}
 
@@ -924,16 +896,16 @@ ggplot(data = abi_taxon_summary)+
   geom_line(aes(x = year, y = ABI.mean, color = taxon))+
   facet_grid(model~., scales='free_y') +
   theme_light(18) +
-  ylab('biomass (mg/ha)')
+  ylab('biomass increment (mg/ha)')
 
 ```
-
-## site level
+## Stand-level Biomass and Biomass increment
 
 ```{R}
 
 agb_all_plot_by_iter <- agb_melt |>
   group_by(year, iter, plot, model) |>
+  # sums all of the trees by plot
   dplyr::summarize(AGB.sum = sum(value),
             .groups = 'keep') 
 
@@ -994,7 +966,7 @@ ggplot(data = abi_site_summary)+
 
 ```
 
-# 4. Compare with data only
+## 6. Comparing RW-only model to our data-based estimates
 
 ```{R}
 # 
@@ -1040,30 +1012,42 @@ print(p2)
 ```
 
 ```{R}
-TAXA.AGB <- TR_AGB %>% group_by(COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>% 
+TAXA.AGB <- TR_AGB %>% group_by(taxon, COMMON_NAME, GENUS, SPECIES, cal.year, plot) %>% 
   
-  summarise(AGB_Mg_ha_taxa = sum(AGB_kg*tph_corr)) %>% 
+  summarise(AGB_Mg_ha_taxa_plot = sum(AGB_kg*tph_corr), 
+            AGBI_Mg_ha_taxa_plot = sum(AGBI_kg*tph_corr)) %>% 
   
   filter(cal.year <= 2010) %>% 
   
   ungroup() %>% 
   
-  group_by(COMMON_NAME, GENUS, SPECIES, plot) %>%
+  group_by(taxon, COMMON_NAME, GENUS, SPECIES, cal.year) %>%
   
-  arrange(cal.year) %>% 
-  
-  mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa)) 
+  summarise(AGB_Mg_ha_taxa = mean(AGB_Mg_ha_taxa_plot, na.rm = TRUE), 
+            AGBI_Mg_ha_taxa = mean(AGBI_Mg_ha_taxa_plot, na.rm =TRUE)) #%>%
+  # ungroup() %>%
+  # group_by(taxon, COMMON_NAME, GENUS, SPECIES) %>%
+  # 
+  # arrange(cal.year) %>% 
+  # 
+  # mutate(AGBI.taxa = AGB_Mg_ha_taxa - lag(AGB_Mg_ha_taxa)) 
 
 
+ggplot(data = agb_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=AGB.lo, ymax=AGB.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = AGB.mean, color = taxon))+
+   geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa), size = 1)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
 
-ggplot()+
-  
-  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGB_Mg_ha_taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot)
 
-
-
-ggplot()+
-  
-  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI.taxa, color = COMMON_NAME), size = 2)+ylab("Taxa Aboveground Biomass (Mg/ha)")+xlab("Year")+facet_wrap(~plot)
+ggplot(data = abi_taxon_summary)+
+  geom_ribbon(aes(x=year, ymin=ABI.lo, ymax=ABI.hi, colour=taxon, fill=taxon), alpha=0.4, linetype=2) +
+  geom_line(aes(x = year, y = ABI.mean, color = taxon))+
+  geom_line(data = TAXA.AGB, aes(x = cal.year, y = AGBI_Mg_ha_taxa), size = 1)+
+  #facet_grid(model~., scales='free_y') +
+  theme_light(18) +
+  ylab('biomass increment (mg/ha)')+facet_wrap(~taxon, scales = "free_y")
 
 ```
