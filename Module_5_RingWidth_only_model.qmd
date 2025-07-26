@@ -4,7 +4,6 @@ author: "Andria Dawson and Kelly Heilman"
 format:
   html:
     code-fold: true
-
 ---
 
 # Ring-width only
@@ -27,6 +26,8 @@ We will also make use of several other packages to organize, summarize, and visu
 ### load the packages
 
 ```{R}
+#| echo: FALSE
+#| warning: FALSE
 library(rstan)
 library(dplyr)
 library(reshape2)
@@ -50,26 +51,28 @@ class(dat)
 
 names(dat)
 
-taxa = dat$taxa
-years = dat$years
+taxa = dat$taxa # the taxa abbreviations
+years = dat$years # the years where we will estimate increments
 
-N_years = dat$N_years
-N_Tr = dat$N_Tr
-N_taxa = dat$N_taxa
-X2Tr = dat$X2Tr
-X2year = dat$X2year
-Tr = dat$Tr %>% arrange(stat_id)
-taxon = Tr$taxon
-plot = Tr$plot
-years = dat$years
-year_lo = min(years)
-year_hi = max(years)
-pdbh = exp(dat$logTr)
+# STAN requires you to tell it the dimensions of the inputs and outputs, so we need to define these: 
+N_years = dat$N_years # number of years
+N_Tr = dat$N_Tr # number of trees
+N_taxa = dat$N_taxa # number of taxa
+X2Tr = dat$X2Tr # vector of tree ids
+X2year = dat$X2year # vector of years for each tree
+Tr = dat$Tr %>% arrange(stat_id) # arrange the Tree data by ids, and save as Tr
+taxon = Tr$taxon # vector of taxon ids
+plot = Tr$plot # vector of plot ids
+years = dat$years # vector of calendar years
+year_lo = min(years) # minimum year
+year_hi = max(years) # maximum year
+pdbh = exp(dat$logTr) #vector of diameters
 
-list2env(dat, envir = globalenv())
 
-N_C = dat$N_C
-X2C = dat$X2C
+list2env(dat, envir = globalenv())# load all the data objects into the environment
+
+N_C = dat$N_C # vector of Census ids
+X2C = dat$X2C # links the Census tree to the increment measurements
 X2year_C = dat$X2year_C
 
 allTrees = dat$allTrees %>% arrange(stat_id)
@@ -78,7 +81,7 @@ plot_C = allTrees$plot
 distance = allTrees$distance
 ```
 
-We will also load a previous estimate of the DBH data uncertainty `sig_d_obs`, and add this to our dataset.
+We will also load a previous estimate of the DBH data uncertainty `sig_d_obs`, and add this to our dataset. This estimate is used as data in the RW-only of the model. We will estimate the DBH data uncertainty in the models that include census measurements.
 
 ```{R}
 sig_d_obs = readRDS('data/sig_d_obs_RWC.RDS')
@@ -87,7 +90,17 @@ dat$sig_d_obs = sig_d_obs
 
 ### Stan Model
 
-The `Stan` model code is stored in `growth_model_RW.stan`. (FIXME)
+The `stan` model code is stored in the `models/` folder. The RW only model is the `growth_model_RW.stan`. If you are working through this tutorial on R, you can view this file in your environment. We won't dive too deep into how to write your own stan model, but note that this model includes several blocks:
+
+1.  `data{}`: inputs read in and used as "data" in the model
+2.  `parameters`{}: defines the parameters that will be estimated in the model (we will draw samples from these in the model block)
+3.  `transformed parameters`{}: defines the parameters that are calculated from other parameters (we will draw samples from parameters and transform them into quantities we care about in this block)
+4.  `model`{}: This is where the increment data model, diameter data model and liklihood function are defined
+
+```{R}
+#| class-output: stan
+writeLines(readLines("models/growth_model_RW.stan"))
+```
 
 ### Running the model: Example for a short run
 
@@ -129,44 +142,55 @@ The model output is a `stanfit` object. We can use this object to assess model f
 
 The default view for the object is a summary that shows summary statistics for the posterior samples for the model parameters. To access the summary table, you can use `summary(fit_RW)` There are arguments we can pass to the summary function to look at particular parameters, and specific the quantiles we want (among other things).
 
-Below we look at a summary for the `sig_x` parameter, which characterizes the process uncertainty for each species.
+Below we look at a summary for the `sig_x` parameter, which characterizes the process uncertainty for each species, and the `sig_x_obs` parameter, which characterizes the increment data uncertainty for all of the data.
 
 ```{r}
 #| eval: TRUE
 
-fit_RW
+#fit_RW
+length(names(fit_RW)) # there are alot of parameters estimated in this model--each year for every tree has an estimated diameter (D[]), and an estimated increment ("X"), as well as an initial diameter estimate (D0[]).
 
-summary(fit_RW)$summary
+#summary(fit_RW)$summary # this will make a summary of the whole model fit, but is not loaded because there are so many parameters. Lets visualize a the taxa-level observation error and population-level observation errors for the increment uncertainty:
 
-summary(fit_RW, pars = c('sig_x'), probs = c(0.1, 0.9))$summary
+summary(fit_RW, pars = c('sig_x', 'sig_x_obs'), probs = c(0.1, 0.9))$summary
+
 ```
 
+## Evaluating model convergence--how do we know we have enough iterations sampled? 
+While not a complete list, we will look at 3 ways of evaluating the stan model fit itself:
+1. Effective sample size
+2. Rhat
+3. Visualizing traceplots
+
+### Effective Sample Size
 The summary table also includes columns for effective sample size (`n_eff`) and `Rhat`. The effective sample size is a statistic used to estimate the number of posterior samples after accounting for autocorrelation. We want this number to be large. There is no definitive rule about the minimum `n_eff` needed to conclude that you have enough samples to make inference about model parameters, but the generally accepted minimum is 100 or 200 ESS for each parameter. In some cases the effective sample size can be larger than the total number of iterations.
 
 We can use `stan_ess` to plot a histogram of the ratio of the effective sample size to the total number of iterations. The larger this value the better. Note than it can be larger than 1 because the ESS can be larger than the total number of iterations.
 
+```{r}
+#| eval: TRUE
+stan_ess(fit_RW)
+```
+### Rhat
 `Rhat` is a statistic that estimates model convergence. It is one way to try to answer the question: has the sampler converged sufficiently so that we are getting samples from the posterior distribution? At convergence, `Rhat` is equal to 1. Perfect convergence is hard to achieve in practice, so generally we want `Rhat` smaller than 1.01 (but this is not always possible for all parameters for some complex models).
 
 ```{r}
 #| eval: TRUE
 stan_rhat(fit_RW)
-
-stan_ess(fit_RW)
 ```
-
+### Traceplots
+Traceplots are useful to visualize if all the different chains are converging on a similar estimate for each value. Here we only show one chain, so it may not be as useful, but we can see that this estimate is varying around a mean value (and not slowly trending up/down over the number of samples).
+```{r}
+#| eval: TRUE
+traceplot(fit_RW, pars = c('sig_x_obs'))
+```
+## Visualizing the model estimates:
 We will want to work with posterior samples for the model parameters, and we can get these by extracting them from the model output object into an easier to work with object. This object is a three dimensional array, which dimensions equal to the number of iterations BY the number of chains BY the number of parameters.
 
 ```{r}
 #| eval: TRUE
-
-# show extract code?
-
-post_RW
-
 class(post_RW)
-
 dim(post_RW)
-
 ```
 
 #### histograms of data and process uncertainty
@@ -178,6 +202,7 @@ Here we will consider the species specific process uncertainty parameter, `sig_x
 First we summarize the posterior samples for `sig_x` by species.
 
 ```{R}
+# this code is pulling out the model samples for each iteration and aligning the estimated process uncertainties for each taxa:
 variables = names(post_RW[1,1,])
 allSX = grep('sig_x\\[',variables)
 
@@ -197,6 +222,7 @@ sig_x_mean = sig_x_mean[order(sig_x_mean$sig_x_mean),]
 
 post_sx_melt$species_code = factor(post_sx_melt$species_code, levels=sig_x_mean$species_code)
 
+# plot up the species level increment uncertainties
 p = ggplot(data=post_sx_melt) +
   # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
   geom_violin(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
@@ -208,14 +234,13 @@ print(p)
 p = ggplot(data=post_sx_melt) +
   geom_histogram(aes(x=sigma_x, , y=after_stat(density), colour=model, fill=model), alpha=0.5) +
   theme_bw(14) +
-  xlab('Species') +
-  ylab('sigma_x') +
+  xlab('sigma_x (increment data uncertainty)') +
   facet_wrap(~species_code)
 print(p)
 
 ```
 
-Then we look at the trace plots for the `sig_x` parameter for each species.
+Then we look at the trace plots for the `sig_x` parameter for each species. Have all of these converged after 500 iterations?
 
 ```{R}
 
@@ -250,16 +275,14 @@ p = ggplot(data=post_sxobs) +
   # geom_boxplot(aes(x=species_code, y=sigma_x, colour=model, fill=model), alpha=0.5) +
   geom_violin(aes(x=model, y=sigma_x_obs, colour=model, fill=model), alpha=0.5) +
   theme_bw(14) +
-  xlab('Species') +
+  #xlab('Species') +
   ylab('sigma_x')
 print(p)
 
 
 p = ggplot(data=post_sxobs) +
   geom_histogram(aes(x=sigma_x_obs, y=after_stat(density), colour=model, fill=model)) +
-  theme_bw(14) +
-  xlab('Species') +
-  ylab('sigma_x')
+  theme_bw(14) 
 print(p)
 
 p = ggplot(data=post_sxobs) +
@@ -271,7 +294,7 @@ p = ggplot(data=post_sxobs) +
 print(p)
 ```
 
-#### chronology-like
+#### Visualizing chronology-like effects: year random effects
 
 Here we will also look at some summary figures for the `beta_t` parameter. For each species, there is a `beta_t` parameter for each year. This parameter is conceptually the same as a forest chronology; it is a time series that describes the common forest growth signal for a given species.
 
@@ -279,7 +302,7 @@ We could look at summary plots for the posterior samples for a given year for a 
 
 We do want to visualize the `beta_t` chronology-like parameters as species-specific time series.
 
-```{R}
+```{R, fig.width=5, fig.height=7}
 
 allBTs = grep('beta_t\\[',variables)
 post_bt = post_RW[,,allBTs]
@@ -314,11 +337,11 @@ print(p)
 
 ```
 
-#### Growth plots for some trees
+#### RW-only model estimated Tree Daimaeter and Growth plots (for some trees)
 
 For the purpose of this workflow, we are most interested in the model inferred tree growth. For each tree, we have parameter estimates that describe increment and diameter growth through for each year.
 
-Here we visualize inferred and observed diameter data for one tree (Tree 1).
+Here we visualize inferred and observed diameter data for one tree (Tree 1). Filled circles indicate the diameter measurement included in this model and hollow circles are census diameter measurements not included in the model. 
 
 ```{R}
 
@@ -606,6 +629,7 @@ q = ggplot(data=rw_validate) +
 print(q)
 ```
 
+
 # 2. Growth to Biomass
 
 We will use the model inferred tree growth to determine tree biomass. This is done using allometric equations, which are used to determine tree biomass based on tree size. In this workflow, we will use the allometric equations from Chojnacky et al. (XXXX). For each species, tree biomass is determined by tree diameter using the equation AGB = exp(beta0 + beta1 \* log(DBH)), where beta0 and beta1 are published parameter values (estimated using destructive sampling that involves cutting down and weighing trees).
@@ -627,6 +651,8 @@ For each tree, for each year, and for each posterior diameter sample we determin
 We also reorganize the data to facilitate visualization.
 
 ```{R}
+#| echo: FALSE
+#| warning: false
 # first for RW only model (no census)
 dbh_array_RW = array(NA, dim = c(N_Tr, N_years, iter))
 agb_array_RW = array(NA, dim = c(N_Tr, N_years, iter))
