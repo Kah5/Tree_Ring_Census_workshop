@@ -40,13 +40,17 @@ Forest censuses, which re-measure individual trees over time, (e.g. Nationwide f
 Estimates of forest carbon and tree-level biomass over time are useful for a variety of applications, including: -understanding drivers of growth and mortality -quantifying the relative roles of growth, mortality, and regeneration in driving forest C over time
 
 ## Workshop Outline:
+We will work through a series of modules
 
 1.  Introduction & how to work through this tutorial (i.e. this page)
 2.  Introduction of Harvard Forest Census and Tree Ring Data
-3.  
+3.  Estimating Biomass from Ring width & Census data (no uncertainty)
+3.  Bayesian Growth Model Introduction
+4.  Ring-width only model
+5.  CENSUS only model
+6.  Ring-width + CENSUS data
+7.  Comparing all three estimates
 
-## Introduce the state-space approach that links tree ring data with forest census data
-
-## Introduction to Bayesian Statistics
-
-1.  Introduce Bayesian statistical techniques using a linear regression
+## Two options for how to work through this workshop:
+1. No-code: Work though on this website
+2. Running .qmd files on Posit Cloud--.qmd files can be run similarly to rmarkdown files
