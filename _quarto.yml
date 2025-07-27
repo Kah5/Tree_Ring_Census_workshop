@@ -16,7 +16,7 @@ project:
       - Module_8_Comparing_Biomass_Estimates.qmd
 
 website:
-  title: "State Space Model Workshop 2025, Livingstone, Zambia"
+  title: "Forest growth and carbon with uncertainty from tree-rings and census data, World Dendro Workshop 2025, Livingstone, Zambia"
   repo-actions: [issue]
   navbar:
     background: primary
