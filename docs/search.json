@@ -378,7 +378,18 @@
     "href": "index.html#schedule",
     "title": "Welcome and Schedule",
     "section": "Schedule",
-    "text": "Schedule\n\n\n\n\n\n\n\n\nTime\nTopic\nPresenter\n\n\n\n\n9:00 - 10:00\nModule 1: Introduction\n\n\n\n10:00 - 10:30\nModule 2: Tree Ring and Census Data\n\n\n\n10:30 - 11:00\nModule 3: Biomass Estimation\n\n\n\n11:00 - 11:30\nModule 4: Tree ring only model\n\n\n\n11:30 - 12:00\nModule 5: Tree ring and forest census model\n\n\n\n12:00 - 12:30\nModule 6: Comparing Biomass Estimates\n\n\n\n12:30 - 1:30\nLunch break\n\n\n\n1:30 - 2:00\nModule 7: Adding climate variables into the State-Space Model",
+    "text": "Schedule\n\n\n\n\n\n\n\n\nTime\nTopic\nPresenter\n\n\n\n\n9:00 - 10:00\nModule 1: Introduction\nKelly, Andria, Ruby\n\n\n10:00 - 10:30\nModule 2: Tree Ring and Census Data\nKelly\n\n\n10:30 - 11:00\nModule 3: Biomass Estimation\nKelly\n\n\n11:00 - 11:15\nCoffee/Tea break?\n\n\n\n11:15 - 12:00\nModule 4: Tree ring only model\nAndria\n\n\n11:30 - 12:00\nModule 5: Tree ring and forest census model\nAndria\n\n\n12:00 - 12:30\nModule 6: Comparing Biomass Estimates\nAndria/Kelly\n\n\n12:30 - 1:30\nLunch",
+    "crumbs": [
+      "Home",
+      "Welcome and Schedule"
+    ]
+  },
+  {
+    "objectID": "index.html#two-options-for-how-to-work-through-this-workshop",
+    "href": "index.html#two-options-for-how-to-work-through-this-workshop",
+    "title": "Welcome and Schedule",
+    "section": "Two options for how to work through this workshop:",
+    "text": "Two options for how to work through this workshop:\n\nNo-code: Work though on this website\nRunning .qmd files on Posit Cloud–.qmd files can be run similarly to rmarkdown files\n\nFollow these Instructions for getting started with this tutorial on POSIT cloud.",
     "crumbs": [
       "Home",
       "Welcome and Schedule"

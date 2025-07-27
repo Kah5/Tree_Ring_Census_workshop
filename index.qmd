@@ -19,19 +19,20 @@ We will work through examples developed in R and RStudio. Experience with R is h
 
 ## Schedule
 
-|     Time      |                             Topic                             | Presenter |
+|     Time      |                    Topic                    |      Presenter      |
 |:-----------------:|:--------------------------------:|:-----------------:|
-| 9:00 - 10:00  |                    Module 1: Introduction                     |           |
-| 10:00 - 10:30 |              Module 2: Tree Ring and Census Data              |           |
-| 10:30 - 11:00 |                 Module 3: Biomass Estimation                  |           |
-| 11:00 - 11:30 |                Module 4: Tree ring only model                 |           |
-| 11:30 - 12:00 |          Module 5: Tree ring and forest census model          |           |
-| 12:00 - 12:30 |             Module 6: Comparing Biomass Estimates             |           |
-| 12:30 - 1:30  |                          Lunch break                          |           |
-|  1:30 - 2:00  | Module 7: Adding climate variables into the State-Space Model |           |
+| 9:00 - 10:00  |           Module 1: Introduction            | Kelly, Andria, Ruby |
+| 10:00 - 10:30 |     Module 2: Tree Ring and Census Data     |        Kelly        |
+| 10:30 - 11:00 |        Module 3: Biomass Estimation         |        Kelly        |
+| 11:00 - 11:15 |              Coffee/Tea break?              |                     |
+| 11:15 - 12:00 |       Module 4: Tree ring only model        |       Andria        |
+| 11:30 - 12:00 | Module 5: Tree ring and forest census model |       Andria        |
+| 12:00 - 12:30 |    Module 6: Comparing Biomass Estimates    |    Andria/Kelly     |
+| 12:30 - 1:30  |                    Lunch                    |                     |
 
-# In preparation for the workshop
+## Two options for how to work through this workshop:
 
-If you would like to follow along and run each module in R, you should:
+1.  No-code: Work though on this website
+2.  Running .qmd files on Posit Cloud--.qmd files can be run similarly to rmarkdown files
 
-1.  make a posit cloud account
+Follow these [Instructions for getting started with this tutorial on POSIT cloud](https://docs.google.com/document/d/1K5ZSQT7rf6SouKSRQ0KpPjsGdl-d3WjMrmQ_Kxj66fw/edit?usp=sharing).
