@@ -14,6 +14,7 @@ project:
       - Module_6_Census_only.qmd
       - Module_7_RingWidth_and_Census.qmd
       - Module_8_Comparing_Biomass_Estimates.qmd
+      - Additional_Resources.qmd
 
 website:
   title: "Forest growth and carbon with uncertainty from tree-rings and census data, World Dendro Workshop 2025, Livingstone, Zambia"
@@ -43,6 +44,7 @@ website:
       - Module_6_Census_only.qmd
       - Module_7_RingWidth_and_Census.qmd
       - Module_8_Comparing_Biomass_Estimates.qmd
+      - Additional_Resources.qmd
   page-navigation: true
 
 format:
